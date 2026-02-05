@@ -1,6 +1,7 @@
 "use client"
 
-import { MoreVertical, Trash2, MessageCircle, Send, Copy } from "lucide-react"
+import { useState } from "react"
+import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -26,7 +27,9 @@ import {
   orderStatusLabels,
   orderStatuses,
 } from "@/lib/validations/orders"
-import type { OrderStatus } from "@/lib/db/schema"
+import type { OrderStatus, PaymentStatus } from "@/lib/db/schema"
+import { PaymentModal } from "./payment-modal"
+import { cn } from "@/lib/utils"
 
 const statusVariants: Record<OrderStatus, "pending" | "info" | "warning" | "success" | "secondary" | "destructive"> = {
   pending_quote: "pending",
@@ -38,7 +41,24 @@ const statusVariants: Record<OrderStatus, "pending" | "info" | "warning" | "succ
   cancelled: "destructive",
 }
 
-function OrderCard({ order }: { order: OrderWithClient }) {
+const paymentStatusLabels: Record<PaymentStatus, string> = {
+  pending: "Sin pagar",
+  partial: "Pago parcial",
+  paid: "Pagado",
+}
+
+const paymentStatusVariants: Record<PaymentStatus, "destructive" | "warning" | "success"> = {
+  pending: "destructive",
+  partial: "warning",
+  paid: "success",
+}
+
+interface OrderCardProps {
+  order: OrderWithClient
+  onPayment: (order: OrderWithClient) => void
+}
+
+function OrderCard({ order, onPayment }: OrderCardProps) {
   const updateOrder = useUpdateOrder()
   const deleteOrder = useDeleteOrder()
   const duplicateOrder = useDuplicateOrder()
@@ -64,6 +84,8 @@ function OrderCard({ order }: { order: OrderWithClient }) {
   const clientName = order.client?.name?.split(" ")[0] || "cliente"
   const hasPhone = !!order.client?.phone
   const hasInstagram = !!order.client?.instagramHandle
+  const hasPrice = !!order.price && Number(order.price) > 0
+  const paymentStatus = (order.paymentStatus || "pending") as PaymentStatus
 
   // Get appropriate message based on status
   const getQuickMessage = () => {
@@ -111,11 +133,26 @@ function OrderCard({ order }: { order: OrderWithClient }) {
             </p>
           )}
 
-          {/* Price and due date */}
+          {/* Price and payment status */}
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             {order.price && (
               <span className="font-medium">
                 ${Number(order.price).toLocaleString("es-AR")}
+              </span>
+            )}
+            {hasPrice && (
+              <span className={cn(
+                "inline-flex items-center gap-1 text-xs font-medium",
+                paymentStatus === "paid" && "text-green-600",
+                paymentStatus === "partial" && "text-orange-600",
+                paymentStatus === "pending" && "text-muted-foreground"
+              )}>
+                {paymentStatus === "paid" && <CheckCircle className="h-3 w-3" />}
+                {paymentStatus === "partial" && <Clock className="h-3 w-3" />}
+                {paymentStatusLabels[paymentStatus]}
+                {paymentStatus === "partial" && order.paymentAmount && (
+                  <span>(${Number(order.paymentAmount).toLocaleString("es-AR")})</span>
+                )}
               </span>
             )}
             {order.dueDate && (
@@ -149,6 +186,15 @@ function OrderCard({ order }: { order: OrderWithClient }) {
                 Instagram
               </a>
             )}
+            {hasPrice && paymentStatus !== "paid" && (
+              <button
+                onClick={() => onPayment(order)}
+                className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
+              >
+                <Receipt className="h-3.5 w-3.5" />
+                Registrar Pago
+              </button>
+            )}
             {hasPhone && (
               <a
                 href={`tel:${order.client!.phone}`}
@@ -158,6 +204,19 @@ function OrderCard({ order }: { order: OrderWithClient }) {
               </a>
             )}
           </div>
+
+          {/* Receipt link if exists */}
+          {order.receiptUrl && (
+            <a
+              href={order.receiptUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
+            >
+              <Receipt className="h-3 w-3" />
+              Ver comprobante
+            </a>
+          )}
 
           {/* Created at */}
           <p className="mt-2 text-xs text-muted-foreground">
@@ -187,6 +246,15 @@ function OrderCard({ order }: { order: OrderWithClient }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {hasPrice && (
+                <>
+                  <DropdownMenuItem onClick={() => onPayment(order)}>
+                    <Receipt className="mr-2 h-4 w-4" />
+                    {paymentStatus === "paid" ? "Ver pago" : "Registrar pago"}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               {hasPhone && (
                 <>
                   <DropdownMenuItem asChild>
@@ -234,6 +302,7 @@ function OrderCard({ order }: { order: OrderWithClient }) {
 
 export function OrderList() {
   const { statusFilter, serviceFilter, quickFilter } = useUIStore()
+  const [paymentOrder, setPaymentOrder] = useState<OrderWithClient | null>(null)
 
   const { data: orders = [], isLoading, error } = useOrders({
     status: statusFilter !== "all" ? statusFilter : undefined,
@@ -300,10 +369,22 @@ export function OrderList() {
   }
 
   return (
-    <div className="space-y-3">
-      {filteredOrders.map((order) => (
-        <OrderCard key={order.id} order={order} />
-      ))}
-    </div>
+    <>
+      <div className="space-y-3">
+        {filteredOrders.map((order) => (
+          <OrderCard
+            key={order.id}
+            order={order}
+            onPayment={setPaymentOrder}
+          />
+        ))}
+      </div>
+
+      <PaymentModal
+        order={paymentOrder}
+        open={!!paymentOrder}
+        onClose={() => setPaymentOrder(null)}
+      />
+    </>
   )
 }

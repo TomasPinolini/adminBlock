@@ -41,6 +41,13 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "client_updated",
   "client_deleted",
   "comment_added",
+  "payment_registered",
+])
+
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "pending",
+  "partial",
+  "paid",
 ])
 
 // Tables
@@ -64,6 +71,11 @@ export const orders = pgTable("orders", {
   description: text("description"),
   price: numeric("price", { precision: 10, scale: 2 }),
   dueDate: date("due_date"),
+  // Payment fields
+  paymentStatus: paymentStatusEnum("payment_status").default("pending").notNull(),
+  paymentAmount: numeric("payment_amount", { precision: 10, scale: 2 }),
+  receiptUrl: text("receipt_url"),
+  paidAt: timestamp("paid_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
@@ -161,3 +173,4 @@ export type NewActivityLog = typeof activityLogs.$inferInsert
 export type ServiceType = (typeof serviceTypeEnum.enumValues)[number]
 export type OrderStatus = (typeof orderStatusEnum.enumValues)[number]
 export type ActivityType = (typeof activityTypeEnum.enumValues)[number]
+export type PaymentStatus = (typeof paymentStatusEnum.enumValues)[number]

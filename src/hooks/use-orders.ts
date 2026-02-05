@@ -135,3 +135,51 @@ export function useDuplicateOrder() {
     },
   })
 }
+
+// Payment
+async function registerPayment({
+  orderId,
+  paymentAmount,
+  receipt,
+}: {
+  orderId: string
+  paymentAmount: number
+  receipt?: File
+}): Promise<{
+  order: Order
+  validation: {
+    orderPrice: number
+    totalPaid: number
+    amountMatch: boolean
+    difference: number
+    status: string
+  }
+}> {
+  const formData = new FormData()
+  formData.append("paymentAmount", paymentAmount.toString())
+  if (receipt) {
+    formData.append("receipt", receipt)
+  }
+
+  const res = await fetch(`/api/orders/${orderId}/payment`, {
+    method: "POST",
+    body: formData,
+  })
+  if (!res.ok) {
+    const error = await res.json()
+    throw new Error(error.error || "Error al registrar pago")
+  }
+  return res.json()
+}
+
+export function useRegisterPayment() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: registerPayment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] })
+      queryClient.invalidateQueries({ queryKey: ["stats"] })
+    },
+  })
+}

@@ -12,7 +12,8 @@
       "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial AdminBlock implementation\n\n- Next.js 14 App Router with TypeScript\n- Supabase auth + Postgres database\n- Drizzle ORM schema \\(clients, orders, comments, attachments\\)\n- Mobile-responsive layout with bottom navigation\n- Orders and clients CRUD with TanStack Query\n- WhatsApp/Instagram quick message integration\n- Spanish UI for family print shop business\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git push:*)",
       "Bash(npx vercel:*)",
-      "WebFetch(domain:blockimpresos.com)"
+      "WebFetch(domain:blockimpresos.com)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: improve clients section with stats, edit, and quick contacts\n\n- Add order statistics per client \\(count, total spent, last order\\)\n- Add edit client functionality with modal reuse\n- Add quick contact buttons \\(WhatsApp, Instagram, call\\)\n- Add client stats dashboard \\(total, new this month, top client, revenue\\)\n- Create /api/clients/stats endpoint for client analytics\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }

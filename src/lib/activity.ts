@@ -51,6 +51,7 @@ export function formatActivityDescription(
     client_updated: `Cliente actualizado: ${entityName || ""}`,
     client_deleted: `Cliente eliminado: ${entityName || ""}`,
     comment_added: "Comentario agregado",
+    payment_registered: `Pago registrado${entityName ? ` - $${entityName}` : ""}`,
   }
   return descriptions[type]
 }
