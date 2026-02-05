@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic"
 
-import { Plus, Download } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -14,21 +14,31 @@ import {
 import { useUIStore } from "@/stores/ui-store"
 import {
   serviceTypes,
-  orderStatuses,
   serviceTypeLabels,
-  orderStatusLabels,
 } from "@/lib/validations/orders"
 import { OrderList } from "@/components/orders/order-list"
 import { OrderFormModal } from "@/components/orders/order-form-modal"
+import { DashboardStats } from "@/components/orders/dashboard-stats"
+import { QuickFilters } from "@/components/orders/quick-filters"
 
 export default function OrdersPage() {
   const {
-    statusFilter,
     serviceFilter,
     setStatusFilter,
     setServiceFilter,
+    setQuickFilter,
     setCreateOrderModalOpen,
   } = useUIStore()
+
+  const handleStatsFilterChange = (filter: string) => {
+    if (filter === "overdue") {
+      setQuickFilter("overdue")
+    } else if (filter === "due_today") {
+      setQuickFilter("due_today")
+    } else {
+      setStatusFilter(filter as any)
+    }
+  }
 
   return (
     <>
@@ -51,35 +61,22 @@ export default function OrdersPage() {
           </Button>
         </div>
 
-        {/* Filters - stack on mobile */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Select
-            value={statusFilter}
-            onValueChange={(value) =>
-              setStatusFilter(value as typeof statusFilter)
-            }
-          >
-            <SelectTrigger className="w-full sm:w-[160px] h-11 lg:h-9">
-              <SelectValue placeholder="Estado" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos los estados</SelectItem>
-              {orderStatuses.map((status) => (
-                <SelectItem key={status} value={status}>
-                  {orderStatusLabels[status]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Dashboard Stats */}
+        <DashboardStats onFilterChange={handleStatsFilterChange} />
 
+        {/* Quick Filters */}
+        <QuickFilters />
+
+        {/* Service Filter */}
+        <div className="flex items-center gap-3">
           <Select
             value={serviceFilter}
             onValueChange={(value) =>
               setServiceFilter(value as typeof serviceFilter)
             }
           >
-            <SelectTrigger className="w-full sm:w-[160px] h-11 lg:h-9">
-              <SelectValue placeholder="Servicio" />
+            <SelectTrigger className="w-full sm:w-[180px] h-10 lg:h-9">
+              <SelectValue placeholder="Tipo de servicio" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los servicios</SelectItem>

@@ -1,6 +1,8 @@
 import { create } from "zustand"
 import { OrderStatus, ServiceType } from "@/lib/db/schema"
 
+export type QuickFilter = "overdue" | "due_today" | null
+
 interface UIState {
   // Sidebar
   sidebarOpen: boolean
@@ -10,8 +12,10 @@ interface UIState {
   // Orders filters
   statusFilter: OrderStatus | "all"
   serviceFilter: ServiceType | "all"
+  quickFilter: QuickFilter
   setStatusFilter: (status: OrderStatus | "all") => void
   setServiceFilter: (service: ServiceType | "all") => void
+  setQuickFilter: (filter: QuickFilter) => void
   resetFilters: () => void
 
   // Modals
@@ -30,9 +34,11 @@ export const useUIStore = create<UIState>((set) => ({
   // Orders filters
   statusFilter: "all",
   serviceFilter: "all",
-  setStatusFilter: (status) => set({ statusFilter: status }),
+  quickFilter: null,
+  setStatusFilter: (status) => set({ statusFilter: status, quickFilter: null }),
   setServiceFilter: (service) => set({ serviceFilter: service }),
-  resetFilters: () => set({ statusFilter: "all", serviceFilter: "all" }),
+  setQuickFilter: (filter) => set({ quickFilter: filter, statusFilter: "all" }),
+  resetFilters: () => set({ statusFilter: "all", serviceFilter: "all", quickFilter: null }),
 
   // Modals
   createOrderModalOpen: false,

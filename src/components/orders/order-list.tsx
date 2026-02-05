@@ -233,11 +233,34 @@ function OrderCard({ order }: { order: OrderWithClient }) {
 }
 
 export function OrderList() {
-  const { statusFilter, serviceFilter } = useUIStore()
+  const { statusFilter, serviceFilter, quickFilter } = useUIStore()
 
   const { data: orders = [], isLoading, error } = useOrders({
     status: statusFilter !== "all" ? statusFilter : undefined,
     serviceType: serviceFilter !== "all" ? serviceFilter : undefined,
+  })
+
+  // Apply quick filters client-side
+  const filteredOrders = orders.filter((order) => {
+    if (!quickFilter) return true
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const todayStr = today.toISOString().split("T")[0]
+
+    if (quickFilter === "overdue") {
+      if (!order.dueDate) return false
+      if (order.status === "delivered" || order.status === "cancelled") return false
+      return new Date(order.dueDate) < today
+    }
+
+    if (quickFilter === "due_today") {
+      if (!order.dueDate) return false
+      if (order.status === "delivered" || order.status === "cancelled") return false
+      return order.dueDate === todayStr
+    }
+
+    return true
   })
 
   if (isLoading) {
@@ -261,18 +284,24 @@ export function OrderList() {
     )
   }
 
-  if (orders.length === 0) {
+  if (filteredOrders.length === 0) {
+    const hasFilters = statusFilter !== "all" || serviceFilter !== "all" || quickFilter !== null
+
     return (
       <div className="rounded-lg border bg-background p-6 lg:p-8 text-center text-muted-foreground">
-        <p className="text-base lg:text-lg font-medium">No hay pedidos</p>
-        <p className="text-sm mt-1">Crea tu primer pedido para comenzar</p>
+        <p className="text-base lg:text-lg font-medium">
+          {hasFilters ? "No hay pedidos con estos filtros" : "No hay pedidos"}
+        </p>
+        <p className="text-sm mt-1">
+          {hasFilters ? "Prueba con otros filtros" : "Crea tu primer pedido para comenzar"}
+        </p>
       </div>
     )
   }
 
   return (
     <div className="space-y-3">
-      {orders.map((order) => (
+      {filteredOrders.map((order) => (
         <OrderCard key={order.id} order={order} />
       ))}
     </div>

@@ -95,6 +95,7 @@ export function useCreateOrder() {
     mutationFn: createOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] })
+      queryClient.invalidateQueries({ queryKey: ["stats"] })
     },
   })
 }
@@ -106,6 +107,7 @@ export function useUpdateOrder() {
     mutationFn: updateOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] })
+      queryClient.invalidateQueries({ queryKey: ["stats"] })
     },
   })
 }
@@ -117,6 +119,7 @@ export function useDeleteOrder() {
     mutationFn: deleteOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] })
+      queryClient.invalidateQueries({ queryKey: ["stats"] })
     },
   })
 }
@@ -128,6 +131,7 @@ export function useDuplicateOrder() {
     mutationFn: duplicateOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] })
+      queryClient.invalidateQueries({ queryKey: ["stats"] })
     },
   })
 }
