@@ -3,6 +3,8 @@ import { db } from "@/lib/db"
 import { orders, clients } from "@/lib/db/schema"
 import { createOrderSchema } from "@/lib/validations/orders"
 import { desc, eq } from "drizzle-orm"
+import { logActivity } from "@/lib/activity"
+import { createClient } from "@/lib/supabase/server"
 
 export async function GET(request: NextRequest) {
   try {
@@ -56,6 +58,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validated = createOrderSchema.parse(body)
 
+    // Get current user
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
     const [newOrder] = await db
       .insert(orders)
       .values({
@@ -66,6 +72,17 @@ export async function POST(request: NextRequest) {
         dueDate: validated.dueDate || null,
       })
       .returning()
+
+    // Log activity
+    await logActivity({
+      type: "order_created",
+      userId: user?.id,
+      userEmail: user?.email,
+      entityType: "order",
+      entityId: newOrder.id,
+      description: `Pedido creado: ${validated.serviceType}`,
+      metadata: { serviceType: validated.serviceType },
+    })
 
     return NextResponse.json(newOrder, { status: 201 })
   } catch (error) {

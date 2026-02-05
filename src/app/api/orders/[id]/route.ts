@@ -3,6 +3,8 @@ import { db } from "@/lib/db"
 import { orders, clients, orderComments } from "@/lib/db/schema"
 import { updateOrderSchema } from "@/lib/validations/orders"
 import { eq, desc } from "drizzle-orm"
+import { logActivity } from "@/lib/activity"
+import { createClient } from "@/lib/supabase/server"
 
 export async function GET(
   request: NextRequest,
@@ -66,6 +68,16 @@ export async function PATCH(
     const body = await request.json()
     const validated = updateOrderSchema.parse(body)
 
+    // Get current order to check for status change
+    const [currentOrder] = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.id, id))
+
+    // Get current user
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
     const [updatedOrder] = await db
       .update(orders)
       .set({ ...validated, updatedAt: new Date() })
@@ -78,6 +90,22 @@ export async function PATCH(
         { status: 404 }
       )
     }
+
+    // Log activity - check if it was a status change
+    const isStatusChange = validated.status && currentOrder?.status !== validated.status
+    await logActivity({
+      type: isStatusChange ? "order_status_changed" : "order_updated",
+      userId: user?.id,
+      userEmail: user?.email,
+      entityType: "order",
+      entityId: id,
+      description: isStatusChange
+        ? `Estado cambiado: ${currentOrder?.status} → ${validated.status}`
+        : "Pedido actualizado",
+      metadata: isStatusChange
+        ? { from: currentOrder?.status, to: validated.status }
+        : validated,
+    })
 
     return NextResponse.json(updatedOrder)
   } catch (error) {
@@ -95,6 +123,11 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
+
+    // Get current user
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
     const [deletedOrder] = await db
       .delete(orders)
       .where(eq(orders.id, id))
@@ -106,6 +139,17 @@ export async function DELETE(
         { status: 404 }
       )
     }
+
+    // Log activity
+    await logActivity({
+      type: "order_deleted",
+      userId: user?.id,
+      userEmail: user?.email,
+      entityType: "order",
+      entityId: id,
+      description: `Pedido eliminado: ${deletedOrder.serviceType}`,
+      metadata: { serviceType: deletedOrder.serviceType },
+    })
 
     return NextResponse.json({ success: true })
   } catch (error) {

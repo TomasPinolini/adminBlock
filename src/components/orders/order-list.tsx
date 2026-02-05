@@ -1,6 +1,6 @@
 "use client"
 
-import { MoreVertical, Trash2, MessageCircle, Send } from "lucide-react"
+import { MoreVertical, Trash2, MessageCircle, Send, Copy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useOrders, useUpdateOrder, useDeleteOrder, type OrderWithClient } from "@/hooks/use-orders"
+import { useOrders, useUpdateOrder, useDeleteOrder, useDuplicateOrder, type OrderWithClient } from "@/hooks/use-orders"
 import { useUIStore } from "@/stores/ui-store"
 import { formatDate, formatRelative, isOverdue } from "@/lib/utils/dates"
 import { getWhatsAppLink, getInstagramLink, messageTemplates } from "@/lib/utils/messaging"
@@ -41,6 +41,7 @@ const statusVariants: Record<OrderStatus, "pending" | "info" | "warning" | "succ
 function OrderCard({ order }: { order: OrderWithClient }) {
   const updateOrder = useUpdateOrder()
   const deleteOrder = useDeleteOrder()
+  const duplicateOrder = useDuplicateOrder()
 
   const handleStatusChange = async (newStatus: string) => {
     await updateOrder.mutateAsync({
@@ -53,6 +54,10 @@ function OrderCard({ order }: { order: OrderWithClient }) {
     if (confirm("Eliminar este pedido?")) {
       await deleteOrder.mutateAsync(order.id)
     }
+  }
+
+  const handleDuplicate = async () => {
+    await duplicateOrder.mutateAsync(order.id)
   }
 
   const overdue = isOverdue(order.dueDate)
@@ -207,6 +212,11 @@ function OrderCard({ order }: { order: OrderWithClient }) {
                   <DropdownMenuSeparator />
                 </>
               )}
+              <DropdownMenuItem onClick={handleDuplicate}>
+                <Copy className="mr-2 h-4 w-4" />
+                Duplicar
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleDelete}
                 className="text-destructive focus:text-destructive"

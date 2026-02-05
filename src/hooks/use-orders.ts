@@ -65,6 +65,14 @@ async function deleteOrder(id: string): Promise<void> {
   if (!res.ok) throw new Error("Error al eliminar pedido")
 }
 
+async function duplicateOrder(id: string): Promise<Order> {
+  const res = await fetch(`/api/orders/${id}/duplicate`, {
+    method: "POST",
+  })
+  if (!res.ok) throw new Error("Error al duplicar pedido")
+  return res.json()
+}
+
 export function useOrders(params?: FetchOrdersParams) {
   return useQuery({
     queryKey: ["orders", params],
@@ -107,6 +115,17 @@ export function useDeleteOrder() {
 
   return useMutation({
     mutationFn: deleteOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] })
+    },
+  })
+}
+
+export function useDuplicateOrder() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: duplicateOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] })
     },

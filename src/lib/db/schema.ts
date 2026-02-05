@@ -31,6 +31,18 @@ export const orderStatusEnum = pgEnum("order_status", [
   "cancelled",
 ])
 
+export const activityTypeEnum = pgEnum("activity_type", [
+  "order_created",
+  "order_updated",
+  "order_status_changed",
+  "order_deleted",
+  "order_duplicated",
+  "client_created",
+  "client_updated",
+  "client_deleted",
+  "comment_added",
+])
+
 // Tables
 export const clients = pgTable("clients", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -87,6 +99,18 @@ export const servicePrices = pgTable("service_prices", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
+export const activityLogs = pgTable("activity_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  activityType: activityTypeEnum("activity_type").notNull(),
+  userId: uuid("user_id"), // References auth.users
+  userEmail: text("user_email"),
+  entityType: text("entity_type").notNull(), // "order", "client"
+  entityId: uuid("entity_id").notNull(),
+  description: text("description").notNull(),
+  metadata: text("metadata"), // JSON string for extra details
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
 // Relations
 export const clientsRelations = relations(clients, ({ many }) => ({
   orders: many(orders),
@@ -131,5 +155,9 @@ export type NewOrderAttachment = typeof orderAttachments.$inferInsert
 export type ServicePrice = typeof servicePrices.$inferSelect
 export type NewServicePrice = typeof servicePrices.$inferInsert
 
+export type ActivityLog = typeof activityLogs.$inferSelect
+export type NewActivityLog = typeof activityLogs.$inferInsert
+
 export type ServiceType = (typeof serviceTypeEnum.enumValues)[number]
 export type OrderStatus = (typeof orderStatusEnum.enumValues)[number]
+export type ActivityType = (typeof activityTypeEnum.enumValues)[number]
