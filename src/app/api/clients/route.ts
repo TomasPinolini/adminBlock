@@ -14,8 +14,9 @@ export async function GET() {
     return NextResponse.json(allClients)
   } catch (error) {
     console.error("Error fetching clients:", error)
+    const errorMessage = error instanceof Error ? error.message : "Unknown error"
     return NextResponse.json(
-      { error: "Error al obtener clientes" },
+      { error: "Error al obtener clientes", details: errorMessage },
       { status: 500 }
     )
   }
