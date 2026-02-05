@@ -37,9 +37,17 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
   const previousPaid = Number(order?.paymentAmount || 0)
   const remaining = orderPrice - previousPaid
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      if (file.size > MAX_FILE_SIZE) {
+        setError("El archivo es muy grande. Máximo 5MB.")
+        if (fileInputRef.current) fileInputRef.current.value = ""
+        return
+      }
+      setError("")
       setReceipt(file)
       // Create preview URL
       const url = URL.createObjectURL(file)
@@ -175,7 +183,7 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
                   Click para subir comprobante
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  JPG, PNG o PDF
+                  JPG, PNG o PDF (máx. 5MB)
                 </p>
               </div>
             ) : (
