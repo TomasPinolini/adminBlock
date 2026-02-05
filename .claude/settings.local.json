@@ -8,7 +8,9 @@
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
       "Bash(npm run db:push:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial AdminBlock implementation\n\n- Next.js 14 App Router with TypeScript\n- Supabase auth + Postgres database\n- Drizzle ORM schema \\(clients, orders, comments, attachments\\)\n- Mobile-responsive layout with bottom navigation\n- Orders and clients CRUD with TanStack Query\n- WhatsApp/Instagram quick message integration\n- Spanish UI for family print shop business\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)"
     ]
   }
 }
