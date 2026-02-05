@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       <div
         style={{
           fontSize: fontSize,
-          background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)",
+          background: "#2ea3f2",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -22,10 +22,11 @@ export async function GET(request: NextRequest) {
           justifyContent: "center",
           color: "white",
           fontWeight: "bold",
+          fontFamily: "Arial, sans-serif",
           borderRadius: borderRadius,
         }}
       >
-        A
+        B
       </div>
     ),
     { width: size, height: size }

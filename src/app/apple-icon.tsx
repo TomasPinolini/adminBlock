@@ -10,7 +10,7 @@ export default function AppleIcon() {
       <div
         style={{
           fontSize: 100,
-          background: "#0f172a",
+          background: "#2ea3f2",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -18,10 +18,11 @@ export default function AppleIcon() {
           justifyContent: "center",
           color: "white",
           fontWeight: "bold",
+          fontFamily: "Arial, sans-serif",
           borderRadius: 24,
         }}
       >
-        A
+        B
       </div>
     ),
     { ...size }

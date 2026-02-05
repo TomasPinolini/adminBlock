@@ -42,7 +42,7 @@ export function Sidebar() {
       {/* Header */}
       <div className="flex h-16 items-center border-b px-4">
         <Link href="/orders" className="flex items-center gap-2">
-          <span className="text-xl font-bold">AdminBlock</span>
+          <img src="/logo.png" alt="Block" className="h-8" />
         </Link>
       </div>
 
