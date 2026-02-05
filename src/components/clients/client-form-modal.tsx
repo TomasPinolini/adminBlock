@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -14,13 +14,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useUIStore } from "@/stores/ui-store"
-import { useCreateClient } from "@/hooks/use-clients"
+import { useCreateClient, useUpdateClient } from "@/hooks/use-clients"
 import { createClientSchema, type CreateClientInput } from "@/lib/validations/clients"
 
 export function ClientFormModal() {
-  const { createClientModalOpen, setCreateClientModalOpen } = useUIStore()
+  const { createClientModalOpen, setCreateClientModalOpen, editingClient, setEditingClient } = useUIStore()
   const createClient = useCreateClient()
+  const updateClient = useUpdateClient()
   const [error, setError] = useState("")
+
+  const isEditing = !!editingClient
 
   const {
     register,
@@ -31,20 +34,36 @@ export function ClientFormModal() {
     resolver: zodResolver(createClientSchema),
   })
 
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (editingClient) {
+      reset({
+        name: editingClient.name,
+        phone: editingClient.phone || "",
+        instagramHandle: editingClient.instagramHandle || "",
+        notes: editingClient.notes || "",
+      })
+    }
+  }, [editingClient, reset])
+
   const onSubmit = async (data: CreateClientInput) => {
     setError("")
     try {
-      await createClient.mutateAsync(data)
-      reset()
-      setCreateClientModalOpen(false)
+      if (isEditing) {
+        await updateClient.mutateAsync({ id: editingClient.id, data })
+      } else {
+        await createClient.mutateAsync(data)
+      }
+      handleClose()
     } catch {
-      setError("Error al crear cliente")
+      setError(isEditing ? "Error al actualizar cliente" : "Error al crear cliente")
     }
   }
 
   const handleClose = () => {
-    reset()
+    reset({ name: "", phone: "", instagramHandle: "", notes: "" })
     setError("")
+    setEditingClient(null)
     setCreateClientModalOpen(false)
   }
 
@@ -52,7 +71,7 @@ export function ClientFormModal() {
     <Dialog open={createClientModalOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Nuevo Cliente</DialogTitle>
+          <DialogTitle>{isEditing ? "Editar Cliente" : "Nuevo Cliente"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -117,7 +136,7 @@ export function ClientFormModal() {
               disabled={isSubmitting}
               className="flex-1 h-11 lg:h-9"
             >
-              {isSubmitting ? "Guardando..." : "Guardar"}
+              {isSubmitting ? "Guardando..." : isEditing ? "Actualizar" : "Guardar"}
             </Button>
           </div>
         </form>

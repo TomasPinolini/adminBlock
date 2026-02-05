@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { useUIStore } from "@/stores/ui-store"
 import { ClientList } from "@/components/clients/client-list"
 import { ClientFormModal } from "@/components/clients/client-form-modal"
+import { ClientStats } from "@/components/clients/client-stats"
 
 export default function ClientsPage() {
   const { setCreateClientModalOpen } = useUIStore()
@@ -34,6 +35,9 @@ export default function ClientsPage() {
             <span className="hidden lg:inline">Nuevo cliente</span>
           </Button>
         </div>
+
+        {/* Client Stats */}
+        <ClientStats />
 
         {/* Search */}
         <div className="flex flex-col sm:flex-row gap-3">

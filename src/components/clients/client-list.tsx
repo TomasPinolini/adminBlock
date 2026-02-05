@@ -1,19 +1,22 @@
 "use client"
 
-import { Phone, Instagram, MoreVertical, Trash2 } from "lucide-react"
+import { Phone, Instagram, MoreVertical, Trash2, Pencil, MessageCircle, Send, Package, DollarSign, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useClients, useDeleteClient } from "@/hooks/use-clients"
+import { useClients, useDeleteClient, type ClientWithStats } from "@/hooks/use-clients"
+import { useUIStore } from "@/stores/ui-store"
 import { formatRelative } from "@/lib/utils/dates"
-import type { Client } from "@/lib/db/schema"
+import { getWhatsAppLink, getInstagramLink, messageTemplates } from "@/lib/utils/messaging"
 
-function ClientCard({ client }: { client: Client }) {
+function ClientCard({ client }: { client: ClientWithStats }) {
   const deleteClient = useDeleteClient()
+  const { setEditingClient } = useUIStore()
 
   const handleDelete = async () => {
     if (confirm(`Eliminar a ${client.name}?`)) {
@@ -21,58 +24,140 @@ function ClientCard({ client }: { client: Client }) {
     }
   }
 
-  return (
-    <div className="flex items-center justify-between rounded-lg border bg-background p-4">
-      <div className="min-w-0 flex-1">
-        <h3 className="font-medium truncate">{client.name}</h3>
-        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-          {client.phone && (
-            <a
-              href={`tel:${client.phone}`}
-              className="flex items-center gap-1 hover:text-foreground"
-            >
-              <Phone className="h-3 w-3" />
-              {client.phone}
-            </a>
-          )}
-          {client.instagramHandle && (
-            <a
-              href={`https://instagram.com/${client.instagramHandle.replace("@", "")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-foreground"
-            >
-              <Instagram className="h-3 w-3" />
-              {client.instagramHandle}
-            </a>
-          )}
-        </div>
-        {client.notes && (
-          <p className="mt-1 text-sm text-muted-foreground truncate">
-            {client.notes}
-          </p>
-        )}
-        <p className="mt-1 text-xs text-muted-foreground">
-          Agregado {formatRelative(client.createdAt)}
-        </p>
-      </div>
+  const handleEdit = () => {
+    setEditingClient(client)
+  }
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={handleDelete}
-            className="text-destructive focus:text-destructive"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Eliminar
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+  const hasPhone = !!client.phone
+  const hasInstagram = !!client.instagramHandle
+  const clientFirstName = client.name.split(" ")[0]
+  const totalSpent = Number(client.totalSpent || 0)
+
+  return (
+    <div className="rounded-lg border bg-background p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          {/* Client name and contact info */}
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-medium">{client.name}</h3>
+              <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                {client.phone && (
+                  <a
+                    href={`tel:${client.phone}`}
+                    className="flex items-center gap-1 hover:text-foreground"
+                  >
+                    <Phone className="h-3 w-3" />
+                    {client.phone}
+                  </a>
+                )}
+                {client.instagramHandle && (
+                  <a
+                    href={`https://instagram.com/${client.instagramHandle.replace("@", "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 hover:text-foreground"
+                  >
+                    <Instagram className="h-3 w-3" />
+                    {client.instagramHandle}
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Order statistics */}
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+            <div className="flex items-center gap-1.5">
+              <Package className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="font-medium">{client.orderCount}</span>
+              <span className="text-muted-foreground">pedidos</span>
+            </div>
+            {totalSpent > 0 && (
+              <div className="flex items-center gap-1.5">
+                <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="font-medium">${totalSpent.toLocaleString("es-AR")}</span>
+                <span className="text-muted-foreground">total</span>
+              </div>
+            )}
+            {client.lastOrderDate && (
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Calendar className="h-3.5 w-3.5" />
+                <span>Último pedido {formatRelative(client.lastOrderDate)}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Notes */}
+          {client.notes && (
+            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+              {client.notes}
+            </p>
+          )}
+
+          {/* Quick contact buttons */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {hasPhone && (
+              <a
+                href={getWhatsAppLink(client.phone!, messageTemplates.thanks(clientFirstName))}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 transition-colors"
+              >
+                <MessageCircle className="h-3.5 w-3.5" />
+                WhatsApp
+              </a>
+            )}
+            {hasInstagram && (
+              <a
+                href={getInstagramLink(client.instagramHandle!)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1.5 text-xs font-medium text-white hover:from-purple-600 hover:to-pink-600 transition-colors"
+              >
+                <Send className="h-3.5 w-3.5" />
+                Instagram
+              </a>
+            )}
+            {hasPhone && (
+              <a
+                href={`tel:${client.phone}`}
+                className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-xs font-medium hover:bg-muted/80 transition-colors"
+              >
+                Llamar
+              </a>
+            )}
+          </div>
+
+          {/* Created at */}
+          <p className="mt-2 text-xs text-muted-foreground">
+            Cliente desde {formatRelative(client.createdAt)}
+          </p>
+        </div>
+
+        {/* Actions */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleEdit}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleDelete}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Eliminar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   )
 }
@@ -86,7 +171,7 @@ export function ClientList({ searchQuery }: { searchQuery: string }) {
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-24 animate-pulse rounded-lg border bg-muted"
+            className="h-32 animate-pulse rounded-lg border bg-muted"
           />
         ))}
       </div>

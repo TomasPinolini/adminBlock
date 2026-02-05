@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { OrderStatus, ServiceType } from "@/lib/db/schema"
+import { OrderStatus, ServiceType, Client } from "@/lib/db/schema"
 
 export type QuickFilter = "overdue" | "due_today" | null
 
@@ -23,6 +23,8 @@ interface UIState {
   setCreateOrderModalOpen: (open: boolean) => void
   createClientModalOpen: boolean
   setCreateClientModalOpen: (open: boolean) => void
+  editingClient: Client | null
+  setEditingClient: (client: Client | null) => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -45,4 +47,6 @@ export const useUIStore = create<UIState>((set) => ({
   setCreateOrderModalOpen: (open) => set({ createOrderModalOpen: open }),
   createClientModalOpen: false,
   setCreateClientModalOpen: (open) => set({ createClientModalOpen: open }),
+  editingClient: null,
+  setEditingClient: (client) => set({ editingClient: client, createClientModalOpen: client !== null }),
 }))

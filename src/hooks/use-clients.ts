@@ -1,7 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import type { Client, NewClient } from "@/lib/db/schema"
 
-async function fetchClients(): Promise<Client[]> {
+export interface ClientWithStats extends Client {
+  orderCount: number
+  totalSpent: string
+  lastOrderDate: string | null
+}
+
+async function fetchClients(): Promise<ClientWithStats[]> {
   const res = await fetch("/api/clients")
   if (!res.ok) throw new Error("Error al obtener clientes")
   return res.json()
@@ -77,5 +83,28 @@ export function useDeleteClient() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clients"] })
     },
+  })
+}
+
+// Client stats
+export interface ClientStats {
+  totalClients: number
+  newThisMonth: number
+  topClient: { id: string; name: string; totalSpent: string } | null
+  totalRevenue: number
+  activeClients: number
+}
+
+async function fetchClientStats(): Promise<ClientStats> {
+  const res = await fetch("/api/clients/stats")
+  if (!res.ok) throw new Error("Error al obtener estadisticas")
+  return res.json()
+}
+
+export function useClientStats() {
+  return useQuery({
+    queryKey: ["clients", "stats"],
+    queryFn: fetchClientStats,
+    refetchInterval: 30000,
   })
 }
