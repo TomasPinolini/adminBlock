@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { orders, clients, orderComments } from "@/lib/db/schema"
-import { updateOrderSchema } from "@/lib/validations/orders"
+import { updateOrderSchema, serviceTypeLabels } from "@/lib/validations/orders"
 import { eq, desc } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
+import { sendWhatsApp, whatsappTemplates } from "@/lib/whatsapp"
+import type { ServiceType } from "@/lib/db/schema"
 
 export async function GET(
   request: NextRequest,
@@ -68,11 +70,18 @@ export async function PATCH(
     const body = await request.json()
     const validated = updateOrderSchema.parse(body)
 
-    // Get current order to check for status change
-    const [currentOrder] = await db
-      .select()
+    // Get current order with client info to check for status change
+    const [currentOrderWithClient] = await db
+      .select({
+        order: orders,
+        clientName: clients.name,
+        clientPhone: clients.phone,
+      })
       .from(orders)
+      .leftJoin(clients, eq(orders.clientId, clients.id))
       .where(eq(orders.id, id))
+
+    const currentOrder = currentOrderWithClient?.order
 
     // Get current user
     const supabase = await createClient()
@@ -106,6 +115,43 @@ export async function PATCH(
         ? { from: currentOrder?.status, to: validated.status }
         : validated,
     })
+
+    // Send WhatsApp notification for specific status changes
+    if (isStatusChange && currentOrderWithClient?.clientPhone) {
+      const clientName = currentOrderWithClient.clientName || "Cliente"
+      const serviceLabel = serviceTypeLabels[updatedOrder.serviceType as ServiceType]
+      const notifyStatuses = ["ready", "quoted", "in_progress"]
+
+      if (notifyStatuses.includes(validated.status!)) {
+        let message: string | null = null
+
+        switch (validated.status) {
+          case "ready":
+            message = whatsappTemplates.orderReady(clientName, serviceLabel)
+            break
+          case "quoted":
+            if (updatedOrder.price) {
+              message = whatsappTemplates.quoteReady(
+                clientName,
+                serviceLabel,
+                Number(updatedOrder.price).toLocaleString("es-AR")
+              )
+            }
+            break
+          case "in_progress":
+            message = whatsappTemplates.orderInProgress(clientName, serviceLabel)
+            break
+        }
+
+        if (message) {
+          // Send in background, don't block response
+          sendWhatsApp({
+            to: currentOrderWithClient.clientPhone,
+            message,
+          }).catch((err) => console.error("WhatsApp send error:", err))
+        }
+      }
+    }
 
     return NextResponse.json(updatedOrder)
   } catch (error) {

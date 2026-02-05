@@ -42,9 +42,13 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   // Protected routes - redirect to login if not authenticated
-  const isProtectedRoute = !request.nextUrl.pathname.startsWith("/login")
+  const pathname = request.nextUrl.pathname
+  const isPublicRoute =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/api/inngest") ||
+    pathname.startsWith("/api/test-whatsapp")
 
-  if (!user && isProtectedRoute) {
+  if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     return NextResponse.redirect(url)

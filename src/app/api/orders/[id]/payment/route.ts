@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { orders } from "@/lib/db/schema"
+import { orders, clients } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
+import { sendWhatsApp, whatsappTemplates } from "@/lib/whatsapp"
 import type { PaymentStatus } from "@/lib/db/schema"
 
 export async function POST(
@@ -23,18 +24,25 @@ export async function POST(
       )
     }
 
-    // Get the order to check price
-    const [order] = await db
-      .select()
+    // Get the order with client info
+    const [orderWithClient] = await db
+      .select({
+        order: orders,
+        clientName: clients.name,
+        clientPhone: clients.phone,
+      })
       .from(orders)
+      .leftJoin(clients, eq(orders.clientId, clients.id))
       .where(eq(orders.id, id))
 
-    if (!order) {
+    if (!orderWithClient) {
       return NextResponse.json(
         { error: "Pedido no encontrado" },
         { status: 404 }
       )
     }
+
+    const order = orderWithClient.order
 
     const orderPrice = Number(order.price || 0)
     const paidAmount = Number(paymentAmount)
@@ -98,6 +106,22 @@ export async function POST(
     // Return validation info
     const amountMatch = totalPaid >= orderPrice
     const difference = orderPrice - totalPaid
+
+    // Send WhatsApp payment confirmation
+    if (orderWithClient.clientPhone) {
+      const clientName = orderWithClient.clientName || "Cliente"
+      const message = whatsappTemplates.paymentConfirmed(
+        clientName,
+        paidAmount.toLocaleString("es-AR"),
+        amountMatch ? undefined : difference.toLocaleString("es-AR")
+      )
+
+      // Send in background, don't block response
+      sendWhatsApp({
+        to: orderWithClient.clientPhone,
+        message,
+      }).catch((err) => console.error("WhatsApp send error:", err))
+    }
 
     return NextResponse.json({
       order: updatedOrder,
