@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+// Legacy service types - kept for backward compatibility
+// Services are now dynamic and loaded from the database
 export const serviceTypes = [
   "copiado",
   "tesis",
@@ -29,7 +31,9 @@ export const invoiceTypeLabels: Record<(typeof invoiceTypes)[number], string> = 
   none: "Sin factura",
 }
 
-export const serviceTypeLabels: Record<(typeof serviceTypes)[number], string> = {
+// Legacy labels - services are now dynamic
+// This is used as fallback when service is not found in database
+export const serviceTypeLabels: Record<string, string> = {
   copiado: "Copiado",
   tesis: "Tesis",
   encuadernacion: "Encuadernación",
@@ -53,9 +57,7 @@ export const orderStatusLabels: Record<(typeof orderStatuses)[number], string> =
 export const createOrderSchema = z.object({
   clientId: z.string().uuid("Cliente inválido"),
   personId: z.string().uuid().optional().nullable(),
-  serviceType: z.enum(serviceTypes, {
-    errorMap: () => ({ message: "Tipo de servicio inválido" }),
-  }),
+  serviceType: z.string().min(1, "Tipo de servicio requerido"),
   description: z.string().min(1, "Descripción requerida"),
   price: z.string().optional(),
   dueDate: z.string().optional(),
@@ -68,7 +70,7 @@ export const createOrderSchema = z.object({
 })
 
 export const updateOrderSchema = z.object({
-  serviceType: z.enum(serviceTypes).optional(),
+  serviceType: z.string().min(1).optional(),
   status: z.enum(orderStatuses).optional(),
   description: z.string().min(1).optional(),
   price: z.string().optional(),

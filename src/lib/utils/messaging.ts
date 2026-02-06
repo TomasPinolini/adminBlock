@@ -1,5 +1,5 @@
 import { serviceTypeLabels, orderStatusLabels } from "@/lib/validations/orders"
-import type { OrderStatus, ServiceType } from "@/lib/db/schema"
+import type { OrderStatus } from "@/lib/db/schema"
 import { formatPhoneForWhatsApp } from "@/config/phone"
 
 // Clean phone number for WhatsApp (remove spaces, dashes, etc.)
@@ -20,16 +20,22 @@ export function getInstagramLink(handle: string): string {
   return `https://ig.me/m/${cleanHandle}`
 }
 
-// Message templates
+// Message templates - now accepts dynamic service types
 export const messageTemplates = {
-  orderReady: (clientName: string, serviceType: ServiceType) =>
-    `Hola ${clientName}! Tu ${serviceTypeLabels[serviceType].toLowerCase()} esta listo para retirar. Te esperamos!`,
+  orderReady: (clientName: string, serviceType: string) => {
+    const serviceLabel = serviceTypeLabels[serviceType] || serviceType
+    return `Hola ${clientName}! Tu ${serviceLabel.toLowerCase()} esta listo para retirar. Te esperamos!`
+  },
 
-  quote: (clientName: string, serviceType: ServiceType, price: string) =>
-    `Hola ${clientName}! La cotizacion para ${serviceTypeLabels[serviceType].toLowerCase()} es de $${price}. Avisame si queres que avancemos!`,
+  quote: (clientName: string, serviceType: string, price: string) => {
+    const serviceLabel = serviceTypeLabels[serviceType] || serviceType
+    return `Hola ${clientName}! La cotizacion para ${serviceLabel.toLowerCase()} es de $${price}. Avisame si queres que avancemos!`
+  },
 
-  inProgress: (clientName: string, serviceType: ServiceType) =>
-    `Hola ${clientName}! Ya estamos trabajando en tu ${serviceTypeLabels[serviceType].toLowerCase()}. Te aviso cuando este listo!`,
+  inProgress: (clientName: string, serviceType: string) => {
+    const serviceLabel = serviceTypeLabels[serviceType] || serviceType
+    return `Hola ${clientName}! Ya estamos trabajando en tu ${serviceLabel.toLowerCase()}. Te aviso cuando este listo!`
+  },
 
   reminder: (clientName: string) =>
     `Hola ${clientName}! Te escribo para recordarte que tenes un pedido pendiente de retirar. Te esperamos!`,

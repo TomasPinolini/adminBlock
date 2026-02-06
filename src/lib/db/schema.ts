@@ -108,7 +108,7 @@ export const orders = pgTable("orders", {
   // Person who made the order (when clientId is a company)
   personId: uuid("person_id")
     .references(() => clients.id, { onDelete: "set null" }),
-  serviceType: serviceTypeEnum("service_type").notNull(),
+  serviceType: text("service_type").notNull(), // references services.name
   status: orderStatusEnum("status").default("pending_quote").notNull(),
   description: text("description"),
   price: numeric("price", { precision: 10, scale: 2 }),
@@ -189,6 +189,18 @@ export const suppliers = pgTable("suppliers", {
   address: text("address"),
   notes: text("notes"),
   isActive: text("is_active").default("true").notNull(), // soft delete
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+// Services catalog (types of services offered)
+export const services = pgTable("services", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull().unique(), // e.g., "copiado", "tesis", "encuadernacion"
+  displayName: text("display_name").notNull(), // e.g., "Copiado", "Tesis", "Encuadernación"
+  description: text("description"),
+  isActive: text("is_active").default("true").notNull(), // soft delete
+  sortOrder: numeric("sort_order", { precision: 10, scale: 0 }).default("0"), // for custom ordering
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
@@ -448,6 +460,9 @@ export type NewAppSetting = typeof appSettings.$inferInsert
 
 export type Supplier = typeof suppliers.$inferSelect
 export type NewSupplier = typeof suppliers.$inferInsert
+
+export type Service = typeof services.$inferSelect
+export type NewService = typeof services.$inferInsert
 
 export type Material = typeof materials.$inferSelect
 export type NewMaterial = typeof materials.$inferInsert
