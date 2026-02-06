@@ -59,14 +59,14 @@
    - [x] Agregar Toaster para feedback de acciones
    - [x] Mejor UX en móvil con componentes touch-friendly
 
+7. Edición de Entidades
+   - [x] Modal para editar pedidos existentes (descripción, precio, fecha)
+   - [x] Modal para editar clientes existentes
+   - [x] Búsqueda/filtro en página de pedidos
+
 ================================================================================
 ⏳ PENDIENTE - ALTA PRIORIDAD
 ================================================================================
-
-7. Edición de Entidades
-   - Modal para editar pedidos existentes (descripción, precio, fecha)
-   - Modal para editar clientes existentes
-   - Búsqueda/filtro en página de pedidos
 
 8. Servicios Dinámicos
    - Permitir crear nuevos tipos de servicio desde el sistema

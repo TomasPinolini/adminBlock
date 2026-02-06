@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
-import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore } from "lucide-react"
+import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -31,6 +31,7 @@ import {
 } from "@/lib/validations/orders"
 import type { OrderStatus, PaymentStatus } from "@/lib/db/schema"
 import { PaymentModal } from "./payment-modal"
+import { EditOrderModal } from "./edit-order-modal"
 import { cn } from "@/lib/utils"
 
 const statusVariants: Record<OrderStatus, "pending" | "info" | "warning" | "success" | "secondary" | "destructive"> = {
@@ -58,9 +59,10 @@ const paymentStatusVariants: Record<PaymentStatus, "destructive" | "warning" | "
 interface OrderCardProps {
   order: OrderWithClient
   onPayment: (order: OrderWithClient) => void
+  onEdit: (order: OrderWithClient) => void
 }
 
-function OrderCard({ order, onPayment }: OrderCardProps) {
+function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
   const { confirm, ConfirmDialog } = useConfirmDialog()
   const updateOrder = useUpdateOrder()
   const deleteOrder = useDeleteOrder()
@@ -303,6 +305,10 @@ function OrderCard({ order, onPayment }: OrderCardProps) {
                   <DropdownMenuSeparator />
                 </>
               )}
+              <DropdownMenuItem onClick={() => onEdit(order)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Editar
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDuplicate} disabled={duplicateOrder.isPending}>
                 <Copy className="mr-2 h-4 w-4" />
                 {duplicateOrder.isPending ? "Duplicando..." : "Duplicar"}
@@ -336,9 +342,14 @@ function OrderCard({ order, onPayment }: OrderCardProps) {
   )
 }
 
-export function OrderList() {
+interface OrderListProps {
+  searchQuery?: string
+}
+
+export function OrderList({ searchQuery = "" }: OrderListProps) {
   const { statusFilter, serviceFilter, quickFilter, showArchived } = useUIStore()
   const [paymentOrder, setPaymentOrder] = useState<OrderWithClient | null>(null)
+  const [editingOrder, setEditingOrder] = useState<OrderWithClient | null>(null)
 
   const { data: orders = [], isLoading, error } = useOrders({
     status: statusFilter !== "all" ? statusFilter : undefined,
@@ -346,8 +357,20 @@ export function OrderList() {
     includeArchived: showArchived,
   })
 
-  // Apply quick filters client-side
+  // Apply quick filters and search client-side
   const filteredOrders = orders.filter((order) => {
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      const clientName = order.client?.name?.toLowerCase() || ""
+      const description = order.description?.toLowerCase() || ""
+      
+      if (!clientName.includes(query) && !description.includes(query)) {
+        return false
+      }
+    }
+
+    // Quick filter
     if (!quickFilter) return true
 
     const today = new Date()
@@ -413,6 +436,7 @@ export function OrderList() {
             key={order.id}
             order={order}
             onPayment={setPaymentOrder}
+            onEdit={setEditingOrder}
           />
         ))}
       </div>
@@ -421,6 +445,12 @@ export function OrderList() {
         order={paymentOrder}
         open={!!paymentOrder}
         onClose={() => setPaymentOrder(null)}
+      />
+
+      <EditOrderModal
+        order={editingOrder}
+        open={!!editingOrder}
+        onOpenChange={(open) => !open && setEditingOrder(null)}
       />
     </>
   )

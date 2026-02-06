@@ -2,8 +2,10 @@
 
 export const dynamic = "force-dynamic"
 
-import { Plus, Archive } from "lucide-react"
+import { useState } from "react"
+import { Plus, Archive, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -32,6 +34,7 @@ export default function OrdersPage() {
     setShowArchived,
     setCreateOrderModalOpen,
   } = useUIStore()
+  const [searchQuery, setSearchQuery] = useState("")
 
   const handleStatsFilterChange = (filter: string) => {
     if (filter === "overdue") {
@@ -70,6 +73,19 @@ export default function OrdersPage() {
         {/* Quick Filters */}
         <QuickFilters />
 
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1 sm:max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por cliente o descripción..."
+              className="pl-9 h-11 lg:h-9"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
         {/* Service Filter */}
         <div className="flex items-center gap-3">
           <Select
@@ -103,7 +119,7 @@ export default function OrdersPage() {
         </div>
 
         {/* Orders list */}
-        <OrderList />
+        <OrderList searchQuery={searchQuery} />
       </div>
 
       <OrderFormModal />
