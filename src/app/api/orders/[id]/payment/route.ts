@@ -3,7 +3,8 @@ import { db } from "@/lib/db"
 import { orders, clients } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
-import { sendWhatsApp, whatsappTemplates } from "@/lib/whatsapp"
+import { sendWhatsAppBackground, whatsappTemplates } from "@/lib/whatsapp"
+import { isPaymentNotificationEnabled } from "@/lib/settings"
 import type { PaymentStatus } from "@/lib/db/schema"
 
 export async function POST(
@@ -107,20 +108,24 @@ export async function POST(
     const amountMatch = totalPaid >= orderPrice
     const difference = orderPrice - totalPaid
 
-    // Send WhatsApp payment confirmation
+    // Send WhatsApp payment confirmation (if enabled)
     if (orderWithClient.clientPhone) {
-      const clientName = orderWithClient.clientName || "Cliente"
-      const message = whatsappTemplates.paymentConfirmed(
-        clientName,
-        paidAmount.toLocaleString("es-AR"),
-        amountMatch ? undefined : difference.toLocaleString("es-AR")
-      )
+      const isEnabled = await isPaymentNotificationEnabled()
+      
+      if (isEnabled) {
+        const clientName = orderWithClient.clientName || "Cliente"
+        const message = whatsappTemplates.paymentConfirmed(
+          clientName,
+          paidAmount.toLocaleString("es-AR"),
+          amountMatch ? undefined : difference.toLocaleString("es-AR")
+        )
 
-      // Send in background, don't block response
-      sendWhatsApp({
-        to: orderWithClient.clientPhone,
-        message,
-      }).catch((err) => console.error("WhatsApp send error:", err))
+        // Send in background, don't block response
+        sendWhatsAppBackground({
+          to: orderWithClient.clientPhone,
+          message,
+        })
+      }
     }
 
     return NextResponse.json({

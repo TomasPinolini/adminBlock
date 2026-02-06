@@ -14,7 +14,7 @@ Sistema de gestion para imprenta - Gestiona pedidos, clientes y cotizaciones.
 - **Zod** - Validation
 - **xlsx** - Excel export
 - **dayjs** - Date formatting
-- **Inngest** - Background jobs (coming soon)
+- **Twilio** - WhatsApp notifications (optional)
 
 ## Configuracion
 

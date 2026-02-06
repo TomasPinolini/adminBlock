@@ -45,7 +45,6 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const isPublicRoute =
     pathname.startsWith("/login") ||
-    pathname.startsWith("/api/inngest") ||
     pathname.startsWith("/api/test-whatsapp")
 
   if (!user && !isPublicRoute) {

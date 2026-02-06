@@ -5,7 +5,8 @@ import { updateOrderSchema, serviceTypeLabels } from "@/lib/validations/orders"
 import { eq, desc } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
-import { sendWhatsApp, whatsappTemplates } from "@/lib/whatsapp"
+import { sendWhatsAppBackground, whatsappTemplates } from "@/lib/whatsapp"
+import { isWhatsAppAutoEnabled } from "@/lib/settings"
 import type { ServiceType } from "@/lib/db/schema"
 
 export async function GET(
@@ -123,32 +124,37 @@ export async function PATCH(
       const notifyStatuses = ["ready", "quoted", "in_progress"]
 
       if (notifyStatuses.includes(validated.status!)) {
-        let message: string | null = null
+        // Check if auto-notification is enabled for this status
+        const isAutoEnabled = await isWhatsAppAutoEnabled(validated.status!)
+        
+        if (isAutoEnabled) {
+          let message: string | null = null
 
-        switch (validated.status) {
-          case "ready":
-            message = whatsappTemplates.orderReady(clientName, serviceLabel)
-            break
-          case "quoted":
-            if (updatedOrder.price) {
-              message = whatsappTemplates.quoteReady(
-                clientName,
-                serviceLabel,
-                Number(updatedOrder.price).toLocaleString("es-AR")
-              )
-            }
-            break
-          case "in_progress":
-            message = whatsappTemplates.orderInProgress(clientName, serviceLabel)
-            break
-        }
+          switch (validated.status) {
+            case "ready":
+              message = whatsappTemplates.orderReady(clientName, serviceLabel)
+              break
+            case "quoted":
+              if (updatedOrder.price) {
+                message = whatsappTemplates.quoteReady(
+                  clientName,
+                  serviceLabel,
+                  Number(updatedOrder.price).toLocaleString("es-AR")
+                )
+              }
+              break
+            case "in_progress":
+              message = whatsappTemplates.orderInProgress(clientName, serviceLabel)
+              break
+          }
 
-        if (message) {
-          // Send in background, don't block response
-          sendWhatsApp({
-            to: currentOrderWithClient.clientPhone,
-            message,
-          }).catch((err) => console.error("WhatsApp send error:", err))
+          if (message) {
+            // Send in background, don't block response
+            sendWhatsAppBackground({
+              to: currentOrderWithClient.clientPhone,
+              message,
+            })
+          }
         }
       }
     }

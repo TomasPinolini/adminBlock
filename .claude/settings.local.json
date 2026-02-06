@@ -13,7 +13,12 @@
       "Bash(git push:*)",
       "Bash(npx vercel:*)",
       "WebFetch(domain:blockimpresos.com)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: improve clients section with stats, edit, and quick contacts\n\n- Add order statistics per client \\(count, total spent, last order\\)\n- Add edit client functionality with modal reuse\n- Add quick contact buttons \\(WhatsApp, Instagram, call\\)\n- Add client stats dashboard \\(total, new this month, top client, revenue\\)\n- Create /api/clients/stats endpoint for client analytics\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: improve clients section with stats, edit, and quick contacts\n\n- Add order statistics per client \\(count, total spent, last order\\)\n- Add edit client functionality with modal reuse\n- Add quick contact buttons \\(WhatsApp, Instagram, call\\)\n- Add client stats dashboard \\(total, new this month, top client, revenue\\)\n- Create /api/clients/stats endpoint for client analytics\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(npx drizzle-kit generate:*)",
+      "Bash(npx drizzle-kit push)",
+      "Bash(npx drizzle-kit migrate:*)",
+      "Bash(node:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: add company/individual client types with relationships\n\n- Add client types: individual \\(persona\\) and company \\(empresa\\)\n- Add client_relationships table for many-to-many links\n- Companies can have multiple linked individuals with roles\n- View company orders includes orders from linked individuals\n- Order form shows person selector for company clients\n- New client form allows linking to company on creation\n- Add user manual and project documentation in Spanish\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }

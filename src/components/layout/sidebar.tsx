@@ -7,6 +7,7 @@ import {
   Users,
   Calculator,
   FileBarChart,
+  Settings,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -30,6 +31,11 @@ const navItems = [
     href: "/reports",
     label: "Reportes",
     icon: FileBarChart,
+  },
+  {
+    href: "/settings",
+    label: "Ajustes",
+    icon: Settings,
   },
 ]
 

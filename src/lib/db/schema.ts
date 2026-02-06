@@ -164,6 +164,14 @@ export const activityLogs = pgTable("activity_logs", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
+// App settings (key-value store)
+export const appSettings = pgTable("app_settings", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  key: text("key").notNull().unique(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
 // Relations
 export const clientsRelations = relations(clients, ({ many }) => ({
   orders: many(orders),
@@ -252,6 +260,9 @@ export type NewServicePrice = typeof servicePrices.$inferInsert
 
 export type ActivityLog = typeof activityLogs.$inferSelect
 export type NewActivityLog = typeof activityLogs.$inferInsert
+
+export type AppSetting = typeof appSettings.$inferSelect
+export type NewAppSetting = typeof appSettings.$inferInsert
 
 export type ServiceType = (typeof serviceTypeEnum.enumValues)[number]
 export type OrderStatus = (typeof orderStatusEnum.enumValues)[number]
