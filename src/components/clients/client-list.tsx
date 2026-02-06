@@ -1,7 +1,8 @@
 "use client"
 
-import { Phone, Instagram, MoreVertical, Trash2, Pencil, MessageCircle, Send, Package, DollarSign, Calendar } from "lucide-react"
+import { Phone, Instagram, MoreVertical, Trash2, Pencil, MessageCircle, Send, Package, DollarSign, Calendar, FileText, Building2, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +17,7 @@ import { getWhatsAppLink, getInstagramLink, messageTemplates } from "@/lib/utils
 
 function ClientCard({ client }: { client: ClientWithStats }) {
   const deleteClient = useDeleteClient()
-  const { setEditingClient } = useUIStore()
+  const { setEditingClient, setViewingClientOrders, setManagingContactsFor } = useUIStore()
 
   const handleDelete = async () => {
     if (confirm(`Eliminar a ${client.name}?`)) {
@@ -32,6 +33,7 @@ function ClientCard({ client }: { client: ClientWithStats }) {
   const hasInstagram = !!client.instagramHandle
   const clientFirstName = client.name.split(" ")[0]
   const totalSpent = Number(client.totalSpent || 0)
+  const isCompany = client.clientType === "company"
 
   return (
     <div className="rounded-lg border bg-background p-4">
@@ -40,7 +42,15 @@ function ClientCard({ client }: { client: ClientWithStats }) {
           {/* Client name and contact info */}
           <div className="flex items-start justify-between">
             <div>
-              <h3 className="font-medium">{client.name}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-medium">{client.name}</h3>
+                {isCompany && (
+                  <Badge variant="outline" className="text-xs gap-1">
+                    <Building2 className="h-3 w-3" />
+                    Empresa
+                  </Badge>
+                )}
+              </div>
               <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                 {client.phone && (
                   <a
@@ -127,6 +137,22 @@ function ClientCard({ client }: { client: ClientWithStats }) {
                 Llamar
               </a>
             )}
+            <button
+              onClick={() => setViewingClientOrders(client)}
+              className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Ver pedidos
+            </button>
+            {isCompany && (
+              <button
+                onClick={() => setManagingContactsFor(client)}
+                className="inline-flex items-center gap-1.5 rounded-md bg-orange-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-orange-700 transition-colors"
+              >
+                <Users className="h-3.5 w-3.5" />
+                Contactos
+              </button>
+            )}
           </div>
 
           {/* Created at */}
@@ -143,6 +169,17 @@ function ClientCard({ client }: { client: ClientWithStats }) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setViewingClientOrders(client)}>
+              <FileText className="mr-2 h-4 w-4" />
+              Ver pedidos
+            </DropdownMenuItem>
+            {isCompany && (
+              <DropdownMenuItem onClick={() => setManagingContactsFor(client)}>
+                <Users className="mr-2 h-4 w-4" />
+                Contactos
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleEdit}>
               <Pencil className="mr-2 h-4 w-4" />
               Editar

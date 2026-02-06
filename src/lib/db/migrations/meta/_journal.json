@@ -8,6 +8,20 @@
       "when": 1770310006752,
       "tag": "0000_watery_kabuki",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770350782470,
+      "tag": "0001_spooky_spirit",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770352042726,
+      "tag": "0002_true_marauders",
+      "breakpoints": true
     }
   ]
 }

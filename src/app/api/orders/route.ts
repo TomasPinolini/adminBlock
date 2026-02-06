@@ -11,16 +11,22 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get("status")
     const serviceType = searchParams.get("serviceType")
+    const clientId = searchParams.get("clientId")
 
     const allOrders = await db
       .select({
         id: orders.id,
         clientId: orders.clientId,
+        personId: orders.personId,
         serviceType: orders.serviceType,
         status: orders.status,
         description: orders.description,
         price: orders.price,
         dueDate: orders.dueDate,
+        paymentStatus: orders.paymentStatus,
+        paymentAmount: orders.paymentAmount,
+        receiptUrl: orders.receiptUrl,
+        paidAt: orders.paidAt,
         createdAt: orders.createdAt,
         updatedAt: orders.updatedAt,
         client: {
@@ -36,6 +42,9 @@ export async function GET(request: NextRequest) {
 
     // Filter in JS for now (can optimize with SQL later)
     let filtered = allOrders
+    if (clientId) {
+      filtered = filtered.filter((o) => o.clientId === clientId)
+    }
     if (status && status !== "all") {
       filtered = filtered.filter((o) => o.status === status)
     }
@@ -66,6 +75,7 @@ export async function POST(request: NextRequest) {
       .insert(orders)
       .values({
         clientId: validated.clientId,
+        personId: validated.personId || null,
         serviceType: validated.serviceType,
         description: validated.description,
         price: validated.price || null,

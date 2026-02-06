@@ -1,0 +1,626 @@
+================================================================================
+                    ADMINBLOCK - MANUAL DE USUARIO
+                         Guía Paso a Paso
+================================================================================
+
+                        ÍNDICE
+                        ------
+
+  1. Cómo entrar a la aplicación
+  2. La pantalla principal (Pedidos)
+  3. Crear un pedido nuevo
+  4. Cambiar el estado de un pedido
+  5. Registrar un pago
+  6. Avisar al cliente por WhatsApp
+  7. Gestión de clientes
+  8. Calculadora de presupuestos
+  9. Los filtros rápidos
+ 10. Exportar a Excel
+
+================================================================================
+1. CÓMO ENTRAR A LA APLICACIÓN
+================================================================================
+
+PASO 1: Abrir el navegador
+--------------------------
+  En el celular: Chrome, Safari, o el navegador que uses
+  En la computadora: Chrome, Firefox, Edge, etc.
+
+PASO 2: Escribir la dirección
+-----------------------------
+  Escribí la dirección de AdminBlock en la barra de arriba
+  (La dirección te la va a pasar Tomás)
+
+PASO 3: Iniciar sesión
+----------------------
+  • Escribí tu email
+  • Escribí tu contraseña
+  • Tocá "Iniciar Sesión"
+
+  ┌─────────────────────────────────────────────┐
+  │  Email:    [___________________________]    │
+  │  Contraseña: [___________________________]  │
+  │                                             │
+  │         [ Iniciar Sesión ]                  │
+  └─────────────────────────────────────────────┘
+
+CONSEJO: Si usás mucho la app desde el celular, podés "Agregar a pantalla
+de inicio" para que aparezca como una app más, con su ícono.
+
+================================================================================
+2. LA PANTALLA PRINCIPAL (PEDIDOS)
+================================================================================
+
+Cuando entrás, ves la pantalla de PEDIDOS. Tiene tres partes:
+
+PARTE 1: ESTADÍSTICAS (arriba)
+------------------------------
+  Rectángulos con números que muestran de un vistazo:
+
+  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐
+  │ Hoy: 3  │  │ Sin     │  │ Listos  │  │ Vencidos│
+  │ pedidos │  │ cotizar │  │ 5       │  │ 2       │
+  │ nuevos  │  │ 7       │  │         │  │         │
+  └─────────┘  └─────────┘  └─────────┘  └─────────┘
+
+  ¡Tocando cualquier número, se filtran automáticamente esos pedidos!
+
+PARTE 2: FILTROS RÁPIDOS
+------------------------
+  Botones para ver solo ciertos pedidos:
+
+  [ Vencidos ]  [ Hoy ]  [ Sin cotizar ]  [ En proceso ]  [ Listos ]
+
+PARTE 3: LISTA DE PEDIDOS
+-------------------------
+  Cada pedido aparece como una tarjeta con:
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  JUAN PÉREZ                              📱 💬 📞              │
+  │  ─────────────────────────────────────────────────────────────  │
+  │  [Tesis]                    Estado: [ En proceso ▼ ]           │
+  │                                                                 │
+  │  "Tesis de arquitectura, 150 páginas..."                       │
+  │                                                                 │
+  │  💰 $15.000                   📅 Entrega: 15/02                │
+  │  [Sin pagar]                                                    │
+  │                                                                 │
+  │  [ Registrar Pago ]                              [ ⋮ Más ]     │
+  └─────────────────────────────────────────────────────────────────┘
+
+================================================================================
+3. CREAR UN PEDIDO NUEVO
+================================================================================
+
+PASO 1: Tocar el botón "Nuevo Pedido"
+-------------------------------------
+  Está arriba a la derecha, es un botón azul que dice "+ Nuevo Pedido"
+
+PASO 2: Completar el formulario
+-------------------------------
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                    NUEVO PEDIDO                                 │
+  │  ───────────────────────────────────────────────────────────    │
+  │                                                                 │
+  │  Cliente *                                                      │
+  │  [ Seleccionar cliente ▼ ]                                     │
+  │                                                                 │
+  │  Tipo de servicio *                                            │
+  │  [ Seleccionar servicio ▼ ]                                    │
+  │                                                                 │
+  │  Descripción                                                    │
+  │  ┌─────────────────────────────────────────────────────────┐   │
+  │  │ Escribir detalles del trabajo...                        │   │
+  │  │                                                          │   │
+  │  └─────────────────────────────────────────────────────────┘   │
+  │                                                                 │
+  │  Precio                          Fecha de entrega               │
+  │  [ $________ ]                   [ __/__/____ ]                │
+  │                                                                 │
+  │            [ Cancelar ]    [ Crear Pedido ]                    │
+  └─────────────────────────────────────────────────────────────────┘
+
+CAMPOS A COMPLETAR:
+
+  • CLIENTE: Elegí de la lista desplegable
+    (Si es cliente nuevo, primero tenés que crearlo - ver sección 7)
+    Los clientes tipo empresa aparecen con un ícono 🏢
+
+  • PERSONA (solo para empresas): Si elegiste una empresa, podés
+    especificar qué persona de esa empresa hizo el pedido.
+    Esto es opcional pero útil para saber quién contactar.
+
+  • TIPO DE SERVICIO: Elegí qué tipo de trabajo es
+    - Copiado
+    - Tesis
+    - Encuadernación
+    - Cartelería
+    - Placas
+    - Calcos
+    - Folletería
+    - Ploteo
+
+  • DESCRIPCIÓN: Detalles del trabajo
+    Ejemplo: "150 copias doble faz, papel común"
+
+  • PRECIO: El monto a cobrar (podés dejarlo vacío si todavía no cotizaste)
+
+  • FECHA DE ENTREGA: Cuándo hay que tenerlo listo
+
+PASO 3: Tocar "Crear Pedido"
+----------------------------
+  ¡Listo! El pedido aparece en la lista.
+
+================================================================================
+4. CAMBIAR EL ESTADO DE UN PEDIDO
+================================================================================
+
+Cada pedido pasa por diferentes estados. Así sabemos en qué está cada trabajo.
+
+LOS ESTADOS SON:
+----------------
+
+  1. PENDIENTE COTIZACIÓN  →  Llegó el pedido, falta darle precio
+  2. COTIZADO              →  Ya le pasamos el precio al cliente
+  3. APROBADO              →  El cliente aceptó, hay que hacerlo
+  4. EN PROCESO            →  Estamos trabajando en el pedido
+  5. LISTO                 →  Terminado, hay que avisar al cliente
+  6. ENTREGADO             →  El cliente ya lo retiró
+  7. CANCELADO             →  Se canceló el trabajo
+
+CÓMO CAMBIAR EL ESTADO:
+-----------------------
+
+  1. Buscá el pedido en la lista
+  2. Donde dice "Estado:" hay un menú desplegable
+  3. Tocá el menú y elegí el nuevo estado
+  4. ¡Listo! El estado cambia automáticamente
+
+     Estado: [ En proceso  ▼ ]
+             ┌─────────────────┐
+             │ Pend. cotización│
+             │ Cotizado        │
+             │ Aprobado        │
+             │ ► En proceso    │  ← El actual
+             │ Listo           │
+             │ Entregado       │
+             │ Cancelado       │
+             └─────────────────┘
+
+IMPORTANTE: Cuando cambiás el estado a "Listo", "Cotizado" o "En proceso",
+           ¡el sistema puede enviar un WhatsApp automático al cliente!
+
+================================================================================
+5. REGISTRAR UN PAGO
+================================================================================
+
+Cuando el cliente paga (todo o una parte), hay que registrarlo.
+
+PASO 1: Buscar el pedido
+------------------------
+  Encontrá el pedido del cliente que pagó
+
+PASO 2: Tocar "Registrar Pago"
+------------------------------
+  El botón está en la tarjeta del pedido
+
+PASO 3: Completar los datos del pago
+------------------------------------
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                    REGISTRAR PAGO                               │
+  │  ───────────────────────────────────────────────────────────    │
+  │                                                                 │
+  │  Precio del pedido:           $15.000                          │
+  │  Ya pagado:                   $0                               │
+  │  Falta pagar:                 $15.000                          │
+  │                                                                 │
+  │  Monto a registrar *                                           │
+  │  [ $________ ]                                                  │
+  │                                                                 │
+  │  Comprobante (opcional)                                         │
+  │  [ Subir archivo ]                                             │
+  │                                                                 │
+  │            [ Cancelar ]    [ Registrar ]                       │
+  └─────────────────────────────────────────────────────────────────┘
+
+  • MONTO A REGISTRAR: Cuánto pagó el cliente
+
+  • COMPROBANTE: Si tenés foto del transfer o comprobante, podés subirla
+    (Acepta JPG, PNG o PDF de hasta 5MB)
+
+PASO 4: Tocar "Registrar"
+-------------------------
+  El sistema calcula automáticamente:
+
+  - Si pagó todo → Estado de pago: "Pagado" (verde)
+  - Si pagó parte → Estado de pago: "Pago parcial" (naranja)
+  - Si no pagó nada → Estado de pago: "Sin pagar" (rojo)
+
+PAGOS PARCIALES:
+----------------
+  Si el cliente paga en cuotas, no hay problema.
+  Registrá cada pago por separado, el sistema suma todo.
+
+  Ejemplo:
+    - Precio: $15.000
+    - Primer pago: $5.000  →  Falta: $10.000 (Pago parcial)
+    - Segundo pago: $10.000 →  Falta: $0 (Pagado)
+
+================================================================================
+6. AVISAR AL CLIENTE POR WHATSAPP
+================================================================================
+
+Hay varias formas de contactar al cliente desde AdminBlock:
+
+OPCIÓN 1: Botones de contacto rápido
+------------------------------------
+  En cada tarjeta de pedido hay 3 íconos arriba a la derecha:
+
+  📱 WhatsApp  →  Abre WhatsApp con el número del cliente
+  💬 Instagram →  Abre Instagram para mandarle mensaje
+  📞 Llamar    →  Llama directo al cliente
+
+OPCIÓN 2: Menú "Más opciones" (⋮)
+---------------------------------
+  Tocá los tres puntitos de un pedido para ver más opciones:
+
+  ┌────────────────────────────┐
+  │ 📱 Avisar "Listo" por WA   │  → Mensaje: "Tu pedido está listo"
+  │ 📱 Enviar recordatorio     │  → Mensaje: "Tenés un pedido pendiente"
+  │ 📋 Duplicar pedido         │
+  │ 🗑️ Eliminar pedido        │
+  └────────────────────────────┘
+
+MENSAJES AUTOMÁTICOS:
+---------------------
+  Cuando tocás estos botones, se abre WhatsApp con un mensaje ya escrito.
+  Solo tenés que ENVIAR.
+
+  Ejemplo de mensaje "Listo":
+  ────────────────────────────
+  "Hola Juan! Tu pedido de Tesis está listo para retirar. ¡Te esperamos!"
+
+  Ejemplo de mensaje "Recordatorio":
+  ──────────────────────────────────
+  "Hola Juan! Te escribo para recordarte que tenés un pedido
+   pendiente de retirar. ¡Te esperamos!"
+
+NOTIFICACIONES AUTOMÁTICAS:
+---------------------------
+  Cuando cambiás el estado de un pedido a "Listo", "Cotizado" o "En proceso",
+  el sistema puede enviar automáticamente un WhatsApp al cliente.
+
+  (Esto depende de cómo esté configurado el sistema)
+
+================================================================================
+7. GESTIÓN DE CLIENTES
+================================================================================
+
+Para ir a la sección de clientes:
+  - En la computadora: Click en "Clientes" en el menú de la izquierda
+  - En el celular: Tocá "Clientes" en la barra de abajo
+
+TIPOS DE CLIENTES
+-----------------
+  Hay dos tipos de clientes:
+
+  👤 PERSONA (Individual)
+     Un cliente particular, como "Juan Pérez"
+
+  🏢 EMPRESA (Company)
+     Una empresa u organización, como "Imprenta Norte S.A."
+     Las empresas pueden tener varias personas vinculadas
+
+CREAR UN CLIENTE NUEVO
+----------------------
+
+PASO 1: Tocar "+ Nuevo Cliente"
+
+PASO 2: Elegir el tipo de cliente
+
+  ┌───────────────────┐  ┌───────────────────┐
+  │  👤 Persona       │  │  🏢 Empresa       │
+  └───────────────────┘  └───────────────────┘
+
+PASO 3: Completar los datos
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                    NUEVO CLIENTE                                │
+  │  ───────────────────────────────────────────────────────────    │
+  │                                                                 │
+  │  Tipo: [ 👤 Persona ] [ 🏢 Empresa ]                           │
+  │                                                                 │
+  │  Nombre *                                                       │
+  │  [ ________________________________ ]                          │
+  │                                                                 │
+  │  Teléfono                                                      │
+  │  [ ________________________________ ]                          │
+  │                                                                 │
+  │  Instagram                                                     │
+  │  [ ________________________________ ]                          │
+  │                                                                 │
+  │  Notas                                                         │
+  │  ┌─────────────────────────────────────────────────────────┐   │
+  │  │ Preferencias, datos adicionales...                      │   │
+  │  └─────────────────────────────────────────────────────────┘   │
+  │                                                                 │
+  │  ┌─ Vincular a empresa (opcional) ─────────────────────────┐   │
+  │  │  Empresa: [ Seleccionar empresa ▼ ]                     │   │
+  │  │  Rol:     [ Secretaria, Gerente... ]                    │   │
+  │  └─────────────────────────────────────────────────────────┘   │
+  │                                                                 │
+  │            [ Cancelar ]    [ Guardar ]                         │
+  └─────────────────────────────────────────────────────────────────┘
+
+  • TIPO: Persona o Empresa
+  • NOMBRE: Obligatorio. El nombre del cliente o empresa.
+  • TELÉFONO: Con código de área (ej: 1155667788)
+  • INSTAGRAM: El usuario sin la @
+  • NOTAS: Cualquier dato útil ("Siempre paga con transfer", "Cliente frecuente")
+  • VINCULAR A EMPRESA: Si es una persona, podés vincularla a una empresa
+    existente y especificar su rol (Secretaria, Gerente, etc.)
+
+PASO 4: Tocar "Guardar"
+
+GESTIONAR PERSONAS DE UNA EMPRESA
+---------------------------------
+  Las empresas pueden tener varias personas vinculadas.
+  Para administrarlas:
+
+  1. En la tarjeta de la empresa, tocá el botón "👥 Personas"
+  2. Se abre un panel donde podés:
+
+     • VER las personas vinculadas con sus datos y roles
+     • VINCULAR una persona existente a la empresa
+     • CREAR una nueva persona y vincularla
+     • EDITAR el rol de una persona
+     • DESVINCULAR una persona de la empresa
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  Personas de IMPRENTA NORTE S.A.                               │
+  │  ───────────────────────────────────────────────────────────    │
+  │                                                                 │
+  │  ┌─────────────────────────────────────────────────────────┐   │
+  │  │  María González (Secretaria)            📱 💬   [ ⋮ ]  │   │
+  │  │  📞 1155667788                                          │   │
+  │  └─────────────────────────────────────────────────────────┘   │
+  │                                                                 │
+  │  ┌─────────────────────────────────────────────────────────┐   │
+  │  │  Pedro Martínez (Gerente)               📱 💬   [ ⋮ ]  │   │
+  │  │  📞 1166778899                                          │   │
+  │  └─────────────────────────────────────────────────────────┘   │
+  │                                                                 │
+  │  [ 🔗 Vincular persona existente ]                             │
+  │  [ ➕ Crear nueva persona ]                                    │
+  └─────────────────────────────────────────────────────────────────┘
+
+  IMPORTANTE: Una persona puede pertenecer a VARIAS empresas.
+  Por ejemplo, un contador puede trabajar para múltiples clientes.
+
+VER PEDIDOS DE UN CLIENTE
+-------------------------
+  Tocá el botón "📦 Ver pedidos" en la tarjeta del cliente para ver
+  el historial completo de pedidos.
+
+  Para EMPRESAS, esto muestra:
+  • Pedidos directos de la empresa
+  • Pedidos de TODAS las personas vinculadas a la empresa
+
+  Así podés ver todo el trabajo que hicieron para esa empresa,
+  sin importar quién hizo cada pedido.
+
+BUSCAR UN CLIENTE
+-----------------
+  Hay una barra de búsqueda arriba de la lista.
+  Podés buscar por:
+  • Nombre
+  • Teléfono
+  • Instagram
+
+INFORMACIÓN DE CADA CLIENTE
+---------------------------
+  En la lista de clientes ves:
+
+  PERSONA:
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  👤 JUAN PÉREZ                            📱 💬 📞   [ ⋮ ]    │
+  │  ─────────────────────────────────────────────────────────────  │
+  │  📞 1155667788                                                  │
+  │  📷 @juanperez                                                  │
+  │                                                                 │
+  │  📦 15 pedidos    💰 $125.000 total    📅 Último: hace 3 días │
+  │                                                                 │
+  │  [ 📦 Ver pedidos ]                                            │
+  └─────────────────────────────────────────────────────────────────┘
+
+  EMPRESA:
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  🏢 IMPRENTA NORTE S.A.                   📱 💬 📞   [ ⋮ ]    │
+  │  ─────────────────────────────────────────────────────────────  │
+  │  📞 1144556677                                                  │
+  │  📷 @imprentanorte                                              │
+  │                                                                 │
+  │  📦 45 pedidos    💰 $580.000 total    📅 Último: hace 1 día  │
+  │                                                                 │
+  │  [ 👥 Personas ]  [ 📦 Ver pedidos ]                           │
+  └─────────────────────────────────────────────────────────────────┘
+
+EDITAR O ELIMINAR CLIENTE
+-------------------------
+  Tocá los tres puntitos (⋮) del cliente y elegí:
+  • Editar → Modifica los datos
+  • Eliminar → Borra el cliente (pide confirmación)
+
+================================================================================
+8. CALCULADORA DE PRESUPUESTOS
+================================================================================
+
+Esta herramienta te ayuda a calcular rápido cuánto cobrar.
+
+CÓMO USARLA:
+------------
+
+PASO 1: Ir a "Presupuestos" en el menú
+
+PASO 2: Elegir el tipo de servicio
+  Desplegable con: Copiado, Tesis, Encuadernación, etc.
+
+PASO 3: Poner la cantidad (si aplica)
+  Por ejemplo: cantidad de páginas, metros cuadrados, unidades
+
+PASO 4: Ver el precio calculado
+  El sistema muestra:
+  • Precio base (si hay)
+  • Precio por unidad
+  • TOTAL
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  CALCULADORA DE PRESUPUESTO                                     │
+  │  ───────────────────────────────────────────────────────────    │
+  │                                                                 │
+  │  Servicio: [ Tesis ▼ ]                                         │
+  │                                                                 │
+  │  Cantidad de páginas: [ 150 ]                                  │
+  │                                                                 │
+  │  ─────────────────────────────────────────                     │
+  │  Precio base:        $2.000                                    │
+  │  150 páginas x $30:  $4.500                                    │
+  │  ─────────────────────────────────────────                     │
+  │  TOTAL:              $6.500                                    │
+  │                                                                 │
+  │  ┌─────────────────────────────────────────────────────────┐   │
+  │  │ Hola! El presupuesto para tu tesis de 150 páginas       │   │
+  │  │ es de $6.500. ¡Avisame si querés que avancemos!         │   │
+  │  └─────────────────────────────────────────────────────────┘   │
+  │                                                                 │
+  │              [ 📋 Copiar mensaje ]                              │
+  └─────────────────────────────────────────────────────────────────┘
+
+PASO 5: Copiar el mensaje
+  Tocá "Copiar mensaje" y pegalo en WhatsApp o Instagram para
+  mandárselo al cliente.
+
+PRECIOS CONFIGURADOS:
+---------------------
+  • Copiado:        $50 por página
+  • Tesis:          $2.000 base + $30 por página
+  • Encuadernación: $500 fijo
+  • Cartelería:     $800 por m²
+  • Placas:         $1.500 fijo
+  • Calcos:         $200 por unidad
+  • Folletería:     $150 por unidad
+  • Ploteo:         $1.200 por m²
+
+  (Los precios se pueden actualizar - hablá con Tomás)
+
+================================================================================
+9. LOS FILTROS RÁPIDOS
+================================================================================
+
+Los filtros te permiten ver solo los pedidos que te interesan.
+
+FILTROS POR ESTADO
+------------------
+  En la pantalla de pedidos hay botones de filtro:
+
+  [ Vencidos ]  [ Hoy ]  [ Sin cotizar ]  [ En proceso ]  [ Listos ]
+
+  • VENCIDOS: Pedidos con fecha de entrega pasada que no se entregaron
+  • HOY: Pedidos que hay que entregar hoy
+  • SIN COTIZAR: Pedidos que todavía no tienen precio
+  • EN PROCESO: Pedidos que se están trabajando
+  • LISTOS: Pedidos terminados esperando que los retiren
+
+FILTROS POR TIPO DE SERVICIO
+----------------------------
+  También podés filtrar por tipo de trabajo:
+
+  [ Tipo de servicio ▼ ]  →  Copiado, Tesis, Encuadernación, etc.
+
+LIMPIAR FILTROS
+---------------
+  Si querés ver todos los pedidos de nuevo:
+
+  • Tocá el botón "Limpiar" o "X" junto a los filtros
+  • O tocá de nuevo el filtro que estaba activo
+
+FILTROS COMBINADOS
+------------------
+  Podés combinar filtros. Por ejemplo:
+
+  "En proceso" + "Tesis"  →  Solo las tesis que están en proceso
+
+================================================================================
+10. EXPORTAR A EXCEL
+================================================================================
+
+Podés bajar los datos en Excel para tenerlos guardados o analizarlos.
+
+PASO 1: Ir a "Reportes" en el menú
+
+PASO 2: Elegir qué exportar
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  REPORTES Y EXPORTACIÓN                                         │
+  │  ───────────────────────────────────────────────────────────    │
+  │                                                                 │
+  │  [ 📊 Pedidos de este mes ]                                    │
+  │      Exporta todos los pedidos del mes actual                   │
+  │                                                                 │
+  │  [ 📊 Pedidos por fecha ]                                      │
+  │      Elegí un rango de fechas personalizado                    │
+  │                                                                 │
+  │  [ 👥 Lista de clientes ]                                      │
+  │      Exporta todos los clientes con sus datos                  │
+  │                                                                 │
+  └─────────────────────────────────────────────────────────────────┘
+
+PASO 3: Tocá el botón y se descarga el archivo Excel
+
+EL ARCHIVO INCLUYE:
+-------------------
+  Pedidos:
+  • Fecha, Cliente, Teléfono, Instagram
+  • Tipo de servicio, Descripción, Estado
+  • Precio, Fecha de entrega
+
+  Clientes:
+  • Nombre, Teléfono, Instagram, Notas
+  • Cantidad de pedidos, Fecha de registro
+
+================================================================================
+                         TIPS Y CONSEJOS
+================================================================================
+
+✓ REVISÁ TODOS LOS DÍAS
+  Entrá a la app y mirá:
+  - ¿Hay pedidos vencidos? (rojo = urgente)
+  - ¿Hay pedidos listos para avisar?
+  - ¿Hay cotizaciones pendientes?
+
+✓ AVISÁ SIEMPRE QUE ESTÉ LISTO
+  Cuando termines un trabajo, cambiá el estado a "Listo" y
+  el sistema puede avisar automáticamente al cliente.
+
+✓ REGISTRÁ LOS PAGOS AL MOMENTO
+  Cuando te paguen, registralo enseguida así no te olvidás.
+
+✓ USÁ LAS NOTAS DEL CLIENTE
+  Si un cliente tiene preferencias ("siempre quiere papel de 120g"),
+  ponelo en las notas así cualquiera que vea el pedido lo sabe.
+
+✓ NO TENGAS MIEDO DE TOCAR
+  No podés "romper" nada. Si te equivocás, siempre se puede corregir.
+  Y si no sabés cómo hacer algo, preguntale a Tomás.
+
+================================================================================
+
+  ¿DUDAS O PROBLEMAS?
+
+  Contactar a: Tomás
+
+================================================================================
+                           FIN DEL MANUAL
+================================================================================

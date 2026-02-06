@@ -8,12 +8,14 @@ export interface OrderWithClient extends Order {
 interface FetchOrdersParams {
   status?: string
   serviceType?: string
+  clientId?: string
 }
 
 async function fetchOrders(params?: FetchOrdersParams): Promise<OrderWithClient[]> {
   const searchParams = new URLSearchParams()
   if (params?.status) searchParams.set("status", params.status)
   if (params?.serviceType) searchParams.set("serviceType", params.serviceType)
+  if (params?.clientId) searchParams.set("clientId", params.clientId)
 
   const res = await fetch(`/api/orders?${searchParams}`)
   if (!res.ok) throw new Error("Error al obtener pedidos")
@@ -77,6 +79,14 @@ export function useOrders(params?: FetchOrdersParams) {
   return useQuery({
     queryKey: ["orders", params],
     queryFn: () => fetchOrders(params),
+  })
+}
+
+export function useClientOrders(clientId: string | null) {
+  return useQuery({
+    queryKey: ["orders", "client", clientId],
+    queryFn: () => fetchOrders({ clientId: clientId! }),
+    enabled: !!clientId,
   })
 }
 

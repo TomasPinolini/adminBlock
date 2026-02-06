@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input"
 import { useUIStore } from "@/stores/ui-store"
 import { ClientList } from "@/components/clients/client-list"
 import { ClientFormModal } from "@/components/clients/client-form-modal"
+import { ClientOrdersModal } from "@/components/clients/client-orders-modal"
+import { ContactsModal } from "@/components/clients/contacts-modal"
 import { ClientStats } from "@/components/clients/client-stats"
 
 export default function ClientsPage() {
@@ -57,6 +59,8 @@ export default function ClientsPage() {
       </div>
 
       <ClientFormModal />
+      <ClientOrdersModal />
+      <ContactsModal />
     </>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -23,12 +23,14 @@ import {
 import { useUIStore } from "@/stores/ui-store"
 import { useCreateOrder } from "@/hooks/use-orders"
 import { useClients } from "@/hooks/use-clients"
+import { useCompanyEmployees } from "@/hooks/use-relationships"
 import {
   createOrderSchema,
   serviceTypes,
   serviceTypeLabels,
   type CreateOrderInput,
 } from "@/lib/validations/orders"
+import { Building2 } from "lucide-react"
 
 export function OrderFormModal() {
   const { createOrderModalOpen, setCreateOrderModalOpen } = useUIStore()
@@ -49,6 +51,21 @@ export function OrderFormModal() {
 
   const selectedClientId = watch("clientId")
   const selectedServiceType = watch("serviceType")
+  const selectedPersonId = watch("personId")
+
+  // Find the selected client to check if it's a company
+  const selectedClient = clients.find(c => c.id === selectedClientId)
+  const isCompany = selectedClient?.clientType === "company"
+
+  // Fetch linked individuals when a company client is selected
+  const { data: employees = [] } = useCompanyEmployees(isCompany ? selectedClientId : null)
+
+  // Reset person when client changes
+  useEffect(() => {
+    if (!isCompany) {
+      setValue("personId", null)
+    }
+  }, [selectedClientId, isCompany, setValue])
 
   const onSubmit = async (data: CreateOrderInput) => {
     setError("")
@@ -92,8 +109,13 @@ export function OrderFormModal() {
                 ) : (
                   clients.map((client) => (
                     <SelectItem key={client.id} value={client.id}>
-                      {client.name}
-                      {client.instagramHandle && ` (${client.instagramHandle})`}
+                      <span className="flex items-center gap-2">
+                        {client.clientType === "company" && (
+                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                        )}
+                        {client.name}
+                        {client.instagramHandle && ` (${client.instagramHandle})`}
+                      </span>
                     </SelectItem>
                   ))
                 )}
@@ -103,6 +125,38 @@ export function OrderFormModal() {
               <p className="text-sm text-destructive">{errors.clientId.message}</p>
             )}
           </div>
+
+          {/* Person selector for company clients */}
+          {isCompany && (
+            <div className="space-y-2">
+              <Label>Persona (opcional)</Label>
+              <Select
+                value={selectedPersonId || ""}
+                onValueChange={(value) => setValue("personId", value === "none" ? null : value)}
+              >
+                <SelectTrigger className="h-11 lg:h-9">
+                  <SelectValue placeholder="¿Quién hace el pedido?" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sin especificar</SelectItem>
+                  {employees.map((employee) => (
+                    <SelectItem key={employee.personId} value={employee.personId}>
+                      {employee.person?.name}
+                      {employee.role && ` (${employee.role})`}
+                    </SelectItem>
+                  ))}
+                  {employees.length === 0 && (
+                    <SelectItem value="no-employees" disabled>
+                      No hay personas - vincúlalas desde Clientes
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Persona de la empresa que hizo el pedido
+              </p>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label>Tipo de servicio *</Label>

@@ -10,6 +10,7 @@ export async function GET() {
     const allClients = await db
       .select({
         id: clients.id,
+        clientType: clients.clientType,
         name: clients.name,
         phone: clients.phone,
         instagramHandle: clients.instagramHandle,

@@ -1,0 +1,394 @@
+================================================================================
+                         ADMINBLOCK - SISTEMA DE GESTIÓN
+                              Documentación del Proyecto
+================================================================================
+
+================================================================================
+¿POR QUÉ VALE LA PENA LLEVAR UN REGISTRO DIGITAL?
+================================================================================
+
+Papá, antes de explicarte qué es AdminBlock, quiero contarte por qué creo
+que esta herramienta te va a simplificar mucho el trabajo diario.
+
+PROBLEMAS COMUNES QUE SEGURO TE PASAN
+-------------------------------------
+
+  ❌ "¿Ya le avisamos a este cliente que su trabajo está listo?"
+     → Nadie se acuerda, el cliente se enoja, o le avisamos dos veces.
+
+  ❌ "¿Cuánto le habíamos cotizado a fulano?"
+     → Hay que revisar WhatsApp, buscar en papelitos, preguntar a otros.
+
+  ❌ "¿Este cliente ya pagó o todavía debe?"
+     → Confusión sobre quién pagó qué, cuánto falta cobrar.
+
+  ❌ "¿Qué trabajos tenemos pendientes para esta semana?"
+     → Información dispersa entre la hermana, el tío, y vos.
+
+  ❌ "¿Quién era el cliente de las tesis que llamó ayer?"
+     → Sin registro, se pierde información importante.
+
+Estos problemas no pasan porque alguien trabaje mal. Pasan porque cuando
+hay muchos pedidos, muchos clientes, y varias personas trabajando,
+ES IMPOSIBLE acordarse de todo de memoria.
+
+LA SOLUCIÓN: TENER TODO EN UN SOLO LUGAR
+----------------------------------------
+
+Imaginate poder abrir el celular y ver:
+
+  ✓ TODOS los pedidos actuales, ordenados por urgencia
+  ✓ Quién debe plata y cuánto falta cobrar
+  ✓ Qué trabajos hay que entregar hoy
+  ✓ El historial completo de cada cliente
+  ✓ Los comentarios entre Flor y vos sobre cada trabajo
+
+Sin tener que buscar en WhatsApp. Sin papelitos. Sin preguntar a nadie.
+
+¿POR QUÉ ADMINBLOCK Y NO UNA PLANILLA DE EXCEL?
+-----------------------------------------------
+
+  1. SE USA DESDE EL CELULAR
+     No necesitás estar en la computadora. Podés ver los pedidos
+     desde el local, desde casa, desde cualquier lado.
+
+  2. TODOS VEN LA MISMA INFORMACIÓN
+     Cuando Flor carga un pedido, vos lo ves al instante.
+     Cuando vos marcás algo como "listo", ella lo sabe.
+
+  3. ES MÁS FÁCIL QUE EXCEL
+     No hay fórmulas, no hay celdas. Solo botones claros
+     que dicen "Nuevo Pedido", "Marcar como Listo", etc.
+
+  4. AVISA AUTOMÁTICAMENTE A LOS CLIENTES
+     Cuando marcás un trabajo como "Listo", el sistema puede
+     enviar un WhatsApp automático al cliente. Sin que hagas nada.
+
+  5. NO SE PIERDE NADA
+     Todo queda guardado en la nube. Si se rompe el celular,
+     si se apaga la computadora, los datos siguen ahí.
+
+  6. ES GRATIS
+     No hay que pagar nada mensual. Solo usarlo.
+
+BENEFICIOS CONCRETOS PARA EL NEGOCIO
+------------------------------------
+
+  💰 MENOS PLATA PERDIDA
+     → Sabés exactamente quién te debe y cuánto
+
+  ⏰ MENOS TIEMPO BUSCANDO INFORMACIÓN
+     → Todo está a un click, no hay que revisar mensajes
+
+  😊 CLIENTES MÁS CONTENTOS
+     → Les avisás al toque cuando está listo su trabajo
+
+  🤝 MEJOR COMUNICACIÓN EN LA FAMILIA
+     → Todos ven lo mismo, no hay malentendidos
+
+  📊 SABÉS CÓMO VA EL NEGOCIO
+     → Cuántos pedidos hay por mes, qué servicios se piden más
+
+NO ES COMPLICADO, ES DIFERENTE
+------------------------------
+
+Sé que parece mucho, pero una vez que lo usés dos o tres veces,
+te va a resultar natural. Es como cuando empezaste a usar WhatsApp:
+al principio parecía raro, pero ahora no podrías vivir sin él.
+
+Además, estoy acá para ayudarte con cualquier duda.
+No hay forma de "romper" nada, y si algo no se entiende, lo arreglamos juntos.
+
+================================================================================
+
+ÍNDICE
+------
+1. ¿Qué es AdminBlock?
+2. ¿Qué puede hacer la aplicación?
+3. ¿Cómo funciona?
+4. Costos
+5. Puntos a decidir
+6. Posibles mejoras futuras
+
+================================================================================
+1. ¿QUÉ ES ADMINBLOCK?
+================================================================================
+
+AdminBlock es una aplicación web para gestionar los pedidos de Block.
+Está diseñada para que la familia pueda:
+
+  • Ver todos los pedidos en un solo lugar
+  • Saber el estado de cada trabajo (pendiente, en proceso, listo, entregado)
+  • Registrar pagos y ver cuánto falta cobrar
+  • Contactar clientes rápidamente por WhatsApp
+  • Tener un historial de clientes y sus pedidos
+
+La aplicación es INTERNA - no la ven los clientes.
+Los clientes siguen contactando por Instagram/WhatsApp como siempre.
+
+================================================================================
+2. ¿QUÉ PUEDE HACER LA APLICACIÓN?
+================================================================================
+
+PEDIDOS
+-------
+  ✓ Crear nuevo pedido (cliente, tipo de servicio, descripción, precio, fecha)
+  ✓ Ver lista de todos los pedidos
+  ✓ Filtrar por estado (pendiente, en proceso, listo, etc.)
+  ✓ Filtrar por tipo de servicio (copiado, tesis, encuadernación, etc.)
+  ✓ Cambiar el estado de un pedido con un click
+  ✓ Ver pedidos vencidos (fecha de entrega pasada)
+  ✓ Duplicar pedidos (útil para clientes frecuentes)
+  ✓ Eliminar pedidos
+
+PAGOS
+-----
+  ✓ Registrar pagos parciales o totales
+  ✓ Subir comprobante de pago (foto del transfer)
+  ✓ Ver cuánto pagó y cuánto falta
+  ✓ Estado de pago: Sin pagar / Pago parcial / Pagado
+
+CLIENTES
+--------
+  ✓ Dos tipos de clientes: Personas y Empresas
+  ✓ Lista de clientes con nombre, teléfono, Instagram
+  ✓ Ver historial de pedidos por cliente
+  ✓ Estadísticas: cuánto gastó cada cliente, cliente top, etc.
+  ✓ Botones rápidos para llamar o enviar WhatsApp
+
+EMPRESAS Y PERSONAS VINCULADAS
+------------------------------
+  ✓ Las empresas pueden tener múltiples personas vinculadas
+  ✓ Cada persona puede pertenecer a varias empresas
+  ✓ Especificar rol de cada persona (Secretaria, Gerente, etc.)
+  ✓ Ver pedidos de empresa incluye pedidos de personas vinculadas
+  ✓ Al crear pedido para empresa, elegir qué persona lo hizo
+
+COMUNICACIÓN
+------------
+  ✓ Botón "WhatsApp" que abre el chat con mensaje pre-armado
+  ✓ Botón "Instagram" que abre el perfil del cliente
+  ✓ Botón "Llamar" para llamar directo
+  ✓ Mensajes automáticos por WhatsApp (ver sección 5 - DECISIÓN REQUERIDA)
+
+TIPOS DE SERVICIO DISPONIBLES
+-----------------------------
+  • Copiado
+  • Tesis
+  • Encuadernación
+  • Cartelería
+  • Placas
+  • Calcos
+  • Folletería
+  • Ploteos
+
+================================================================================
+3. ¿CÓMO FUNCIONA?
+================================================================================
+
+ACCESO
+------
+  • Se accede desde cualquier navegador (Chrome, Safari, etc.)
+  • Funciona en celular, tablet y computadora
+  • Requiere usuario y contraseña (solo para la familia)
+  • URL: [pendiente de definir al publicar]
+
+FLUJO DE TRABAJO TÍPICO
+-----------------------
+
+  1. LLEGA UN PEDIDO (por Instagram/WhatsApp)
+     → La persona que recibe el mensaje crea el pedido en AdminBlock
+     → Estado inicial: "Pendiente de cotización"
+
+  2. SE COTIZA
+     → Se agrega el precio al pedido
+     → Se cambia estado a "Cotizado"
+     → Se envía presupuesto al cliente (manual o automático)
+
+  3. CLIENTE APRUEBA
+     → Se cambia estado a "Aprobado"
+
+  4. SE TRABAJA
+     → Se cambia estado a "En proceso"
+     → (Opcional) Se puede notificar al cliente automáticamente
+
+  5. ESTÁ LISTO
+     → Se cambia estado a "Listo"
+     → Se avisa al cliente para que retire
+
+  6. SE ENTREGA Y COBRA
+     → Se registra el pago
+     → Se sube comprobante si hay
+     → Se cambia estado a "Entregado"
+
+USUARIOS
+--------
+  Actualmente hay 1 usuario configurado.
+  Se pueden crear más usuarios para cada miembro de la familia.
+  Cada uno con su email y contraseña.
+
+================================================================================
+4. COSTOS
+================================================================================
+
+COSTOS ACTUALES (gratis o muy bajo)
+-----------------------------------
+
+  SERVICIO          COSTO MENSUAL    LÍMITES
+  ─────────────────────────────────────────────────────────
+  Vercel            $0 USD           Hosting de la app
+  (hosting)                          Gratis hasta 100GB de tráfico
+                                     Más que suficiente para uso familiar
+
+  Supabase          $0 USD           Base de datos + almacenamiento
+  (base de datos)                    Gratis: 500MB datos, 1GB archivos
+                                     Suficiente para miles de pedidos
+
+  TOTAL ACTUAL:     $0 USD/mes
+
+COSTOS OPCIONALES
+-----------------
+
+  SERVICIO          COSTO            PARA QUÉ SIRVE
+  ─────────────────────────────────────────────────────────
+  Dominio propio    ~$15 USD/año     Tener "block.com.ar" en vez de
+  (ej: block.com.ar)                 una URL larga de Vercel
+
+  WhatsApp auto     ~$5-10 USD/mes   Enviar WhatsApp automáticos
+  (Twilio)                           sin tocar el celular
+                                     (Ver sección 5)
+
+CUÁNDO HABRÍA QUE PAGAR
+-----------------------
+  • Si superan 500MB de datos (miles de pedidos con fotos)
+  • Si quieren dominio personalizado
+  • Si quieren WhatsApp automático real (no sandbox de prueba)
+
+  Para el volumen actual (~30 pedidos/semana), TODO ES GRATIS.
+
+================================================================================
+5. PUNTOS A DECIDIR
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  DECISIÓN 1: MENSAJES DE WHATSAPP AUTOMÁTICOS                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  SITUACIÓN ACTUAL:
+  La app tiene botones que abren WhatsApp con un mensaje pre-escrito.
+  Hay que HACER CLICK para enviar. Es manual pero gratis.
+
+  OPCIÓN A: Mantener manual (GRATIS)
+  ──────────────────────────────────
+    • Cuando cambian el estado a "Listo", aparece botón de WhatsApp
+    • Hacen click → se abre WhatsApp → envían el mensaje
+    • Ventaja: Gratis para siempre
+    • Desventaja: Hay que hacer click y enviar
+
+  OPCIÓN B: WhatsApp automático (PAGO ~$5-10 USD/mes)
+  ───────────────────────────────────────────────────
+    • Cuando cambian estado a "Listo", SE ENVÍA SOLO
+    • No hay que tocar nada más
+    • Ventaja: Más cómodo, no se olvidan de avisar
+    • Desventaja: Costo mensual, requiere configuración adicional
+
+  RECOMENDACIÓN:
+  Empezar con la opción A (manual/gratis).
+  Si después sienten que se olvidan de avisar o es muy tedioso,
+  se puede agregar la opción B.
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  DECISIÓN 2: USUARIOS Y ACCESO                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ¿Quiénes van a usar la aplicación?
+
+    [ ] Papá (Roberto?)
+    [ ] Tío
+    [ ] Mamá
+    [ ] Hermana
+    [ ] Otros: _____________
+
+  ¿Cada uno necesita su propio usuario o comparten uno?
+
+    [ ] Un usuario compartido (más simple)
+    [ ] Un usuario por persona (se ve quién hizo qué)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  DECISIÓN 3: DOMINIO / URL                                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ¿Quieren un dominio fácil de recordar?
+
+    OPCIÓN A: URL gratuita de Vercel (gratis)
+    ─────────────────────────────────────────
+      Ejemplo: adminblock-xyz123.vercel.app
+      Largo pero funciona perfecto
+
+    OPCIÓN B: Dominio propio (~$15 USD/año)
+    ───────────────────────────────────────
+      Ejemplo: block.com.ar o gestionblock.com
+      Más profesional y fácil de recordar
+
+================================================================================
+6. POSIBLES MEJORAS FUTURAS
+================================================================================
+
+Estas son cosas que se PUEDEN agregar si resultan útiles.
+No están hechas todavía, pero son posibles:
+
+AUTOMATIZACIONES
+----------------
+  • Recordatorio automático de pedidos vencidos (email diario)
+  • Alerta cuando un pedido lleva muchos días sin moverse
+  • Resumen semanal por email (cuántos pedidos, cuánto facturado)
+
+REPORTES
+--------
+  • Exportar a Excel (ya está implementado)
+  • Gráficos de ventas por mes
+  • Servicios más pedidos
+  • Mejores clientes
+
+CALCULADORA DE PRESUPUESTOS
+---------------------------
+  • Precios predefinidos por servicio
+  • Calcular automáticamente según cantidad de páginas/unidades
+  • Generar presupuesto para copiar y pegar al cliente
+
+COMENTARIOS INTERNOS
+--------------------
+  • Agregar notas en cada pedido
+  • Comunicación entre quien recibe el pedido y quien lo hace
+  • Historial de cambios
+
+INTEGRACIÓN CON INSTAGRAM
+-------------------------
+  • Ver mensajes de Instagram directo en la app (complejo)
+  • Crear pedido desde un mensaje de Instagram (complejo)
+
+================================================================================
+RESUMEN DE DECISIONES PENDIENTES
+================================================================================
+
+  #   DECISIÓN                              OPCIONES
+  ─────────────────────────────────────────────────────────────────
+  1   WhatsApp automático                   A) Manual/Gratis (recomendado)
+                                            B) Automático/$5-10 USD mes
+
+  2   Usuarios                              A) Uno compartido
+                                            B) Uno por persona
+
+  3   Dominio                               A) URL de Vercel (gratis)
+                                            B) Dominio propio (~$15/año)
+
+================================================================================
+CONTACTO TÉCNICO
+================================================================================
+
+  Desarrollado por: Tomás
+  Cualquier problema o consulta → hablar con Tomás
+
+================================================================================
+                              FIN DEL DOCUMENTO
+================================================================================

@@ -44,6 +44,7 @@ export const orderStatusLabels: Record<(typeof orderStatuses)[number], string> =
 
 export const createOrderSchema = z.object({
   clientId: z.string().uuid("Cliente invalido"),
+  personId: z.string().uuid().optional().nullable(),
   serviceType: z.enum(serviceTypes, {
     errorMap: () => ({ message: "Tipo de servicio invalido" }),
   }),
