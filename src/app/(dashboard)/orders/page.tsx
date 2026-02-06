@@ -15,6 +15,7 @@ import { useUIStore } from "@/stores/ui-store"
 import {
   serviceTypes,
   serviceTypeLabels,
+  orderStatuses,
 } from "@/lib/validations/orders"
 import { OrderList } from "@/components/orders/order-list"
 import { OrderFormModal } from "@/components/orders/order-form-modal"
@@ -38,7 +39,7 @@ export default function OrdersPage() {
     } else if (filter === "due_today") {
       setQuickFilter("due_today")
     } else {
-      setStatusFilter(filter as any)
+      setStatusFilter(filter as typeof orderStatuses[number] | "all")
     }
   }
 

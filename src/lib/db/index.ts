@@ -29,8 +29,9 @@ export function getDb() {
 
 // For backwards compatibility - but this will throw on import if DATABASE_URL is missing
 export const db = new Proxy({} as ReturnType<typeof drizzle>, {
-  get(_, prop) {
-    return (getDb() as any)[prop]
+  get(_, prop: string | symbol) {
+    const dbInstance = getDb()
+    return dbInstance[prop as keyof typeof dbInstance]
   },
 })
 

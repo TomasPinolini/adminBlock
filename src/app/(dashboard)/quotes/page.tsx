@@ -143,8 +143,9 @@ export default function QuotesPage() {
     try {
       await createOrderFromQuote.mutateAsync(quoteId)
       alert("Pedido creado exitosamente!")
-    } catch (error: any) {
-      alert(error.message || "Error al crear pedido")
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Error al crear pedido"
+      alert(message)
     }
   }
 
