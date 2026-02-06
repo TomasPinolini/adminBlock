@@ -303,20 +303,20 @@ function OrderCard({ order, onPayment }: OrderCardProps) {
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuItem onClick={handleDuplicate}>
+              <DropdownMenuItem onClick={handleDuplicate} disabled={duplicateOrder.isPending}>
                 <Copy className="mr-2 h-4 w-4" />
-                Duplicar
+                {duplicateOrder.isPending ? "Duplicando..." : "Duplicar"}
               </DropdownMenuItem>
               {canArchive && !isArchived && (
-                <DropdownMenuItem onClick={handleArchive}>
+                <DropdownMenuItem onClick={handleArchive} disabled={archiveOrder.isPending}>
                   <Archive className="mr-2 h-4 w-4" />
-                  Archivar
+                  {archiveOrder.isPending ? "Archivando..." : "Archivar"}
                 </DropdownMenuItem>
               )}
               {isArchived && (
-                <DropdownMenuItem onClick={handleUnarchive}>
+                <DropdownMenuItem onClick={handleUnarchive} disabled={unarchiveOrder.isPending}>
                   <ArchiveRestore className="mr-2 h-4 w-4" />
-                  Desarchivar
+                  {unarchiveOrder.isPending ? "Desarchivando..." : "Desarchivar"}
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />

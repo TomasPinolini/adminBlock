@@ -24,16 +24,16 @@ export const orderStatuses = [
 export const serviceTypeLabels: Record<(typeof serviceTypes)[number], string> = {
   copiado: "Copiado",
   tesis: "Tesis",
-  encuadernacion: "Encuadernacion",
-  carteleria: "Carteleria",
+  encuadernacion: "Encuadernación",
+  carteleria: "Cartelería",
   placas: "Placas",
   calcos: "Calcos",
-  folleteria: "Folleteria",
+  folleteria: "Folletería",
   ploteo: "Ploteo",
 }
 
 export const orderStatusLabels: Record<(typeof orderStatuses)[number], string> = {
-  pending_quote: "Pendiente cotizacion",
+  pending_quote: "Pendiente cotización",
   quoted: "Cotizado",
   approved: "Aprobado",
   in_progress: "En proceso",
@@ -43,12 +43,12 @@ export const orderStatusLabels: Record<(typeof orderStatuses)[number], string> =
 }
 
 export const createOrderSchema = z.object({
-  clientId: z.string().uuid("Cliente invalido"),
+  clientId: z.string().uuid("Cliente inválido"),
   personId: z.string().uuid().optional().nullable(),
   serviceType: z.enum(serviceTypes, {
-    errorMap: () => ({ message: "Tipo de servicio invalido" }),
+    errorMap: () => ({ message: "Tipo de servicio inválido" }),
   }),
-  description: z.string().min(1, "Descripcion requerida"),
+  description: z.string().min(1, "Descripción requerida"),
   price: z.string().optional(),
   dueDate: z.string().optional(),
 })
