@@ -2,12 +2,79 @@
 
 export const dynamic = "force-dynamic"
 
-import { Download, CalendarDays, Users } from "lucide-react"
+import { useState } from "react"
+import { Download, CalendarDays, Users, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { exportOrdersToExcel, exportClientsToExcel } from "@/lib/utils/export"
 
 export default function ReportsPage() {
+  const [fromDate, setFromDate] = useState("")
+  const [toDate, setToDate] = useState("")
+  const [loading, setLoading] = useState<string | null>(null)
+
+  const handleExportMonthOrders = async () => {
+    setLoading("month")
+    try {
+      const res = await fetch("/api/export/orders?period=month")
+      if (!res.ok) throw new Error("Error al exportar")
+      const orders = await res.json()
+      if (orders.length === 0) {
+        alert("No hay pedidos este mes")
+        return
+      }
+      exportOrdersToExcel(orders, "pedidos_mes")
+    } catch (error) {
+      console.error(error)
+      alert("Error al exportar pedidos")
+    } finally {
+      setLoading(null)
+    }
+  }
+
+  const handleExportDateRange = async () => {
+    if (!fromDate || !toDate) {
+      alert("Selecciona ambas fechas")
+      return
+    }
+    setLoading("range")
+    try {
+      const res = await fetch(`/api/export/orders?from=${fromDate}&to=${toDate}`)
+      if (!res.ok) throw new Error("Error al exportar")
+      const orders = await res.json()
+      if (orders.length === 0) {
+        alert("No hay pedidos en ese rango")
+        return
+      }
+      exportOrdersToExcel(orders, `pedidos_${fromDate}_${toDate}`)
+    } catch (error) {
+      console.error(error)
+      alert("Error al exportar pedidos")
+    } finally {
+      setLoading(null)
+    }
+  }
+
+  const handleExportClients = async () => {
+    setLoading("clients")
+    try {
+      const res = await fetch("/api/export/clients")
+      if (!res.ok) throw new Error("Error al exportar")
+      const clients = await res.json()
+      if (clients.length === 0) {
+        alert("No hay clientes registrados")
+        return
+      }
+      exportClientsToExcel(clients, "clientes")
+    } catch (error) {
+      console.error(error)
+      alert("Error al exportar clientes")
+    } finally {
+      setLoading(null)
+    }
+  }
+
   return (
     <div className="space-y-4 lg:space-y-6">
       {/* Header */}
@@ -33,9 +100,18 @@ export default function ReportsPage() {
               </p>
             </div>
           </div>
-          <Button className="w-full h-11 lg:h-9" variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Exportar
+          <Button 
+            className="w-full h-11 lg:h-9" 
+            variant="outline"
+            onClick={handleExportMonthOrders}
+            disabled={loading === "month"}
+          >
+            {loading === "month" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            {loading === "month" ? "Exportando..." : "Exportar"}
           </Button>
         </div>
 
@@ -55,16 +131,35 @@ export default function ReportsPage() {
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
               <Label className="text-xs">Desde</Label>
-              <Input type="date" className="h-11 lg:h-9" />
+              <Input 
+                type="date" 
+                className="h-11 lg:h-9" 
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Hasta</Label>
-              <Input type="date" className="h-11 lg:h-9" />
+              <Input 
+                type="date" 
+                className="h-11 lg:h-9"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+              />
             </div>
           </div>
-          <Button className="w-full h-11 lg:h-9" variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Exportar
+          <Button 
+            className="w-full h-11 lg:h-9" 
+            variant="outline"
+            onClick={handleExportDateRange}
+            disabled={loading === "range" || !fromDate || !toDate}
+          >
+            {loading === "range" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            {loading === "range" ? "Exportando..." : "Exportar"}
           </Button>
         </div>
 
@@ -81,9 +176,18 @@ export default function ReportsPage() {
               </p>
             </div>
           </div>
-          <Button className="w-full h-11 lg:h-9" variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Exportar
+          <Button 
+            className="w-full h-11 lg:h-9" 
+            variant="outline"
+            onClick={handleExportClients}
+            disabled={loading === "clients"}
+          >
+            {loading === "clients" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            {loading === "clients" ? "Exportando..." : "Exportar"}
           </Button>
         </div>
       </div>

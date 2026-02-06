@@ -7,7 +7,7 @@ import {
   Users,
   Calculator,
   FileBarChart,
-  Settings,
+  Settings as SettingsIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -35,7 +35,7 @@ const navItems = [
   {
     href: "/settings",
     label: "Ajustes",
-    icon: Settings,
+    icon: SettingsIcon,
   },
 ]
 
