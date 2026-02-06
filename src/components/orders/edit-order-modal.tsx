@@ -44,13 +44,19 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
 
   useEffect(() => {
     if (order) {
+      // Validate invoice type to ensure it's one of the valid values
+      const validInvoiceTypes = ["A", "B", "none"] as const
+      const invoiceType = validInvoiceTypes.includes(order.invoiceType as any) 
+        ? (order.invoiceType as "A" | "B" | "none")
+        : "none"
+      
       setFormData({
         description: order.description || "",
         price: order.price || "",
         dueDate: order.dueDate || "",
         serviceType: order.serviceType || "",
         invoiceNumber: order.invoiceNumber || "",
-        invoiceType: (order.invoiceType as "A" | "B" | "none") || "none",
+        invoiceType,
         quantity: order.quantity || "",
       })
     }

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import type { Order, NewOrder, Client } from "@/lib/db/schema"
+import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 
 export interface OrderWithClient extends Order {
   client: Pick<Client, "id" | "name" | "phone" | "instagramHandle"> | null
@@ -19,13 +20,13 @@ async function fetchOrders(params?: FetchOrdersParams): Promise<OrderWithClient[
   if (params?.clientId) searchParams.set("clientId", params.clientId)
   if (params?.includeArchived) searchParams.set("includeArchived", "true")
 
-  const res = await fetch(`/api/orders?${searchParams}`)
+  const res = await fetchWithTimeout(`/api/orders?${searchParams}`, { timeout: 15000 })
   if (!res.ok) throw new Error("Error al obtener pedidos")
   return res.json()
 }
 
 async function fetchOrder(id: string): Promise<OrderWithClient> {
-  const res = await fetch(`/api/orders/${id}`)
+  const res = await fetchWithTimeout(`/api/orders/${id}`, { timeout: 10000 })
   if (!res.ok) throw new Error("Error al obtener pedido")
   return res.json()
 }
@@ -37,10 +38,11 @@ async function createOrder(data: {
   price?: string
   dueDate?: string
 }): Promise<Order> {
-  const res = await fetch("/api/orders", {
+  const res = await fetchWithTimeout("/api/orders", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    timeout: 15000,
   })
   if (!res.ok) throw new Error("Error al crear pedido")
   return res.json()
@@ -53,25 +55,28 @@ async function updateOrder({
   id: string
   data: Partial<NewOrder>
 }): Promise<Order> {
-  const res = await fetch(`/api/orders/${id}`, {
+  const res = await fetchWithTimeout(`/api/orders/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    timeout: 15000,
   })
   if (!res.ok) throw new Error("Error al actualizar pedido")
   return res.json()
 }
 
 async function deleteOrder(id: string): Promise<void> {
-  const res = await fetch(`/api/orders/${id}`, {
+  const res = await fetchWithTimeout(`/api/orders/${id}`, {
     method: "DELETE",
+    timeout: 10000,
   })
   if (!res.ok) throw new Error("Error al eliminar pedido")
 }
 
 async function duplicateOrder(id: string): Promise<Order> {
-  const res = await fetch(`/api/orders/${id}/duplicate`, {
+  const res = await fetchWithTimeout(`/api/orders/${id}/duplicate`, {
     method: "POST",
+    timeout: 10000,
   })
   if (!res.ok) throw new Error("Error al duplicar pedido")
   return res.json()

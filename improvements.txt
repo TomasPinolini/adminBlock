@@ -106,9 +106,14 @@
     - Ver entregas programadas
     - Vista semanal/mensual
 
-14. Facturación
-    - Generar facturas para pedidos
-    - Integración con sistema de facturación (por evaluar)
+14. Facturación ✅ COMPLETADO (Feb 2026)
+    - [x] Agregar campos de facturación a pedidos (invoiceNumber, invoiceType, quantity, subtotal, taxAmount)
+    - [x] Agregar CUIT a clientes
+    - [x] Crear utilidades de cálculo de IVA (21%)
+    - [x] UI para editar facturas en pedidos
+    - [x] Soporte para Factura A (con IVA) y Factura B (monotributo)
+    - [ ] Generar PDFs de facturas (futuro)
+    - [ ] Integración con AFIP (futuro)
 
 15. PWA / App Instalable
     - Hacer la app instalable en móvil
@@ -116,6 +121,169 @@
 
 16. Dark Mode
     - Toggle para cambiar tema claro/oscuro
+
+================================================================================
+📋 CODE REVIEW - ISSUES ENCONTRADOS (Feb 2026)
+================================================================================
+
+🔴 CRÍTICOS - REQUIEREN ATENCIÓN INMEDIATA
+-------------------------------------------
+
+1. Database Schema Mismatch - Invoice Type
+   - Schema define invoiceTypeEnum pero migración usa TEXT
+   - Fix: Actualizar migración para usar enum o cambiar schema a TEXT
+   - Ubicación: migrations/add_invoice_fields_simple.sql:9
+
+2. Missing Error Boundaries
+   - No hay error boundaries para capturar crashes de componentes
+   - Impacto: Crashes se propagan al usuario, mala UX
+   - Fix: Agregar error boundaries a nivel de rutas
+
+3. Unsafe Type Assertions
+   - Uso de 'as' sin validación
+   - Ejemplo: invoiceType: (order.invoiceType as "A" | "B" | "none")
+   - Riesgo: Errores en runtime si los datos no coinciden
+
+4. No Request Timeouts
+   - Los fetch pueden colgar infinitamente
+   - Causa del bug "Guardando..." que viste
+   - Fix: Agregar AbortController o timeout wrapper
+
+🟡 IMPORTANTES - ARREGLAR PRONTO
+---------------------------------
+
+5. Inconsistent Soft Delete
+   - isArchived/isActive usan TEXT con "true"/"false" en vez de boolean
+   - Afecta: orders.isArchived, suppliers.isActive, materials.isActive
+   - Fix: Migrar a boolean o crear helpers consistentes
+
+6. Missing Input Validation on Invoice Calculations
+   - No valida números negativos o NaN en calculateIVA()
+   - Ubicación: src/lib/utils/invoice.ts
+   - Fix: Agregar validación de inputs
+
+7. Inconsistent Error Messages
+   - Mix de español/inglés en errores
+   - Fix: Estandarizar todos los mensajes
+
+8. Missing Database Indexes
+   - Faltan índices en: orders.status, orders.clientId, orders.paymentStatus, clients.clientType
+   - Impacto: Queries lentas a medida que crece la data
+   - Fix: Agregar índices en migración
+
+9. Duplicate Client System
+   - Tabla 'contacts' (legacy) y 'clientRelationships' hacen lo mismo
+   - Fix: Migrar todos los contacts a clientRelationships y eliminar tabla
+
+10. No Input Sanitization
+    - Sin protección XSS en inputs
+    - Riesgo: Vulnerabilidad de seguridad
+    - Fix: Sanitizar inputs especialmente en notes/description
+
+🟢 MEJORAS MENORES - NICE TO HAVE
+----------------------------------
+
+11. Hardcoded IVA Rate
+    - IVA_RATE = 0.21 está hardcodeado
+    - Fix: Mover a app settings para flexibilidad
+
+12. No Pagination
+    - Se cargan todos los registros sin paginación
+    - Impacto: Performance degradada con datasets grandes
+    - Fix: Implementar cursor-based pagination
+
+13. Missing Loading States
+    - Algunos botones no muestran loading (archive/unarchive)
+    - Fix: Agregar estados de loading consistentes
+
+14. No Optimistic Updates
+    - UI no se actualiza optimísticamente
+    - Impacto: Performance percibida lenta
+    - Fix: Agregar optimistic updates en React Query
+
+15. Inconsistent Date Handling
+    - Mix de Date objects, ISO strings, date strings
+    - Riesgo: Bugs de timezone
+    - Fix: Estandarizar en ISO strings
+
+16. No Rate Limiting
+    - APIs sin rate limiting
+    - Riesgo: Abuso o DoS
+    - Fix: Agregar middleware de rate limiting
+
+17. TypeScript Not in Strict Mode
+    - tsconfig.json no usa strict mode
+    - Fix: Habilitar strict mode para mejor type safety
+
+18. No Structured Logging
+    - Solo console.error para logging
+    - Problema: Difícil debuggear en producción
+    - Fix: Implementar logging estructurado (Pino, Winston)
+
+19. No Retry Logic
+    - Requests fallidos no reintentan
+    - Impacto: Mala UX en problemas de red
+    - Fix: Agregar retry logic a React Query
+
+20. Missing Frontend Validation
+    - Algunos forms no validan antes de submit
+    - Ejemplo: Formato CUIT no se valida
+    - Fix: Agregar validación frontend matching backend schemas
+
+📊 PERFORMANCE
+--------------
+
+21. N+1 Query Problem
+    - Fetching de data relacionada en loops
+    - Fix: Usar Drizzle's 'with' para eager loading
+
+22. Large Bundle Size
+    - Sin code splitting para componentes grandes
+    - Fix: Usar dynamic imports para modals y componentes pesados
+
+23. No Caching Strategy
+    - Sin headers de HTTP caching
+    - Fix: Agregar Cache-Control headers apropiados
+
+🔒 SEGURIDAD
+------------
+
+24. No CSRF Protection
+    - Sin validación de CSRF tokens
+    - Riesgo: Ataques de cross-site request forgery
+    - Fix: Implementar protección CSRF
+
+25. Sensitive Data in Logs
+    - Objetos de error completos en logs (pueden contener data sensible)
+    - Fix: Sanitizar logs antes de loggear
+
+26. SQL Injection (Verificar)
+    - Drizzle ORM debería proteger, pero necesita verificación
+    - Fix: Auditar todas las raw SQL queries si existen
+
+🎯 PRIORIDADES RECOMENDADAS
+---------------------------
+
+ALTA PRIORIDAD (Arreglar Ya):
+1. Fix invoice_type enum/TEXT mismatch
+2. Agregar request timeouts
+3. Agregar índices faltantes en DB
+4. Implementar error boundaries
+5. Fix soft delete inconsistency
+
+MEDIA PRIORIDAD (Arreglar Pronto):
+6. Migrar contacts a clientRelationships
+7. Agregar validación y sanitización de inputs
+8. Implementar paginación
+9. Agregar manejo de errores apropiado
+10. Estandarizar mensajes de error
+
+BAJA PRIORIDAD (Nice to Have):
+11. Agregar optimistic updates
+12. Implementar code splitting
+13. Agregar logging estructurado
+14. Habilitar TypeScript strict mode
+15. Agregar rate limiting
 
 ================================================================================
                          FIN DEL ROADMAP

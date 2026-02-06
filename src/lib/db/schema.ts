@@ -44,12 +44,6 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "payment_registered",
 ])
 
-export const invoiceTypeEnum = pgEnum("invoice_type", [
-  "A", // Factura A - con IVA discriminado
-  "B", // Factura B - monotributo
-  "none", // Sin factura
-])
-
 export const paymentStatusEnum = pgEnum("payment_status", [
   "pending",
   "partial",
@@ -121,7 +115,7 @@ export const orders = pgTable("orders", {
   dueDate: date("due_date"),
   // Invoice fields
   invoiceNumber: text("invoice_number"), // e.g., "3079", "1209"
-  invoiceType: invoiceTypeEnum("invoice_type").default("none"),
+  invoiceType: text("invoice_type").default("none"), // "A", "B", or "none"
   quantity: numeric("quantity", { precision: 10, scale: 2 }), // cantidad de unidades
   subtotal: numeric("subtotal", { precision: 10, scale: 2 }), // monto sin IVA
   taxAmount: numeric("tax_amount", { precision: 10, scale: 2 }), // monto de IVA (21%)

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import type { Client, NewClient } from "@/lib/db/schema"
+import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 
 export interface ClientWithStats extends Client {
   orderCount: number
@@ -8,16 +9,17 @@ export interface ClientWithStats extends Client {
 }
 
 async function fetchClients(): Promise<ClientWithStats[]> {
-  const res = await fetch("/api/clients")
+  const res = await fetchWithTimeout("/api/clients", { timeout: 10000 })
   if (!res.ok) throw new Error("Error al obtener clientes")
   return res.json()
 }
 
 async function createClient(data: NewClient): Promise<Client> {
-  const res = await fetch("/api/clients", {
+  const res = await fetchWithTimeout("/api/clients", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    timeout: 15000,
   })
   if (!res.ok) throw new Error("Error al crear cliente")
   return res.json()
@@ -30,18 +32,20 @@ async function updateClient({
   id: string
   data: Partial<NewClient>
 }): Promise<Client> {
-  const res = await fetch(`/api/clients/${id}`, {
+  const res = await fetchWithTimeout(`/api/clients/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    timeout: 15000,
   })
   if (!res.ok) throw new Error("Error al actualizar cliente")
   return res.json()
 }
 
 async function deleteClient(id: string): Promise<void> {
-  const res = await fetch(`/api/clients/${id}`, {
+  const res = await fetchWithTimeout(`/api/clients/${id}`, {
     method: "DELETE",
+    timeout: 10000,
   })
   if (!res.ok) throw new Error("Error al eliminar cliente")
 }
