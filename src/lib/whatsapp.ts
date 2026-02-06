@@ -37,13 +37,11 @@ export function isWhatsAppEnabled(): boolean {
 export async function sendWhatsApp({ to, message }: SendWhatsAppParams): Promise<WhatsAppResult> {
   // Check if Twilio is configured
   if (!isTwilioConfigured || !client || !fromNumber) {
-    console.warn("WhatsApp: Twilio not configured, skipping message")
     return { success: false, error: "Twilio not configured" }
   }
 
   // Validate phone number
   if (!to || to.trim().length < 8) {
-    console.warn("WhatsApp: Invalid phone number")
     return { success: false, error: "Invalid phone number" }
   }
 
@@ -60,7 +58,6 @@ export async function sendWhatsApp({ to, message }: SendWhatsAppParams): Promise
       body: message,
     })
 
-    console.log(`WhatsApp sent to ${to}: ${result.sid}`)
     return { success: true, sid: result.sid }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error"
@@ -72,11 +69,7 @@ export async function sendWhatsApp({ to, message }: SendWhatsAppParams): Promise
 // Safe background send - doesn't throw, logs errors
 export function sendWhatsAppBackground(params: SendWhatsAppParams): void {
   sendWhatsApp(params)
-    .then((result) => {
-      if (!result.success) {
-        console.warn(`WhatsApp background send failed: ${result.error}`)
-      }
-    })
+    .then(() => {})
     .catch((err) => {
       console.error("WhatsApp background send error:", err)
     })
