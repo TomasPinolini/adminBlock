@@ -1,181 +1,271 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, Trash2, ArrowLeft, Layers } from "lucide-react"
+import { Plus, Trash2, ArrowLeft, Edit, Package } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import {
-  useMaterials,
-  useServiceMaterials,
-  useAddServiceMaterial,
-  useRemoveServiceMaterial,
-} from "@/hooks/use-materials"
-import { serviceTypes, serviceTypeLabels } from "@/lib/validations/orders"
+  useServices,
+  useCreateService,
+  useUpdateService,
+  useDeleteService,
+} from "@/hooks/use-services"
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
+import type { Service } from "@/lib/db/schema"
 
 export default function ServicesPage() {
-  const [selectedService, setSelectedService] = useState<string>(serviceTypes[0])
-  const [selectedMaterialId, setSelectedMaterialId] = useState<string>("")
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [editingService, setEditingService] = useState<Service | null>(null)
+  const [formData, setFormData] = useState({
+    name: "",
+    displayName: "",
+    description: "",
+  })
 
-  const { data: materials = [] } = useMaterials()
-  const { data: serviceMaterials = [], isLoading } = useServiceMaterials(selectedService)
-  const addServiceMaterial = useAddServiceMaterial()
-  const removeServiceMaterial = useRemoveServiceMaterial()
+  const { data: services = [], isLoading } = useServices()
+  const createService = useCreateService()
+  const updateService = useUpdateService()
+  const deleteService = useDeleteService()
+  const { confirm, ConfirmDialog } = useConfirmDialog()
 
-  const assignedMaterialIds = serviceMaterials.map((sm) => sm.materialId)
-  const availableMaterials = materials.filter(
-    (m) => !assignedMaterialIds.includes(m.id)
-  )
+  const handleOpenCreate = () => {
+    setFormData({ name: "", displayName: "", description: "" })
+    setIsCreateOpen(true)
+  }
 
-  const handleAddMaterial = async () => {
-    if (!selectedMaterialId) return
+  const handleOpenEdit = (service: Service) => {
+    setEditingService(service)
+    setFormData({
+      name: service.name,
+      displayName: service.displayName,
+      description: service.description || "",
+    })
+  }
+
+  const handleCloseDialog = () => {
+    setIsCreateOpen(false)
+    setEditingService(null)
+    setFormData({ name: "", displayName: "", description: "" })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
     try {
-      await addServiceMaterial.mutateAsync({
-        serviceType: selectedService,
-        materialId: selectedMaterialId,
-      })
-      setSelectedMaterialId("")
+      if (editingService) {
+        await updateService.mutateAsync({
+          id: editingService.id,
+          name: formData.name.toLowerCase().trim(),
+          displayName: formData.displayName.trim(),
+          description: formData.description.trim() || null,
+        })
+        toast.success("Servicio actualizado")
+      } else {
+        await createService.mutateAsync({
+          name: formData.name.toLowerCase().trim(),
+          displayName: formData.displayName.trim(),
+          description: formData.description.trim() || undefined,
+        })
+        toast.success("Servicio creado")
+      }
+      handleCloseDialog()
     } catch (error) {
-      console.error("Error adding material:", error)
+      toast.error(error instanceof Error ? error.message : "Error al guardar servicio")
     }
   }
 
-  const handleRemoveMaterial = async (id: string) => {
-    try {
-      await removeServiceMaterial.mutateAsync(id)
-    } catch (error) {
-      console.error("Error removing material:", error)
+  const handleDelete = async (service: Service) => {
+    const confirmed = await confirm({
+      title: "Eliminar servicio",
+      description: `¿Estás seguro de que deseas eliminar "${service.displayName}"? Esta acción no se puede deshacer.`,
+      confirmText: "Eliminar",
+      variant: "destructive",
+    })
+
+    if (confirmed) {
+      try {
+        await deleteService.mutateAsync(service.id)
+        toast.success("Servicio eliminado")
+      } catch (error) {
+        toast.error("Error al eliminar servicio")
+      }
     }
   }
 
   return (
     <div className="space-y-4 lg:space-y-6">
+      <ConfirmDialog />
+
       {/* Header */}
-      <div className="flex items-center gap-2">
-        <Link href="/settings">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-xl lg:text-2xl font-bold">Materiales por Servicio</h1>
-          <p className="text-sm text-muted-foreground">
-            Configura qué materiales se usan en cada tipo de servicio
-          </p>
-        </div>
-      </div>
-
-      {/* Service Selector */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Tipo de servicio</label>
-        <Select value={selectedService} onValueChange={setSelectedService}>
-          <SelectTrigger className="w-full sm:w-64">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {serviceTypes.map((service) => (
-              <SelectItem key={service} value={service}>
-                {serviceTypeLabels[service]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Materials for selected service */}
-      <div className="space-y-4">
-        <h2 className="font-semibold">
-          Materiales para {serviceTypeLabels[selectedService as keyof typeof serviceTypeLabels]}
-        </h2>
-
-        {isLoading ? (
-          <div className="space-y-2">
-            {[1, 2].map((i) => (
-              <div key={i} className="h-14 animate-pulse rounded-lg border bg-muted" />
-            ))}
-          </div>
-        ) : serviceMaterials.length === 0 ? (
-          <div className="rounded-lg border border-dashed bg-muted/50 p-6 text-center">
-            <Layers className="mx-auto h-8 w-8 text-muted-foreground" />
-            <p className="mt-2 text-sm text-muted-foreground">
-              No hay materiales asignados a este servicio
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Link href="/settings">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-xl lg:text-2xl font-bold">Servicios</h1>
+            <p className="text-sm text-muted-foreground">
+              Gestiona los tipos de servicio que ofreces
             </p>
           </div>
-        ) : (
-          <div className="space-y-2">
-            {serviceMaterials.map((sm) => (
-              <div
-                key={sm.id}
-                className="flex items-center justify-between rounded-lg border bg-background p-3"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="font-medium">{sm.material?.name}</span>
-                  <span className="text-sm text-muted-foreground">
-                    ({sm.material?.unit})
-                  </span>
+        </div>
+        <Button onClick={handleOpenCreate}>
+          <Plus className="mr-2 h-4 w-4" />
+          Nuevo Servicio
+        </Button>
+      </div>
+
+      {/* Services List */}
+      {isLoading ? (
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-20 animate-pulse rounded-lg border bg-muted" />
+          ))}
+        </div>
+      ) : services.length === 0 ? (
+        <div className="rounded-lg border border-dashed bg-muted/50 p-12 text-center">
+          <Package className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-semibold">No hay servicios</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Comienza creando tu primer tipo de servicio
+          </p>
+          <Button onClick={handleOpenCreate} className="mt-4">
+            <Plus className="mr-2 h-4 w-4" />
+            Crear Servicio
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {services.map((service) => (
+            <div
+              key={service.id}
+              className="flex items-center justify-between rounded-lg border bg-background p-4"
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold">{service.displayName}</h3>
+                  <span className="text-xs text-muted-foreground">({service.name})</span>
                 </div>
+                {service.description && (
+                  <p className="mt-1 text-sm text-muted-foreground">{service.description}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => handleRemoveMaterial(sm.id)}
+                  onClick={() => handleOpenEdit(service)}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleDelete(service)}
                   className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
+      )}
 
-        {/* Add material */}
-        {availableMaterials.length > 0 && (
-          <div className="flex gap-2">
-            <Select value={selectedMaterialId} onValueChange={setSelectedMaterialId}>
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Seleccionar material..." />
-              </SelectTrigger>
-              <SelectContent>
-                {availableMaterials.map((material) => (
-                  <SelectItem key={material.id} value={material.id}>
-                    {material.name} ({material.unit})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              onClick={handleAddMaterial}
-              disabled={!selectedMaterialId || addServiceMaterial.isPending}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Agregar
-            </Button>
-          </div>
-        )}
+      {/* Create/Edit Dialog */}
+      <Dialog open={isCreateOpen || !!editingService} onOpenChange={handleCloseDialog}>
+        <DialogContent>
+          <form onSubmit={handleSubmit}>
+            <DialogHeader>
+              <DialogTitle>
+                {editingService ? "Editar Servicio" : "Nuevo Servicio"}
+              </DialogTitle>
+              <DialogDescription>
+                {editingService
+                  ? "Modifica los datos del servicio"
+                  : "Crea un nuevo tipo de servicio"}
+              </DialogDescription>
+            </DialogHeader>
 
-        {availableMaterials.length === 0 && materials.length > 0 && (
-          <p className="text-sm text-muted-foreground">
-            Todos los materiales ya están asignados a este servicio.
-          </p>
-        )}
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">
+                  Nombre interno <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="copiado, tesis, encuadernacion..."
+                  required
+                  disabled={!!editingService}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Minúsculas, sin espacios. Se usa internamente en el sistema.
+                </p>
+              </div>
 
-        {materials.length === 0 && (
-          <div className="rounded-lg border border-dashed bg-muted/50 p-4">
-            <p className="text-sm text-muted-foreground">
-              No hay materiales creados.{" "}
-              <Link href="/settings/materials" className="text-primary underline">
-                Crear materiales primero
-              </Link>
-            </p>
-          </div>
-        )}
-      </div>
+              <div className="space-y-2">
+                <Label htmlFor="displayName">
+                  Nombre para mostrar <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="displayName"
+                  value={formData.displayName}
+                  onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+                  placeholder="Copiado, Tesis, Encuadernación..."
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Como se mostrará en la interfaz
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Descripción (opcional)</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Descripción del servicio..."
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={handleCloseDialog}>
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={
+                  !formData.name.trim() ||
+                  !formData.displayName.trim() ||
+                  createService.isPending ||
+                  updateService.isPending
+                }
+              >
+                {editingService ? "Guardar Cambios" : "Crear Servicio"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

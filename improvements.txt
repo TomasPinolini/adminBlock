@@ -64,31 +64,42 @@
    - [x] Modal para editar clientes existentes
    - [x] Búsqueda/filtro en página de pedidos
 
+8. Servicios Dinámicos 
+   - [x] Crear tabla de servicios en base de datos
+   - [x] Migración de enum a TEXT para service_type
+   - [x] API CRUD para servicios (/api/services)
+   - [x] Hooks para gestión de servicios (use-services.ts)
+   - [x] Validaciones actualizadas para servicios dinámicos
+   - [x] Message templates actualizados
+   - [ ] UI para gestionar servicios en Settings (pendiente)
+   - [ ] Actualizar forms de pedidos con dropdown dinámico (pendiente)
+
+9. Facturación 
+   - [x] Agregar campos de facturación a pedidos 
+   (invoiceNumber, invoiceType, quantity, subtotal, taxAmount)
+   - [x] Agregar CUIT a clientes
+   - [x] Crear utilidades de cálculo de IVA (21%)
+   - [x] UI para editar facturas en pedidos
+   - [x] Soporte para Factura A (con IVA) y Factura B (monotributo)
+   - [ ] Generar PDFs de facturas (futuro)
+   - [ ] Integración con AFIP (futuro)
+
 ================================================================================
-⏳ PENDIENTE - ALTA PRIORIDAD
+ PENDIENTE - ALTA PRIORIDAD
 ================================================================================
 
-8. Servicios Dinámicos
-   - Permitir crear nuevos tipos de servicio desde el sistema
-   - Editar servicios existentes
-   - Asignar materiales a cada servicio dinámicamente
-
-================================================================================
-⏳ PENDIENTE - MEDIA PRIORIDAD
-================================================================================
-
-9. Sistema de Roles
+1. Sistema de Roles
    - ROL ADMIN: Papá, Tío - acceso completo
    - ROL OPERADOR: Mamá, Hermana - solo crear clientes/pedidos
    - Restringir acceso a configuración y cotización
 
-10. Auditoría
+2. Auditoría
    - Ver quién hizo cada acción
    - Ver cuándo se hizo cada acción
    - Ver qué cambió en cada acción
    - UI para ver historial de actividad
 
-11. Optimización Stats API
+3. Optimización Stats API
    - Usar SQL aggregations en vez de cargar todos los pedidos
    - Mejorar performance del dashboard
 

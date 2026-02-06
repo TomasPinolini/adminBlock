@@ -24,10 +24,9 @@ import { useUIStore } from "@/stores/ui-store"
 import { useCreateOrder } from "@/hooks/use-orders"
 import { useClients } from "@/hooks/use-clients"
 import { useCompanyEmployees } from "@/hooks/use-relationships"
+import { useServices } from "@/hooks/use-services"
 import {
   createOrderSchema,
-  serviceTypes,
-  serviceTypeLabels,
   type CreateOrderInput,
 } from "@/lib/validations/orders"
 import { Building2 } from "lucide-react"
@@ -36,6 +35,7 @@ export function OrderFormModal() {
   const { createOrderModalOpen, setCreateOrderModalOpen } = useUIStore()
   const createOrder = useCreateOrder()
   const { data: clients = [] } = useClients()
+  const { data: services = [] } = useServices()
   const [error, setError] = useState("")
 
   const {
@@ -162,19 +162,23 @@ export function OrderFormModal() {
             <Label>Tipo de servicio *</Label>
             <Select
               value={selectedServiceType}
-              onValueChange={(value) =>
-                setValue("serviceType", value as CreateOrderInput["serviceType"])
-              }
+              onValueChange={(value) => setValue("serviceType", value)}
             >
               <SelectTrigger className="h-11 lg:h-9">
                 <SelectValue placeholder="Selecciona un servicio" />
               </SelectTrigger>
               <SelectContent>
-                {serviceTypes.map((service) => (
-                  <SelectItem key={service} value={service}>
-                    {serviceTypeLabels[service]}
+                {services.length === 0 ? (
+                  <SelectItem value="none" disabled>
+                    No hay servicios - configúralos en Ajustes
                   </SelectItem>
-                ))}
+                ) : (
+                  services.map((service) => (
+                    <SelectItem key={service.id} value={service.name}>
+                      {service.displayName}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
             {errors.serviceType && (

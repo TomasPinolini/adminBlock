@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { useUpdateOrder } from "@/hooks/use-orders"
+import { useServices } from "@/hooks/use-services"
 import type { OrderWithClient } from "@/hooks/use-orders"
 import {
   Dialog,
@@ -21,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { serviceTypeLabels, serviceTypes, invoiceTypeLabels, invoiceTypes } from "@/lib/validations/orders"
+import { invoiceTypeLabels, invoiceTypes } from "@/lib/validations/orders"
 import { calculateInvoiceBreakdown } from "@/lib/utils/invoice"
 
 interface EditOrderModalProps {
@@ -32,6 +33,7 @@ interface EditOrderModalProps {
 
 export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProps) {
   const updateOrder = useUpdateOrder()
+  const { data: services = [] } = useServices()
   const [formData, setFormData] = useState({
     description: "",
     price: "",
@@ -86,7 +88,7 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
           description: formData.description,
           price: formData.price || null,
           dueDate: formData.dueDate || null,
-          serviceType: formData.serviceType as typeof serviceTypes[number],
+          serviceType: formData.serviceType,
           invoiceNumber: formData.invoiceNumber || null,
           invoiceType: formData.invoiceType,
           quantity: formData.quantity || null,
@@ -120,13 +122,13 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
               value={formData.serviceType}
               onValueChange={(value) => setFormData({ ...formData, serviceType: value })}
             >
-              <SelectTrigger id="serviceType">
+              <SelectTrigger>
                 <SelectValue placeholder="Seleccionar servicio" />
               </SelectTrigger>
               <SelectContent>
-                {serviceTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {serviceTypeLabels[type]}
+                {services.map((service) => (
+                  <SelectItem key={service.id} value={service.name}>
+                    {service.displayName}
                   </SelectItem>
                 ))}
               </SelectContent>
