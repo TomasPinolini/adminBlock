@@ -22,17 +22,17 @@ interface StatCardProps {
 
 function StatCard({ label, value, icon, variant = "default", onClick }: StatCardProps) {
   const variantStyles = {
-    default: "bg-background border",
-    warning: "bg-orange-50 border-orange-200 dark:bg-orange-950/20 dark:border-orange-800",
-    success: "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800",
-    info: "bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-800",
+    default: "bg-card border border-border",
+    warning: "bg-orange-50 border-orange-200 dark:bg-orange-950/30 dark:border-orange-800/50",
+    success: "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800/50",
+    info: "bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800/50",
   }
 
   const iconStyles = {
     default: "text-muted-foreground",
-    warning: "text-orange-600 dark:text-orange-400",
-    success: "text-green-600 dark:text-green-400",
-    info: "text-blue-600 dark:text-blue-400",
+    warning: "text-orange-600 dark:text-orange-500",
+    success: "text-green-600 dark:text-green-500",
+    info: "text-blue-600 dark:text-blue-500",
   }
 
   return (
@@ -113,15 +113,15 @@ export function DashboardStats({ onFilterChange }: DashboardStatsProps) {
 
       {/* Revenue Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="flex items-center gap-3 rounded-lg border bg-background p-3">
-          <DollarSign className="h-5 w-5 text-green-600" />
+        <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
+          <DollarSign className="h-5 w-5 text-green-600 dark:text-green-500" />
           <div>
             <p className="text-lg font-bold">{formatCurrency(stats.weekRevenue)}</p>
             <p className="text-xs text-muted-foreground">Esta semana</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-lg border bg-background p-3">
-          <DollarSign className="h-5 w-5 text-green-600" />
+        <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
+          <DollarSign className="h-5 w-5 text-green-600 dark:text-green-500" />
           <div>
             <p className="text-lg font-bold">{formatCurrency(stats.monthRevenue)}</p>
             <p className="text-xs text-muted-foreground">Este mes</p>
