@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic"
 
 import { useState } from "react"
+import { toast } from "sonner"
 import { Download, CalendarDays, Users, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,13 +22,13 @@ export default function ReportsPage() {
       if (!res.ok) throw new Error("Error al exportar")
       const orders = await res.json()
       if (orders.length === 0) {
-        alert("No hay pedidos este mes")
+        toast.info("No hay pedidos este mes")
         return
       }
       exportOrdersToExcel(orders, "pedidos_mes")
     } catch (error) {
       console.error(error)
-      alert("Error al exportar pedidos")
+      toast.error("Error al exportar pedidos")
     } finally {
       setLoading(null)
     }
@@ -35,7 +36,7 @@ export default function ReportsPage() {
 
   const handleExportDateRange = async () => {
     if (!fromDate || !toDate) {
-      alert("Selecciona ambas fechas")
+      toast.warning("Selecciona ambas fechas")
       return
     }
     setLoading("range")
@@ -44,13 +45,13 @@ export default function ReportsPage() {
       if (!res.ok) throw new Error("Error al exportar")
       const orders = await res.json()
       if (orders.length === 0) {
-        alert("No hay pedidos en ese rango")
+        toast.info("No hay pedidos en ese rango")
         return
       }
       exportOrdersToExcel(orders, `pedidos_${fromDate}_${toDate}`)
     } catch (error) {
       console.error(error)
-      alert("Error al exportar pedidos")
+      toast.error("Error al exportar pedidos")
     } finally {
       setLoading(null)
     }
@@ -63,13 +64,13 @@ export default function ReportsPage() {
       if (!res.ok) throw new Error("Error al exportar")
       const clients = await res.json()
       if (clients.length === 0) {
-        alert("No hay clientes registrados")
+        toast.info("No hay clientes registrados")
         return
       }
       exportClientsToExcel(clients, "clientes")
     } catch (error) {
       console.error(error)
-      alert("Error al exportar clientes")
+      toast.error("Error al exportar clientes")
     } finally {
       setLoading(null)
     }

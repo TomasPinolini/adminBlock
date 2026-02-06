@@ -2,7 +2,9 @@
 
 export const dynamic = "force-dynamic"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { toast } from "sonner"
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
 import { Plus, Trash2, Copy, Check, FileText, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,6 +35,7 @@ interface QuoteMaterialItem {
 }
 
 export default function QuotesPage() {
+  const { confirm, ConfirmDialog } = useConfirmDialog()
   const { data: materials = [] } = useMaterials()
   const { data: suppliers = [] } = useSuppliers()
   const { data: clients = [] } = useClients()
@@ -134,18 +137,25 @@ export default function QuotesPage() {
   }
 
   const handleDeleteQuote = async (id: string) => {
-    if (confirm("¿Eliminar esta cotización?")) {
+    const confirmed = await confirm({
+      title: "Eliminar cotización",
+      description: "¿Estás seguro de que deseas eliminar esta cotización? Esta acción no se puede deshacer.",
+      confirmText: "Eliminar",
+      variant: "destructive",
+    })
+    if (confirmed) {
       await deleteQuote.mutateAsync(id)
+      toast.success("Cotización eliminada")
     }
   }
 
   const handleCreateOrder = async (quoteId: string) => {
     try {
       await createOrderFromQuote.mutateAsync(quoteId)
-      alert("Pedido creado exitosamente!")
+      toast.success("Pedido creado exitosamente!")
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error al crear pedido"
-      alert(message)
+      toast.error(message)
     }
   }
 
@@ -458,6 +468,7 @@ export default function QuotesPage() {
           </div>
         )}
       </div>
+      <ConfirmDialog />
     </div>
   )
 }
