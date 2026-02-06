@@ -1,0 +1,114 @@
+================================================================================
+                    ADMINBLOCK - ROADMAP DE MEJORAS
+================================================================================
+
+================================================================================
+✅ COMPLETADO
+================================================================================
+
+1. Reports - Excel Export
+   - Exportar pedidos del mes
+   - Exportar pedidos por rango de fechas
+   - Exportar lista de clientes
+
+2. WhatsApp Settings Toggle
+   - Configurar notificaciones automáticas por estado
+   - Toggle para activar/desactivar cada tipo de mensaje
+
+================================================================================
+🔄 EN PROGRESO
+================================================================================
+
+3. Sistema de Proveedores, Materiales y Cotización
+   Objetivo: Permitir cotizar pedidos basándose en costos reales de materiales
+            con seguimiento de proveedores
+   
+   Modelo de datos:
+   - Proveedor tiene muchos materiales
+   - Material pertenece a un proveedor (pero puede existir en varios proveedores)
+   - Al cotizar, se elige proveedor + material + precio del momento
+   - Se guarda qué proveedor se usó en cada pedido
+   
+   Tareas:
+   - [x] Crear tabla de materiales (nombre, unidad, precio actual)
+   - [x] Crear tabla de materiales por servicio (qué materiales usa cada tipo)
+   - [x] Crear tabla de materiales por pedido (materiales usados en cada orden)
+   - [x] API CRUD para materiales
+   - [x] UI para gestionar catálogo de materiales (Ajustes > Materiales)
+   - [x] UI para configurar materiales por servicio
+   - [ ] Crear tabla de proveedores (nombre, teléfono, dirección, notas)
+   - [ ] Crear tabla proveedor_materiales (qué materiales ofrece cada proveedor)
+   - [ ] API CRUD para proveedores
+   - [ ] UI para gestionar proveedores (Ajustes > Proveedores)
+   - [ ] UI para asignar materiales a proveedores
+   - [ ] Actualizar order_materials para guardar proveedor usado
+   - [ ] Actualizar formulario de pedido: seleccionar proveedor + precio actual
+   - [ ] Calcular costo total + margen de ganancia
+   - [ ] Mostrar ganancia por pedido
+
+================================================================================
+⏳ PENDIENTE - ALTA PRIORIDAD
+================================================================================
+
+4. Servicios Dinámicos
+   - Permitir crear nuevos tipos de servicio desde el sistema
+   - Editar servicios existentes
+   - Asignar materiales a cada servicio
+
+5. Dialogs + Toasts
+   - Reemplazar confirm() nativo con dialogs bonitos
+   - Agregar notificaciones toast para feedback de acciones
+   - Mejor UX en móvil
+
+6. Edición de Entidades
+   - Modal para editar pedidos existentes (descripción, precio, fecha)
+   - Modal para editar clientes existentes
+   - Búsqueda en página de pedidos
+
+================================================================================
+⏳ PENDIENTE - MEDIA PRIORIDAD
+================================================================================
+
+7. Sistema de Roles
+   - ROL ADMIN: Papá, Tío - acceso completo
+   - ROL OPERADOR: Mamá, Hermana - solo crear clientes/pedidos
+   - Restringir acceso a configuración y cotización
+
+8. Auditoría
+   - Ver quién hizo cada acción
+   - Ver cuándo se hizo cada acción
+   - Ver qué cambió en cada acción
+   - UI para ver historial de actividad
+
+9. Optimización Stats API
+   - Usar SQL aggregations en vez de cargar todos los pedidos
+   - Mejorar performance del dashboard
+
+================================================================================
+⏳ PENDIENTE - BAJA PRIORIDAD / FUTURO
+================================================================================
+
+10. WhatsApp Incoming
+    - Recibir comprobantes de pago automáticamente por WhatsApp
+    - Asociar PDFs a pedidos por número de teléfono
+    - Enviar recordatorios a clientes que no retiran
+
+11. Calendario
+    - Vista de pedidos por fecha
+    - Ver entregas programadas
+    - Vista semanal/mensual
+
+12. Facturación
+    - Generar facturas para pedidos
+    - Integración con sistema de facturación (por evaluar)
+
+13. PWA / App Instalable
+    - Hacer la app instalable en móvil
+    - Notificaciones push
+
+14. Dark Mode
+    - Toggle para cambiar tema claro/oscuro
+
+================================================================================
+                         FIN DEL ROADMAP
+================================================================================

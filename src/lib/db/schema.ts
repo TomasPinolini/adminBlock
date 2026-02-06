@@ -172,6 +172,105 @@ export const appSettings = pgTable("app_settings", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
+// Suppliers (proveedores)
+export const suppliers = pgTable("suppliers", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  phone: text("phone"),
+  address: text("address"),
+  notes: text("notes"),
+  isActive: text("is_active").default("true").notNull(), // soft delete
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+// Materials catalog (global list of materials)
+export const materials = pgTable("materials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  unit: text("unit").notNull(), // "metro", "unidad", "hoja", "m2", etc.
+  notes: text("notes"),
+  isActive: text("is_active").default("true").notNull(), // soft delete
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+// Which materials each supplier offers (with their price)
+export const supplierMaterials = pgTable("supplier_materials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  supplierId: uuid("supplier_id")
+    .references(() => suppliers.id, { onDelete: "cascade" })
+    .notNull(),
+  materialId: uuid("material_id")
+    .references(() => materials.id, { onDelete: "cascade" })
+    .notNull(),
+  currentPrice: numeric("current_price", { precision: 10, scale: 2 }), // last known price from this supplier
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+// Which materials are typically used for each service type
+export const serviceMaterials = pgTable("service_materials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  serviceType: serviceTypeEnum("service_type").notNull(),
+  materialId: uuid("material_id")
+    .references(() => materials.id, { onDelete: "cascade" })
+    .notNull(),
+  defaultQuantity: numeric("default_quantity", { precision: 10, scale: 2 }),
+  isRequired: text("is_required").default("false").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
+// Quotes (cotizaciones) - saved quotes that can become orders
+export const quotes = pgTable("quotes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  clientId: uuid("client_id").references(() => clients.id),
+  serviceType: serviceTypeEnum("service_type"),
+  description: text("description"),
+  materialsCost: numeric("materials_cost", { precision: 10, scale: 2 }), // sum of all materials
+  profitMargin: numeric("profit_margin", { precision: 10, scale: 2 }), // profit amount
+  profitType: text("profit_type").default("fixed"), // "fixed" or "percentage"
+  totalPrice: numeric("total_price", { precision: 10, scale: 2 }), // materialsCost + profit
+  orderId: uuid("order_id").references(() => orders.id), // if converted to order
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+// Materials in a quote
+export const quoteMaterials = pgTable("quote_materials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  quoteId: uuid("quote_id")
+    .references(() => quotes.id, { onDelete: "cascade" })
+    .notNull(),
+  materialId: uuid("material_id")
+    .references(() => materials.id, { onDelete: "restrict" })
+    .notNull(),
+  supplierId: uuid("supplier_id")
+    .references(() => suppliers.id, { onDelete: "restrict" }),
+  quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
+  unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
+  subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
+// Materials used in a specific order (for quoting)
+export const orderMaterials = pgTable("order_materials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderId: uuid("order_id")
+    .references(() => orders.id, { onDelete: "cascade" })
+    .notNull(),
+  materialId: uuid("material_id")
+    .references(() => materials.id, { onDelete: "restrict" })
+    .notNull(),
+  supplierId: uuid("supplier_id")
+    .references(() => suppliers.id, { onDelete: "restrict" }),
+  quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
+  unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(), // price at time of quote
+  subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(), // quantity * unitPrice
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
 // Relations
 export const clientsRelations = relations(clients, ({ many }) => ({
   orders: many(orders),
@@ -220,6 +319,80 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
   }),
   comments: many(orderComments),
   attachments: many(orderAttachments),
+  materials: many(orderMaterials),
+}))
+
+export const suppliersRelations = relations(suppliers, ({ many }) => ({
+  supplierMaterials: many(supplierMaterials),
+  orderMaterials: many(orderMaterials),
+  quoteMaterials: many(quoteMaterials),
+}))
+
+export const quotesRelations = relations(quotes, ({ one, many }) => ({
+  client: one(clients, {
+    fields: [quotes.clientId],
+    references: [clients.id],
+  }),
+  order: one(orders, {
+    fields: [quotes.orderId],
+    references: [orders.id],
+  }),
+  materials: many(quoteMaterials),
+}))
+
+export const quoteMaterialsRelations = relations(quoteMaterials, ({ one }) => ({
+  quote: one(quotes, {
+    fields: [quoteMaterials.quoteId],
+    references: [quotes.id],
+  }),
+  material: one(materials, {
+    fields: [quoteMaterials.materialId],
+    references: [materials.id],
+  }),
+  supplier: one(suppliers, {
+    fields: [quoteMaterials.supplierId],
+    references: [suppliers.id],
+  }),
+}))
+
+export const materialsRelations = relations(materials, ({ many }) => ({
+  serviceMaterials: many(serviceMaterials),
+  orderMaterials: many(orderMaterials),
+  supplierMaterials: many(supplierMaterials),
+  quoteMaterials: many(quoteMaterials),
+}))
+
+export const supplierMaterialsRelations = relations(supplierMaterials, ({ one }) => ({
+  supplier: one(suppliers, {
+    fields: [supplierMaterials.supplierId],
+    references: [suppliers.id],
+  }),
+  material: one(materials, {
+    fields: [supplierMaterials.materialId],
+    references: [materials.id],
+  }),
+}))
+
+export const serviceMaterialsRelations = relations(serviceMaterials, ({ one }) => ({
+  material: one(materials, {
+    fields: [serviceMaterials.materialId],
+    references: [materials.id],
+  }),
+}))
+
+export const orderMaterialsRelations = relations(orderMaterials, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderMaterials.orderId],
+    references: [orders.id],
+  }),
+  material: one(materials, {
+    fields: [orderMaterials.materialId],
+    references: [materials.id],
+  }),
+  supplier: one(suppliers, {
+    fields: [orderMaterials.supplierId],
+    references: [suppliers.id],
+  }),
 }))
 
 export const orderCommentsRelations = relations(orderComments, ({ one }) => ({
@@ -263,6 +436,27 @@ export type NewActivityLog = typeof activityLogs.$inferInsert
 
 export type AppSetting = typeof appSettings.$inferSelect
 export type NewAppSetting = typeof appSettings.$inferInsert
+
+export type Supplier = typeof suppliers.$inferSelect
+export type NewSupplier = typeof suppliers.$inferInsert
+
+export type Material = typeof materials.$inferSelect
+export type NewMaterial = typeof materials.$inferInsert
+
+export type SupplierMaterial = typeof supplierMaterials.$inferSelect
+export type NewSupplierMaterial = typeof supplierMaterials.$inferInsert
+
+export type ServiceMaterial = typeof serviceMaterials.$inferSelect
+export type NewServiceMaterial = typeof serviceMaterials.$inferInsert
+
+export type OrderMaterial = typeof orderMaterials.$inferSelect
+export type NewOrderMaterial = typeof orderMaterials.$inferInsert
+
+export type Quote = typeof quotes.$inferSelect
+export type NewQuote = typeof quotes.$inferInsert
+
+export type QuoteMaterial = typeof quoteMaterials.$inferSelect
+export type NewQuoteMaterial = typeof quoteMaterials.$inferInsert
 
 export type ServiceType = (typeof serviceTypeEnum.enumValues)[number]
 export type OrderStatus = (typeof orderStatusEnum.enumValues)[number]

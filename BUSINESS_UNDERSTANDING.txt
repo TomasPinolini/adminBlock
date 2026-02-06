@@ -1,0 +1,282 @@
+================================================================================
+                    ADMINBLOCK - BUSINESS UNDERSTANDING
+                              (VERSIÓN FINAL)
+================================================================================
+
+================================================================================
+1. EL NEGOCIO
+================================================================================
+
+NOMBRE: Block (imprenta familiar)
+UBICACIÓN: Rosario, Argentina
+TIPO: Imprenta / Centro de copiado / Servicios gráficos
+
+SERVICIOS QUE OFRECEN:
+  • Copiado (fotocopias, impresiones)
+  • Tesis (impresión y encuadernación de trabajos académicos)
+  • Encuadernación
+  • Cartelería (carteles, banners)
+  • Placas (carteles para pegar en negocios y casas)
+  • Calcos (stickers, calcomanías)
+  • Folletería (folletos, volantes, flyers)
+  • Ploteo (impresión gran formato)
+
+MODELO DE NEGOCIO:
+  - Clientes llegan por Instagram, WhatsApp, email, o en persona
+  - Se cotiza el trabajo según el costo actual de materiales (varía según proveedores)
+  - Cliente aprueba
+  - Se realiza el trabajo
+  - Cliente retira y paga (a veces seña por adelantado)
+  - Cliente envía comprobante de pago por WhatsApp (PDF)
+
+PRICING:
+  - NO hay precios fijos - cada trabajo se cotiza individualmente
+  - El costo depende de los materiales que se usen
+  - Los precios de materiales varían según lo que cobren los proveedores
+  - Se agrega margen de ganancia (% o monto fijo)
+
+================================================================================
+2. USUARIOS DEL SISTEMA
+================================================================================
+
+USUARIOS INTERNOS (familia):
+  • Papá - Dueño, usuario principal, cotiza y hace trabajos
+  • Tío - Trabaja en el negocio
+  • Mamá, Hermana - Redes sociales (no gestionan pedidos)
+  • Tomás - Desarrollador, también puede usar el sistema
+
+CLIENTES (externos, NO usan el sistema):
+  • Personas individuales (estudiantes, particulares)
+  • Empresas (con múltiples contactos)
+    NOTA: Diferentes personas de la misma empresa pueden hacer pedidos distintos
+
+NOTA: Los clientes NO acceden a AdminBlock. Siguen contactando por 
+Instagram/WhatsApp como siempre. El sistema es 100% interno.
+
+================================================================================
+3. FLUJO DE TRABAJO PRINCIPAL
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  CICLO DE VIDA DE UN PEDIDO                                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  1. RECEPCIÓN (Instagram/WhatsApp/Email/Presencial)
+     └─> Papá recibe el pedido
+     └─> Crea pedido en AdminBlock → Estado: "Pendiente de cotización"
+
+  2. COTIZACIÓN
+     └─> Papá ingresa los materiales y sus precios actuales
+     └─> Sistema calcula el costo total de materiales
+     └─> Se agrega margen de ganancia (% o monto fijo)
+     └─> Precio final se guarda → Estado: "Cotizado"
+     └─> Se envía presupuesto al cliente (WhatsApp)
+
+  3. APROBACIÓN
+     └─> Cliente confirma que quiere el trabajo
+     └─> Se cambia estado → "Aprobado"
+     └─> (Opcional) Cliente hace seña/pago parcial
+
+  4. PRODUCCIÓN
+     └─> Se realiza el trabajo
+     └─> Estado: "En proceso"
+     └─> Notificación al cliente: OPCIONAL (configurable por pedido)
+
+  5. LISTO PARA RETIRO
+     └─> Trabajo terminado → Estado: "Listo"
+     └─> Se avisa al cliente (WhatsApp automático o manual)
+
+  6. ENTREGA Y COBRO
+     └─> Cliente retira
+     └─> Cliente envía comprobante de pago por WhatsApp
+     └─> Se registra pago (sistema recibe PDF automáticamente - FUTURO)
+     └─> Estado: "Entregado"
+
+================================================================================
+4. CASOS DE USO PRINCIPALES
+================================================================================
+
+CASO 1: Crear pedido nuevo
+  Actor: Papá
+  Trigger: Cliente contacta pidiendo trabajo
+  Pasos:
+    1. Abrir AdminBlock
+    2. Buscar si el cliente ya existe, si no → crear cliente
+    3. Crear pedido: seleccionar cliente, tipo de servicio, descripción
+    4. (Opcional) Agregar fecha de entrega
+    5. Estado inicial: "Pendiente de cotización"
+
+CASO 2: Cotizar un pedido (NUEVO FLUJO CON MATERIALES)
+  Actor: Papá
+  Trigger: Pedido en estado "Pendiente de cotización"
+  Pasos:
+    1. Abrir pedido
+    2. Seleccionar materiales del catálogo (según tipo de servicio)
+    3. Ingresar cantidad de cada material
+    4. Actualizar precio unitario si cambió (precio del proveedor)
+    5. Sistema calcula: Σ(cantidad × precio) = Costo total
+    6. Agregar margen de ganancia (% o monto fijo)
+    7. Precio final = Costo + Margen
+    8. Guardar → Estado cambia a "Cotizado"
+    9. Enviar presupuesto al cliente (botón WhatsApp)
+
+CASO 3: Marcar pedido como listo
+  Actor: Papá o Tío
+  Trigger: Trabajo físico terminado
+  Pasos:
+    1. Buscar pedido en la lista
+    2. Cambiar estado a "Listo"
+    3. Elegir si notificar al cliente (checkbox)
+    4. Si sí → WhatsApp automático o manual
+
+CASO 4: Registrar pago
+  Actor: Papá
+  Trigger: Cliente paga (efectivo, transferencia)
+  Pasos:
+    1. Buscar pedido
+    2. Click en "Registrar pago"
+    3. Ingresar monto
+    4. (Actual) Subir comprobante manualmente
+    5. (Futuro) Sistema recibe PDF por WhatsApp automáticamente
+    6. Sistema calcula si está pagado o falta
+
+CASO 5: Ver pedidos vencidos
+  Actor: Cualquier usuario
+  Trigger: Revisar qué trabajos están atrasados
+  Pasos:
+    1. Ver dashboard con filtro "Vencidos"
+    2. Contactar clientes para coordinar
+
+CASO 6: Buscar historial de cliente
+  Actor: Cualquier usuario
+  Trigger: Cliente pregunta por un trabajo anterior
+  Pasos:
+    1. Ir a Clientes
+    2. Buscar por nombre/teléfono/Instagram
+    3. Ver historial de pedidos
+
+CASO 7: Gestionar catálogo de materiales (NUEVO)
+  Actor: Papá
+  Trigger: Agregar nuevo material o actualizar precios
+  Pasos:
+    1. Ir a Ajustes > Materiales
+    2. Agregar/editar material: nombre, unidad, precio actual
+    3. Asignar a qué servicios aplica (ej: "Lona" → Cartelería, Ploteo)
+
+================================================================================
+5. DECISIONES DE DISEÑO
+================================================================================
+
+SERVICIOS:
+  - Los servicios actuales son correctos (pendiente confirmar con papá)
+  - Papá debe poder crear nuevos tipos de servicio desde el sistema
+
+ROLES DE USUARIO:
+  - ROL ADMIN (Papá, Tío): Acceso completo a todo el sistema
+  - ROL OPERADOR (Mamá, Hermana, otros): Solo pueden crear clientes y pedidos
+    (No pueden cotizar, editar materiales, ni configurar el sistema)
+
+PAGOS:
+  - Los clientes pagan de ambas formas: seña adelantada o al retirar
+  - Empresas a veces pagan varios pedidos juntos (cuenta corriente informal)
+
+AUDITORÍA:
+  - SÍ se necesita: registrar quién hizo cada acción y cuándo
+
+WHATSAPP:
+  - Botones manuales: funcionan bien
+  - Mensajes automáticos: requieren Twilio premium (pendiente activar)
+  - Recordatorios a clientes: útil para el futuro
+
+FACTURACIÓN:
+  - Por evaluar (no es prioridad inmediata)
+
+================================================================================
+6. PROBLEMAS QUE RESUELVE ADMINBLOCK
+================================================================================
+
+Basado en PROYECTO_BLOCK.txt, estos son los problemas principales:
+
+  ❌ "¿Ya le avisamos a este cliente?"
+     → SOLUCIÓN: Estado del pedido + WhatsApp automático/manual
+
+  ❌ "¿Cuánto le habíamos cotizado?"
+     → SOLUCIÓN: Precio guardado en cada pedido
+
+  ❌ "¿Este cliente ya pagó?"
+     → SOLUCIÓN: Estado de pago (sin pagar/parcial/pagado)
+
+  ❌ "¿Qué trabajos tenemos pendientes?"
+     → SOLUCIÓN: Dashboard con filtros por estado
+
+  ❌ "¿Quién era el cliente de las tesis?"
+     → SOLUCIÓN: Búsqueda de clientes + historial
+
+  ❌ "¿Cuánto me costaron los materiales?" (NUEVO)
+     → SOLUCIÓN: Sistema de materiales con costos por pedido
+
+  ❌ "¿Cuánto gané en este trabajo?" (NUEVO)
+     → SOLUCIÓN: Precio final - Costo materiales = Ganancia
+
+================================================================================
+7. PREGUNTAS SOBRE PROVEEDORES
+================================================================================
+
+Necesito entender cómo funcionan los proveedores para diseñar bien el sistema:
+
+SOBRE LOS PROVEEDORES:
+  [ ] ¿Cuántos proveedores tienen aproximadamente?
+  100 como máximo, de los cuales el decide a quien comprarle, 
+  depediendo si ofrecen ese material y el precio en el momento.
+  
+  [ ] ¿Un mismo material puede venir de diferentes proveedores?
+      (Ej: "Lona" la pueden comprar a Proveedor A o Proveedor B)
+  Si, el puede comprar la lona de Proveedor A y el tela de Proveedor B.
+  Sería útil guardar la compra de ese material.
+
+  [ ] ¿El precio del mismo material varía mucho entre proveedores?
+  Si.
+
+  [ ] ¿Cambian de proveedor seguido o suelen comprar siempre al mismo?
+  Cambian, mi padre decide en el momento.
+
+SOBRE LA COTIZACIÓN:
+  [ ] Cuando tu papá cotiza, ¿elige de qué proveedor va a comprar el material?
+      ¿O simplemente pone el precio que le sale en ese momento?
+  Elige el precio que le sale en ese momento. Solo para el pedido.
+  
+  [ ] ¿Necesita comparar precios entre proveedores antes de cotizar?
+  No, la comparación la hace el en el momento. Luego registra cuanto le sale.
+  
+  [ ] ¿Quiere ver el historial de precios de un material? 
+      (Ej: "La lona costaba $X hace un mes, ahora cuesta $Y")
+  No. Pero si quiero que el sistema guarde el precio de cada material para cada pedido.
+
+SOBRE EL REGISTRO:
+  [ ] ¿Qué datos necesitan guardar de cada proveedor?
+      - Nombre
+      - Teléfono/WhatsApp
+      - Dirección
+      - Notas
+      - ¿Algo más? -> No se, todavía, lo defino en la reunión. 
+  
+  [ ] ¿Necesitan saber a qué proveedor le compraron para cada pedido?
+      (Para saber dónde reclamar si hay problemas)
+      Si. 
+
+FLUJO PROPUESTO (confirmá si tiene sentido):
+  1. Crear proveedores en el sistema (nombre, contacto)
+  2. Cada material puede tener varios proveedores con diferentes precios
+  3. Al cotizar, se elige el proveedor/precio que se va a usar
+  4. Se guarda qué proveedor se usó en cada pedido
+
+¿Este flujo tiene sentido o es más simple que eso? Si tiene.
+
+Nota: Mi idea es que mi viejo pueda:
+  - crear un proveedor, agregarle toda la info necesaria sobre el mismo.
+  - luego agregarle materiales que ofrece.
+  - y a la hora de agregar los materiales para el pedido, pueda seleccionar el proveedor y el precio que le sale en ese momento.
+  
+================================================================================
+                         FIN DEL DOCUMENTO
+================================================================================
