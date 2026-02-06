@@ -42,10 +42,6 @@
    - [x] UI toggle para ver pedidos archivados
    - [x] Botón "Archivar" para pedidos entregados + pagados
 
-================================================================================
-🔄 EN PROGRESO - CALIDAD DE CÓDIGO
-================================================================================
-
 5. Limpieza y Mejoras de Código
    Objetivo: Mejorar calidad, seguridad y mantenibilidad del código
    
@@ -56,18 +52,14 @@
    
    Prioridad Media (UX):
    - [x] Reemplazar alert/confirm nativos con shadcn dialogs
-   - [ ] Agregar loading states a mutaciones (archive, unarchive, etc)
-   - [ ] Corregir acentos españoles: Encuadernación, Folletería, Cartelería
+   - [x] Agregar loading states a mutaciones (archive, unarchive, etc)
+   - [x] Corregir acentos españoles: Encuadernación, Folletería, Cartelería
    
    Prioridad Baja (Limpieza):
-   - [ ] Deprecar tabla legacy "contacts" (migrar a clientRelationships)
-   - [ ] Extraer lógica hardcodeada de teléfonos AR a config/env
-   - [ ] Estandarizar formato de errores en API responses
-   - [ ] Agregar índices DB para queries frecuentes (clientId, status, isArchived)
-
-================================================================================
-✅ COMPLETADO
-================================================================================
+   - [x] Deprecar tabla legacy "contacts" (migrar a clientRelationships)
+   - [x] Extraer lógica hardcodeada de teléfonos AR a config/env
+   - [x] Estandarizar formato de errores en API responses
+   - [x] Agregar índices DB para queries frecuentes (clientId, status, isArchived)
 
 6. Dialogs + Toasts (shadcn/ui)
    - [x] Reemplazar confirm() nativo con AlertDialog

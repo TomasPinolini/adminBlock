@@ -1,25 +1,10 @@
 import { serviceTypeLabels, orderStatusLabels } from "@/lib/validations/orders"
 import type { OrderStatus, ServiceType } from "@/lib/db/schema"
+import { formatPhoneForWhatsApp } from "@/config/phone"
 
 // Clean phone number for WhatsApp (remove spaces, dashes, etc.)
 export function cleanPhoneNumber(phone: string): string {
-  // Remove everything except digits
-  let cleaned = phone.replace(/\D/g, "")
-
-  // If starts with 15, assume Argentina mobile, add 549
-  if (cleaned.startsWith("15")) {
-    cleaned = "549" + cleaned.substring(2)
-  }
-  // If starts with 11 (Buenos Aires), add 549
-  else if (cleaned.startsWith("11") && cleaned.length === 10) {
-    cleaned = "549" + cleaned
-  }
-  // If doesn't start with country code, assume Argentina
-  else if (!cleaned.startsWith("54") && cleaned.length <= 10) {
-    cleaned = "549" + cleaned
-  }
-
-  return cleaned
+  return formatPhoneForWhatsApp(phone)
 }
 
 // Generate WhatsApp link with pre-filled message
