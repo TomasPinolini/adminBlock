@@ -1,17 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import type { Contact, NewContact } from "@/lib/db/schema"
+import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 
 async function fetchContacts(clientId: string): Promise<Contact[]> {
-  const res = await fetch(`/api/contacts?clientId=${clientId}`)
+  const res = await fetchWithTimeout(`/api/contacts?clientId=${clientId}`, { timeout: 10000 })
   if (!res.ok) throw new Error("Error al obtener contactos")
   return res.json()
 }
 
 async function createContact(data: NewContact): Promise<Contact> {
-  const res = await fetch("/api/contacts", {
+  const res = await fetchWithTimeout("/api/contacts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    timeout: 15000,
   })
   if (!res.ok) throw new Error("Error al crear contacto")
   return res.json()
@@ -24,18 +26,20 @@ async function updateContact({
   id: string
   data: Partial<NewContact>
 }): Promise<Contact> {
-  const res = await fetch(`/api/contacts/${id}`, {
+  const res = await fetchWithTimeout(`/api/contacts/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    timeout: 15000,
   })
   if (!res.ok) throw new Error("Error al actualizar contacto")
   return res.json()
 }
 
 async function deleteContact(id: string): Promise<void> {
-  const res = await fetch(`/api/contacts/${id}`, {
+  const res = await fetchWithTimeout(`/api/contacts/${id}`, {
     method: "DELETE",
+    timeout: 10000,
   })
   if (!res.ok) throw new Error("Error al eliminar contacto")
 }

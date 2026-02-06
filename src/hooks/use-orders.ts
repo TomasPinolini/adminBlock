@@ -178,9 +178,10 @@ async function registerPayment({
     formData.append("receipt", receipt)
   }
 
-  const res = await fetch(`/api/orders/${orderId}/payment`, {
+  const res = await fetchWithTimeout(`/api/orders/${orderId}/payment`, {
     method: "POST",
     body: formData,
+    timeout: 15000,
   })
   if (!res.ok) {
     const error = await res.json()
@@ -203,15 +204,17 @@ export function useRegisterPayment() {
 
 // Archive/Unarchive
 async function archiveOrder(id: string): Promise<void> {
-  const res = await fetch(`/api/orders/${id}/archive`, {
+  const res = await fetchWithTimeout(`/api/orders/${id}/archive`, {
     method: "POST",
+    timeout: 10000,
   })
   if (!res.ok) throw new Error("Error al archivar pedido")
 }
 
 async function unarchiveOrder(id: string): Promise<void> {
-  const res = await fetch(`/api/orders/${id}/archive`, {
+  const res = await fetchWithTimeout(`/api/orders/${id}/archive`, {
     method: "DELETE",
+    timeout: 10000,
   })
   if (!res.ok) throw new Error("Error al desarchivar pedido")
 }

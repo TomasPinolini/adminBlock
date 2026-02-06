@@ -100,7 +100,7 @@ export interface ClientStats {
 }
 
 async function fetchClientStats(): Promise<ClientStats> {
-  const res = await fetch("/api/clients/stats")
+  const res = await fetchWithTimeout("/api/clients/stats", { timeout: 10000 })
   if (!res.ok) throw new Error("Error al obtener estadisticas")
   return res.json()
 }

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import type { ClientRelationship, Client } from "@/lib/db/schema"
+import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 
 export interface RelationshipWithPerson extends ClientRelationship {
   person: Pick<Client, "id" | "name" | "phone" | "instagramHandle"> | null
@@ -10,13 +11,13 @@ export interface RelationshipWithCompany extends ClientRelationship {
 }
 
 async function fetchCompanyEmployees(companyId: string): Promise<RelationshipWithPerson[]> {
-  const res = await fetch(`/api/relationships?companyId=${companyId}`)
+  const res = await fetchWithTimeout(`/api/relationships?companyId=${companyId}`, { timeout: 10000 })
   if (!res.ok) throw new Error("Error al obtener empleados")
   return res.json()
 }
 
 async function fetchPersonEmployments(personId: string): Promise<RelationshipWithCompany[]> {
-  const res = await fetch(`/api/relationships?personId=${personId}`)
+  const res = await fetchWithTimeout(`/api/relationships?personId=${personId}`, { timeout: 10000 })
   if (!res.ok) throw new Error("Error al obtener empleos")
   return res.json()
 }
@@ -27,10 +28,11 @@ async function createRelationship(data: {
   role?: string
   notes?: string
 }): Promise<ClientRelationship> {
-  const res = await fetch("/api/relationships", {
+  const res = await fetchWithTimeout("/api/relationships", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    timeout: 15000,
   })
   if (!res.ok) {
     const error = await res.json()
@@ -46,18 +48,20 @@ async function updateRelationship({
   id: string
   data: { role?: string; notes?: string }
 }): Promise<ClientRelationship> {
-  const res = await fetch(`/api/relationships/${id}`, {
+  const res = await fetchWithTimeout(`/api/relationships/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    timeout: 15000,
   })
   if (!res.ok) throw new Error("Error al actualizar relación")
   return res.json()
 }
 
 async function deleteRelationship(id: string): Promise<void> {
-  const res = await fetch(`/api/relationships/${id}`, {
+  const res = await fetchWithTimeout(`/api/relationships/${id}`, {
     method: "DELETE",
+    timeout: 10000,
   })
   if (!res.ok) throw new Error("Error al eliminar relación")
 }
