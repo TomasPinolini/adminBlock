@@ -40,9 +40,10 @@ CREATE INDEX IF NOT EXISTS idx_service_materials_service ON service_materials(se
 CREATE INDEX IF NOT EXISTS idx_service_materials_material ON service_materials(material_id);
 
 -- Activity log indexes (for auditing)
-CREATE INDEX IF NOT EXISTS idx_activity_entity_type ON activity(entity_type);
-CREATE INDEX IF NOT EXISTS idx_activity_entity_id ON activity(entity_id);
-CREATE INDEX IF NOT EXISTS idx_activity_created_at ON activity(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_activity_type ON activity_logs(activity_type);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_entity_type ON activity_logs(entity_type);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_entity_id ON activity_logs(entity_id);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at ON activity_logs(created_at DESC);
 
 -- Order comments indexes
 CREATE INDEX IF NOT EXISTS idx_order_comments_order ON order_comments(order_id);
