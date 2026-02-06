@@ -89,6 +89,11 @@ export async function POST(request: NextRequest) {
         description: validated.description,
         price: validated.price || null,
         dueDate: validated.dueDate || null,
+        invoiceNumber: validated.invoiceNumber || null,
+        invoiceType: validated.invoiceType || "none",
+        quantity: validated.quantity || null,
+        subtotal: validated.subtotal || null,
+        taxAmount: validated.taxAmount || null,
       })
       .returning()
 

@@ -21,6 +21,14 @@ export const orderStatuses = [
   "cancelled",
 ] as const
 
+export const invoiceTypes = ["A", "B", "none"] as const
+
+export const invoiceTypeLabels: Record<(typeof invoiceTypes)[number], string> = {
+  A: "Factura A",
+  B: "Factura B",
+  none: "Sin factura",
+}
+
 export const serviceTypeLabels: Record<(typeof serviceTypes)[number], string> = {
   copiado: "Copiado",
   tesis: "Tesis",
@@ -51,6 +59,12 @@ export const createOrderSchema = z.object({
   description: z.string().min(1, "Descripción requerida"),
   price: z.string().optional(),
   dueDate: z.string().optional(),
+  // Invoice fields
+  invoiceNumber: z.string().optional(),
+  invoiceType: z.enum(invoiceTypes).optional(),
+  quantity: z.string().optional(),
+  subtotal: z.string().optional(),
+  taxAmount: z.string().optional(),
 })
 
 export const updateOrderSchema = z.object({
@@ -59,6 +73,12 @@ export const updateOrderSchema = z.object({
   description: z.string().min(1).optional(),
   price: z.string().optional(),
   dueDate: z.string().optional(),
+  // Invoice fields
+  invoiceNumber: z.string().optional(),
+  invoiceType: z.enum(invoiceTypes).optional(),
+  quantity: z.string().optional(),
+  subtotal: z.string().optional(),
+  taxAmount: z.string().optional(),
 })
 
 export const createCommentSchema = z.object({

@@ -7,6 +7,7 @@ export const createClientSchema = z.object({
   name: z.string().min(1, "Nombre requerido"),
   phone: z.string().optional(),
   instagramHandle: z.string().optional(),
+  cuit: z.string().optional(),
   notes: z.string().optional(),
   // Optional: link individual to a company on creation
   companyId: z.string().uuid().optional().nullable(),
@@ -18,6 +19,7 @@ export const updateClientSchema = z.object({
   name: z.string().min(1, "Nombre requerido").optional(),
   phone: z.string().optional(),
   instagramHandle: z.string().optional(),
+  cuit: z.string().optional(),
   notes: z.string().optional(),
 })
 

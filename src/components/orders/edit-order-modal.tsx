@@ -21,7 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { serviceTypeLabels, serviceTypes } from "@/lib/validations/orders"
+import { serviceTypeLabels, serviceTypes, invoiceTypeLabels, invoiceTypes } from "@/lib/validations/orders"
+import { calculateInvoiceBreakdown } from "@/lib/utils/invoice"
 
 interface EditOrderModalProps {
   order: OrderWithClient | null
@@ -36,6 +37,9 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
     price: "",
     dueDate: "",
     serviceType: "",
+    invoiceNumber: "",
+    invoiceType: "none" as "A" | "B" | "none",
+    quantity: "",
   })
 
   useEffect(() => {
@@ -45,6 +49,9 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
         price: order.price || "",
         dueDate: order.dueDate || "",
         serviceType: order.serviceType || "",
+        invoiceNumber: order.invoiceNumber || "",
+        invoiceType: (order.invoiceType as "A" | "B" | "none") || "none",
+        quantity: order.quantity || "",
       })
     }
   }, [order])
@@ -54,6 +61,19 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
     if (!order) return
 
     try {
+      // Calculate invoice breakdown if price and invoice type are provided
+      let invoiceData = {}
+      if (formData.price && formData.invoiceType !== "none") {
+        const breakdown = calculateInvoiceBreakdown(
+          parseFloat(formData.price),
+          formData.invoiceType
+        )
+        invoiceData = {
+          subtotal: breakdown.subtotal.toString(),
+          taxAmount: breakdown.taxAmount.toString(),
+        }
+      }
+
       await updateOrder.mutateAsync({
         id: order.id,
         data: {
@@ -61,6 +81,10 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
           price: formData.price || null,
           dueDate: formData.dueDate || null,
           serviceType: formData.serviceType as typeof serviceTypes[number],
+          invoiceNumber: formData.invoiceNumber || null,
+          invoiceType: formData.invoiceType,
+          quantity: formData.quantity || null,
+          ...invoiceData,
         },
       })
       toast.success("Pedido actualizado")
@@ -133,6 +157,50 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
               type="date"
               value={formData.dueDate}
               onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="invoiceNumber">N° Factura</Label>
+              <Input
+                id="invoiceNumber"
+                value={formData.invoiceNumber}
+                onChange={(e) => setFormData({ ...formData, invoiceNumber: e.target.value })}
+                placeholder="3079"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="invoiceType">Tipo de Factura</Label>
+              <Select
+                value={formData.invoiceType}
+                onValueChange={(value: "A" | "B" | "none") => 
+                  setFormData({ ...formData, invoiceType: value })
+                }
+              >
+                <SelectTrigger id="invoiceType">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {invoiceTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {invoiceTypeLabels[type]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="quantity">Cantidad</Label>
+            <Input
+              id="quantity"
+              type="text"
+              value={formData.quantity}
+              onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+              placeholder="Ej: 155 (termocopiados)"
             />
           </div>
 

@@ -44,6 +44,12 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "payment_registered",
 ])
 
+export const invoiceTypeEnum = pgEnum("invoice_type", [
+  "A", // Factura A - con IVA discriminado
+  "B", // Factura B - monotributo
+  "none", // Sin factura
+])
+
 export const paymentStatusEnum = pgEnum("payment_status", [
   "pending",
   "partial",
@@ -62,6 +68,7 @@ export const clients = pgTable("clients", {
   name: text("name").notNull(),
   phone: text("phone"),
   instagramHandle: text("instagram_handle"),
+  cuit: text("cuit"), // CUIT for invoicing
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -112,6 +119,12 @@ export const orders = pgTable("orders", {
   description: text("description"),
   price: numeric("price", { precision: 10, scale: 2 }),
   dueDate: date("due_date"),
+  // Invoice fields
+  invoiceNumber: text("invoice_number"), // e.g., "3079", "1209"
+  invoiceType: invoiceTypeEnum("invoice_type").default("none"),
+  quantity: numeric("quantity", { precision: 10, scale: 2 }), // cantidad de unidades
+  subtotal: numeric("subtotal", { precision: 10, scale: 2 }), // monto sin IVA
+  taxAmount: numeric("tax_amount", { precision: 10, scale: 2 }), // monto de IVA (21%)
   // Payment fields
   paymentStatus: paymentStatusEnum("payment_status").default("pending").notNull(),
   paymentAmount: numeric("payment_amount", { precision: 10, scale: 2 }),

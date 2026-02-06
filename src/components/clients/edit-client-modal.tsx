@@ -34,6 +34,7 @@ export function EditClientModal({ client, open, onOpenChange }: EditClientModalP
     name: "",
     phone: "",
     instagramHandle: "",
+    cuit: "",
     notes: "",
     clientType: "individual" as "individual" | "company",
   })
@@ -44,6 +45,7 @@ export function EditClientModal({ client, open, onOpenChange }: EditClientModalP
         name: client.name || "",
         phone: client.phone || "",
         instagramHandle: client.instagramHandle || "",
+        cuit: client.cuit || "",
         notes: client.notes || "",
         clientType: client.clientType || "individual",
       })
@@ -61,6 +63,7 @@ export function EditClientModal({ client, open, onOpenChange }: EditClientModalP
           name: formData.name,
           phone: formData.phone || null,
           instagramHandle: formData.instagramHandle || null,
+          cuit: formData.cuit || null,
           notes: formData.notes || null,
           clientType: formData.clientType,
         },
@@ -133,6 +136,16 @@ export function EditClientModal({ client, open, onOpenChange }: EditClientModalP
               value={formData.instagramHandle}
               onChange={(e) => setFormData({ ...formData, instagramHandle: e.target.value })}
               placeholder="@usuario"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="cuit">CUIT</Label>
+            <Input
+              id="cuit"
+              value={formData.cuit}
+              onChange={(e) => setFormData({ ...formData, cuit: e.target.value })}
+              placeholder="20-12345678-9"
             />
           </div>
 
