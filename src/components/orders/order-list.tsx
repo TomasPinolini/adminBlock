@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock } from "lucide-react"
+import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useOrders, useUpdateOrder, useDeleteOrder, useDuplicateOrder, type OrderWithClient } from "@/hooks/use-orders"
+import { useOrders, useUpdateOrder, useDeleteOrder, useDuplicateOrder, useArchiveOrder, useUnarchiveOrder, type OrderWithClient } from "@/hooks/use-orders"
 import { useUIStore } from "@/stores/ui-store"
 import { formatDate, formatRelative, isOverdue } from "@/lib/utils/dates"
 import { getWhatsAppLink, getInstagramLink, messageTemplates } from "@/lib/utils/messaging"
@@ -62,6 +62,8 @@ function OrderCard({ order, onPayment }: OrderCardProps) {
   const updateOrder = useUpdateOrder()
   const deleteOrder = useDeleteOrder()
   const duplicateOrder = useDuplicateOrder()
+  const archiveOrder = useArchiveOrder()
+  const unarchiveOrder = useUnarchiveOrder()
 
   const handleStatusChange = async (newStatus: string) => {
     await updateOrder.mutateAsync({
@@ -79,6 +81,17 @@ function OrderCard({ order, onPayment }: OrderCardProps) {
   const handleDuplicate = async () => {
     await duplicateOrder.mutateAsync(order.id)
   }
+
+  const handleArchive = async () => {
+    await archiveOrder.mutateAsync(order.id)
+  }
+
+  const handleUnarchive = async () => {
+    await unarchiveOrder.mutateAsync(order.id)
+  }
+
+  const isArchived = order.isArchived === "true"
+  const canArchive = order.status === "delivered" && order.paymentStatus === "paid"
 
   const overdue = isOverdue(order.dueDate)
   const clientName = order.client?.name?.split(" ")[0] || "cliente"
@@ -284,6 +297,18 @@ function OrderCard({ order, onPayment }: OrderCardProps) {
                 <Copy className="mr-2 h-4 w-4" />
                 Duplicar
               </DropdownMenuItem>
+              {canArchive && !isArchived && (
+                <DropdownMenuItem onClick={handleArchive}>
+                  <Archive className="mr-2 h-4 w-4" />
+                  Archivar
+                </DropdownMenuItem>
+              )}
+              {isArchived && (
+                <DropdownMenuItem onClick={handleUnarchive}>
+                  <ArchiveRestore className="mr-2 h-4 w-4" />
+                  Desarchivar
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleDelete}
@@ -301,12 +326,13 @@ function OrderCard({ order, onPayment }: OrderCardProps) {
 }
 
 export function OrderList() {
-  const { statusFilter, serviceFilter, quickFilter } = useUIStore()
+  const { statusFilter, serviceFilter, quickFilter, showArchived } = useUIStore()
   const [paymentOrder, setPaymentOrder] = useState<OrderWithClient | null>(null)
 
   const { data: orders = [], isLoading, error } = useOrders({
     status: statusFilter !== "all" ? statusFilter : undefined,
     serviceType: serviceFilter !== "all" ? serviceFilter : undefined,
+    includeArchived: showArchived,
   })
 
   // Apply quick filters client-side

@@ -117,6 +117,8 @@ export const orders = pgTable("orders", {
   paymentAmount: numeric("payment_amount", { precision: 10, scale: 2 }),
   receiptUrl: text("receipt_url"),
   paidAt: timestamp("paid_at"),
+  isArchived: text("is_archived").default("false").notNull(), // soft delete for delivered+paid
+  archivedAt: timestamp("archived_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })

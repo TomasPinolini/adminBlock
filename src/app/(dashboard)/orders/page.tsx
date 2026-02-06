@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic"
 
-import { Plus } from "lucide-react"
+import { Plus, Archive } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -24,9 +24,11 @@ import { QuickFilters } from "@/components/orders/quick-filters"
 export default function OrdersPage() {
   const {
     serviceFilter,
+    showArchived,
     setStatusFilter,
     setServiceFilter,
     setQuickFilter,
+    setShowArchived,
     setCreateOrderModalOpen,
   } = useUIStore()
 
@@ -87,6 +89,16 @@ export default function OrdersPage() {
               ))}
             </SelectContent>
           </Select>
+
+          <Button
+            variant={showArchived ? "secondary" : "outline"}
+            size="sm"
+            onClick={() => setShowArchived(!showArchived)}
+            className="h-10 lg:h-9"
+          >
+            <Archive className="h-4 w-4 mr-2" />
+            {showArchived ? "Ocultando archivados" : "Ver archivados"}
+          </Button>
         </div>
 
         {/* Orders list */}

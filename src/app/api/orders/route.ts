@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status")
     const serviceType = searchParams.get("serviceType")
     const clientId = searchParams.get("clientId")
+    const includeArchived = searchParams.get("includeArchived") === "true"
 
     const allOrders = await db
       .select({
@@ -27,6 +28,8 @@ export async function GET(request: NextRequest) {
         paymentAmount: orders.paymentAmount,
         receiptUrl: orders.receiptUrl,
         paidAt: orders.paidAt,
+        isArchived: orders.isArchived,
+        archivedAt: orders.archivedAt,
         createdAt: orders.createdAt,
         updatedAt: orders.updatedAt,
         client: {
@@ -42,6 +45,12 @@ export async function GET(request: NextRequest) {
 
     // Filter in JS for now (can optimize with SQL later)
     let filtered = allOrders
+    
+    // By default, hide archived orders unless explicitly requested
+    if (!includeArchived) {
+      filtered = filtered.filter((o) => o.isArchived !== "true")
+    }
+    
     if (clientId) {
       filtered = filtered.filter((o) => o.clientId === clientId)
     }

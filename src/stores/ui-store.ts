@@ -13,9 +13,11 @@ interface UIState {
   statusFilter: OrderStatus | "all"
   serviceFilter: ServiceType | "all"
   quickFilter: QuickFilter
+  showArchived: boolean
   setStatusFilter: (status: OrderStatus | "all") => void
   setServiceFilter: (service: ServiceType | "all") => void
   setQuickFilter: (filter: QuickFilter) => void
+  setShowArchived: (show: boolean) => void
   resetFilters: () => void
 
   // Modals
@@ -43,10 +45,12 @@ export const useUIStore = create<UIState>((set) => ({
   statusFilter: "all",
   serviceFilter: "all",
   quickFilter: null,
+  showArchived: false,
   setStatusFilter: (status) => set({ statusFilter: status, quickFilter: null }),
   setServiceFilter: (service) => set({ serviceFilter: service }),
   setQuickFilter: (filter) => set({ quickFilter: filter, statusFilter: "all" }),
-  resetFilters: () => set({ statusFilter: "all", serviceFilter: "all", quickFilter: null }),
+  setShowArchived: (show) => set({ showArchived: show }),
+  resetFilters: () => set({ statusFilter: "all", serviceFilter: "all", quickFilter: null, showArchived: false }),
 
   // Modals
   createOrderModalOpen: false,

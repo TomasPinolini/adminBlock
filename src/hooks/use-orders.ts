@@ -9,6 +9,7 @@ interface FetchOrdersParams {
   status?: string
   serviceType?: string
   clientId?: string
+  includeArchived?: boolean
 }
 
 async function fetchOrders(params?: FetchOrdersParams): Promise<OrderWithClient[]> {
@@ -16,6 +17,7 @@ async function fetchOrders(params?: FetchOrdersParams): Promise<OrderWithClient[
   if (params?.status) searchParams.set("status", params.status)
   if (params?.serviceType) searchParams.set("serviceType", params.serviceType)
   if (params?.clientId) searchParams.set("clientId", params.clientId)
+  if (params?.includeArchived) searchParams.set("includeArchived", "true")
 
   const res = await fetch(`/api/orders?${searchParams}`)
   if (!res.ok) throw new Error("Error al obtener pedidos")
@@ -187,6 +189,45 @@ export function useRegisterPayment() {
 
   return useMutation({
     mutationFn: registerPayment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] })
+      queryClient.invalidateQueries({ queryKey: ["stats"] })
+    },
+  })
+}
+
+// Archive/Unarchive
+async function archiveOrder(id: string): Promise<void> {
+  const res = await fetch(`/api/orders/${id}/archive`, {
+    method: "POST",
+  })
+  if (!res.ok) throw new Error("Error al archivar pedido")
+}
+
+async function unarchiveOrder(id: string): Promise<void> {
+  const res = await fetch(`/api/orders/${id}/archive`, {
+    method: "DELETE",
+  })
+  if (!res.ok) throw new Error("Error al desarchivar pedido")
+}
+
+export function useArchiveOrder() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: archiveOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] })
+      queryClient.invalidateQueries({ queryKey: ["stats"] })
+    },
+  })
+}
+
+export function useUnarchiveOrder() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: unarchiveOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] })
       queryClient.invalidateQueries({ queryKey: ["stats"] })
