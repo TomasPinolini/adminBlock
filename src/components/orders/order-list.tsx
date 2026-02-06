@@ -187,6 +187,27 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
             )}
           </div>
 
+          {/* Invoice information */}
+          {(order.invoiceNumber || order.invoiceType !== "none" || order.quantity) && (
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              {order.invoiceNumber && (
+                <span className="inline-flex items-center gap-1">
+                  <Receipt className="h-3 w-3" />
+                  Factura {order.invoiceType !== "none" ? order.invoiceType : ""} N° {order.invoiceNumber}
+                </span>
+              )}
+              {order.quantity && (
+                <span>Cantidad: {order.quantity}</span>
+              )}
+              {order.subtotal && order.invoiceType === "A" && (
+                <span>Subtotal: ${Number(order.subtotal).toLocaleString("es-AR")}</span>
+              )}
+              {order.taxAmount && order.invoiceType === "A" && (
+                <span>IVA: ${Number(order.taxAmount).toLocaleString("es-AR")}</span>
+              )}
+            </div>
+          )}
+
           {/* Quick message buttons */}
           <div className="mt-3 flex flex-wrap gap-2">
             {hasPhone && (

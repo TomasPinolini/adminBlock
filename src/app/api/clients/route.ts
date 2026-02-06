@@ -14,6 +14,7 @@ export async function GET() {
         name: clients.name,
         phone: clients.phone,
         instagramHandle: clients.instagramHandle,
+        cuit: clients.cuit,
         notes: clients.notes,
         createdAt: clients.createdAt,
         orderCount: sql<number>`COALESCE(COUNT(${orders.id}), 0)::int`,

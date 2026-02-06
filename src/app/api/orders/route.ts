@@ -24,6 +24,13 @@ export async function GET(request: NextRequest) {
         description: orders.description,
         price: orders.price,
         dueDate: orders.dueDate,
+        // Invoice fields
+        invoiceNumber: orders.invoiceNumber,
+        invoiceType: orders.invoiceType,
+        quantity: orders.quantity,
+        subtotal: orders.subtotal,
+        taxAmount: orders.taxAmount,
+        // Payment fields
         paymentStatus: orders.paymentStatus,
         paymentAmount: orders.paymentAmount,
         receiptUrl: orders.receiptUrl,

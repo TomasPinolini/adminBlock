@@ -82,6 +82,12 @@ function ClientCard({ client }: { client: ClientWithStats }) {
                     {client.instagramHandle}
                   </a>
                 )}
+                {client.cuit && (
+                  <div className="flex items-center gap-1">
+                    <FileText className="h-3 w-3" />
+                    CUIT: {client.cuit}
+                  </div>
+                )}
               </div>
             </div>
           </div>
