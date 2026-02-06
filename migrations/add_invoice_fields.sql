@@ -1,23 +1,53 @@
--- Add invoice type enum
-CREATE TYPE invoice_type AS ENUM ('A', 'B', 'none');
+-- Add invoice type enum (only if it doesn't exist)
+DO $$ BEGIN
+    CREATE TYPE invoice_type AS ENUM ('A', 'B', 'none');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
--- Add CUIT field to clients table
-ALTER TABLE clients 
-ADD COLUMN cuit TEXT;
+-- Add CUIT field to clients table (only if it doesn't exist)
+DO $$ BEGIN
+    ALTER TABLE clients ADD COLUMN cuit TEXT;
+EXCEPTION
+    WHEN duplicate_column THEN null;
+END $$;
 
--- Add invoice fields to orders table
-ALTER TABLE orders 
-ADD COLUMN invoice_number TEXT,
-ADD COLUMN invoice_type invoice_type DEFAULT 'none',
-ADD COLUMN quantity NUMERIC(10, 2),
-ADD COLUMN subtotal NUMERIC(10, 2),
-ADD COLUMN tax_amount NUMERIC(10, 2);
+-- Add invoice fields to orders table (only if they don't exist)
+DO $$ BEGIN
+    ALTER TABLE orders ADD COLUMN invoice_number TEXT;
+EXCEPTION
+    WHEN duplicate_column THEN null;
+END $$;
 
--- Add index for invoice number lookups
-CREATE INDEX idx_orders_invoice_number ON orders(invoice_number) WHERE invoice_number IS NOT NULL;
+DO $$ BEGIN
+    ALTER TABLE orders ADD COLUMN invoice_type invoice_type DEFAULT 'none';
+EXCEPTION
+    WHEN duplicate_column THEN null;
+END $$;
 
--- Add index for CUIT lookups
-CREATE INDEX idx_clients_cuit ON clients(cuit) WHERE cuit IS NOT NULL;
+DO $$ BEGIN
+    ALTER TABLE orders ADD COLUMN quantity NUMERIC(10, 2);
+EXCEPTION
+    WHEN duplicate_column THEN null;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE orders ADD COLUMN subtotal NUMERIC(10, 2);
+EXCEPTION
+    WHEN duplicate_column THEN null;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE orders ADD COLUMN tax_amount NUMERIC(10, 2);
+EXCEPTION
+    WHEN duplicate_column THEN null;
+END $$;
+
+-- Add index for invoice number lookups (only if it doesn't exist)
+CREATE INDEX IF NOT EXISTS idx_orders_invoice_number ON orders(invoice_number) WHERE invoice_number IS NOT NULL;
+
+-- Add index for CUIT lookups (only if it doesn't exist)
+CREATE INDEX IF NOT EXISTS idx_clients_cuit ON clients(cuit) WHERE cuit IS NOT NULL;
 
 -- Comments for documentation
 COMMENT ON COLUMN clients.cuit IS 'CUIT for invoicing purposes';

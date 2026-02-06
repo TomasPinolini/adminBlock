@@ -67,6 +67,7 @@ export function ClientFormModal() {
         name: editingClient.name,
         phone: editingClient.phone || "",
         instagramHandle: editingClient.instagramHandle || "",
+        cuit: editingClient.cuit || "",
         notes: editingClient.notes || "",
       })
     }
@@ -194,6 +195,16 @@ export function ClientFormModal() {
               placeholder={clientType === "company" ? "@empresa" : "@usuario"}
               className="h-11 lg:h-9"
               {...register("instagramHandle")}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="cuit">CUIT</Label>
+            <Input
+              id="cuit"
+              placeholder="20-12345678-9"
+              className="h-11 lg:h-9"
+              {...register("cuit")}
             />
           </div>
 
