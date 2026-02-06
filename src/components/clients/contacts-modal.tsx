@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -406,6 +408,7 @@ function EditRoleForm({
 type FormMode = "none" | "link" | "create" | "editRole"
 
 export function ContactsModal() {
+  const { confirm, ConfirmDialog } = useConfirmDialog()
   const { managingContactsFor, setManagingContactsFor } = useUIStore()
   const { data: employees = [], isLoading } = useCompanyEmployees(managingContactsFor?.id || null)
   const deleteRelationship = useDeleteRelationship()
@@ -424,8 +427,15 @@ export function ContactsModal() {
   }
 
   const handleUnlink = async (relationship: RelationshipWithPerson) => {
-    if (confirm(`¿Desvincular a ${relationship.person?.name} de esta empresa?`)) {
+    const confirmed = await confirm({
+      title: "Desvincular persona",
+      description: `¿Estás seguro de que deseas desvincular a ${relationship.person?.name} de esta empresa?`,
+      confirmText: "Desvincular",
+      variant: "destructive",
+    })
+    if (confirmed) {
       await deleteRelationship.mutateAsync(relationship.id)
+      toast.success("Persona desvinculada")
     }
   }
 
@@ -519,6 +529,7 @@ export function ContactsModal() {
           </div>
         )}
       </DialogContent>
+      <ConfirmDialog />
     </Dialog>
   )
 }

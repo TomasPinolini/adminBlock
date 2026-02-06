@@ -1,5 +1,7 @@
 "use client"
 
+import { toast } from "sonner"
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
 import { Phone, Instagram, MoreVertical, Trash2, Pencil, MessageCircle, Send, Package, DollarSign, Calendar, FileText, Building2, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -16,12 +18,20 @@ import { formatRelative } from "@/lib/utils/dates"
 import { getWhatsAppLink, getInstagramLink, messageTemplates } from "@/lib/utils/messaging"
 
 function ClientCard({ client }: { client: ClientWithStats }) {
+  const { confirm, ConfirmDialog } = useConfirmDialog()
   const deleteClient = useDeleteClient()
   const { setEditingClient, setViewingClientOrders, setManagingContactsFor } = useUIStore()
 
   const handleDelete = async () => {
-    if (confirm(`Eliminar a ${client.name}?`)) {
+    const confirmed = await confirm({
+      title: "Eliminar cliente",
+      description: `¿Estás seguro de que deseas eliminar a ${client.name}? Esta acción eliminará todos sus pedidos y no se puede deshacer.`,
+      confirmText: "Eliminar",
+      variant: "destructive",
+    })
+    if (confirmed) {
       await deleteClient.mutateAsync(client.id)
+      toast.success("Cliente eliminado")
     }
   }
 
@@ -195,6 +205,7 @@ function ClientCard({ client }: { client: ClientWithStats }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      <ConfirmDialog />
     </div>
   )
 }

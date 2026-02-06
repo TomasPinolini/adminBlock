@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
 import { Plus, Pencil, Trash2, Package, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -21,6 +23,7 @@ import {
 import type { Material } from "@/lib/db/schema"
 
 export default function MaterialsPage() {
+  const { confirm, ConfirmDialog } = useConfirmDialog()
   const { data: materials = [], isLoading } = useMaterials()
   const createMaterial = useCreateMaterial()
   const updateMaterial = useUpdateMaterial()
@@ -74,8 +77,15 @@ export default function MaterialsPage() {
   }
 
   const handleDelete = async (material: Material) => {
-    if (confirm(`¿Eliminar "${material.name}"?`)) {
+    const confirmed = await confirm({
+      title: "Eliminar material",
+      description: `¿Estás seguro de que deseas eliminar "${material.name}"? Esta acción no se puede deshacer.`,
+      confirmText: "Eliminar",
+      variant: "destructive",
+    })
+    if (confirmed) {
       await deleteMaterial.mutateAsync(material.id)
+      toast.success("Material eliminado")
     }
   }
 
@@ -246,6 +256,7 @@ export default function MaterialsPage() {
           </form>
         </DialogContent>
       </Dialog>
+      <ConfirmDialog />
     </div>
   )
 }

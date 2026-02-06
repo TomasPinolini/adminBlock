@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
 import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -59,6 +61,7 @@ interface OrderCardProps {
 }
 
 function OrderCard({ order, onPayment }: OrderCardProps) {
+  const { confirm, ConfirmDialog } = useConfirmDialog()
   const updateOrder = useUpdateOrder()
   const deleteOrder = useDeleteOrder()
   const duplicateOrder = useDuplicateOrder()
@@ -73,8 +76,15 @@ function OrderCard({ order, onPayment }: OrderCardProps) {
   }
 
   const handleDelete = async () => {
-    if (confirm("Eliminar este pedido?")) {
+    const confirmed = await confirm({
+      title: "Eliminar pedido",
+      description: `¿Estás seguro de que deseas eliminar el pedido de ${order.client?.name}? Esta acción no se puede deshacer.`,
+      confirmText: "Eliminar",
+      variant: "destructive",
+    })
+    if (confirmed) {
       await deleteOrder.mutateAsync(order.id)
+      toast.success("Pedido eliminado")
     }
   }
 
@@ -321,6 +331,7 @@ function OrderCard({ order, onPayment }: OrderCardProps) {
           </DropdownMenu>
         </div>
       </div>
+      <ConfirmDialog />
     </div>
   )
 }

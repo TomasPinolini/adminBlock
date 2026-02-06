@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
 import { Plus, Pencil, Trash2, Truck, ArrowLeft, Package } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -33,6 +35,7 @@ import { useMaterials } from "@/hooks/use-materials"
 import type { Supplier } from "@/lib/db/schema"
 
 export default function SuppliersPage() {
+  const { confirm, ConfirmDialog } = useConfirmDialog()
   const { data: suppliers = [], isLoading } = useSuppliers()
   const { data: materials = [] } = useMaterials()
   const createSupplier = useCreateSupplier()
@@ -106,11 +109,18 @@ export default function SuppliersPage() {
   }
 
   const handleDelete = async (supplier: Supplier) => {
-    if (confirm(`¿Eliminar "${supplier.name}"?`)) {
+    const confirmed = await confirm({
+      title: "Eliminar proveedor",
+      description: `¿Estás seguro de que deseas eliminar a "${supplier.name}"? Esta acción no se puede deshacer.`,
+      confirmText: "Eliminar",
+      variant: "destructive",
+    })
+    if (confirmed) {
       await deleteSupplier.mutateAsync(supplier.id)
       if (selectedSupplier?.id === supplier.id) {
         setSelectedSupplier(null)
       }
+      toast.success("Proveedor eliminado")
     }
   }
 
@@ -449,6 +459,7 @@ export default function SuppliersPage() {
           </form>
         </DialogContent>
       </Dialog>
+      <ConfirmDialog />
     </div>
   )
 }
