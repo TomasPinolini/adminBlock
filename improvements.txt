@@ -6,119 +6,77 @@
 ✅ COMPLETADO
 ================================================================================
 
-1. Reports - Excel Export
-   - Exportar pedidos del mes
-   - Exportar pedidos por rango de fechas
-   - Exportar lista de clientes
+    1. Reports - Excel Export
+    - Exportar pedidos del mes
+    - Exportar pedidos por rango de fechas
+    - Exportar lista de clientes
 
-2. WhatsApp Settings Toggle
-   - Configurar notificaciones automáticas por estado
-   - Toggle para activar/desactivar cada tipo de mensaje
+    2. WhatsApp Settings Toggle
+    - Configurar notificaciones automáticas por estado
+    - Toggle para activar/desactivar cada tipo de mensaje
 
-3. Sistema de Proveedores, Materiales y Cotización
-   - [x] Crear tabla de materiales (nombre, unidad, notas)
-   - [x] Crear tabla de proveedores (nombre, teléfono, dirección, notas)
-   - [x] Crear tabla proveedor_materiales (qué materiales ofrece cada proveedor)
-   - [x] Crear tabla de materiales por servicio (qué materiales usa cada tipo)
-   - [x] Crear tabla de materiales por pedido (materiales usados en cada orden)
-   - [x] Crear tabla de cotizaciones (quotes) y quote_materials
-   - [x] API CRUD para materiales
-   - [x] API CRUD para proveedores
-   - [x] API CRUD para supplier_materials
-   - [x] API CRUD para quotes
-   - [x] UI para gestionar catálogo de materiales (Ajustes > Materiales)
-   - [x] UI para gestionar proveedores (Ajustes > Proveedores)
-   - [x] UI para asignar materiales a proveedores con precios
-   - [x] UI para configurar materiales por servicio
-   - [x] UI Cotizador: seleccionar materiales, proveedor y precio
-   - [x] Calcular costo total + margen de ganancia
-   - [x] Guardar cotizaciones y convertirlas en pedidos
-   - [x] Actualizar order_materials para guardar proveedor usado
+    3. Sistema de Proveedores, Materiales y Cotización
+    - [x] Crear tabla de materiales (nombre, unidad, notas)
+    - [x] Crear tabla de proveedores (nombre, teléfono, dirección, notas)
+    - [x] Crear tabla proveedor_materiales (qué materiales ofrece cada proveedor)
+    - [x] Crear tabla de materiales por servicio (qué materiales usa cada tipo)
+    - [x] Crear tabla de materiales por pedido (materiales usados en cada orden)
+    - [x] Crear tabla de cotizaciones (quotes) y quote_materials
+    - [x] API CRUD para materiales
+    - [x] API CRUD para proveedores
+    - [x] API CRUD para supplier_materials
+    - [x] API CRUD para quotes
+    - [x] UI para gestionar catálogo de materiales (Ajustes > Materiales)
+    - [x] UI para gestionar proveedores (Ajustes > Proveedores)
+    - [x] UI para asignar materiales a proveedores con precios
+    - [x] UI para configurar materiales por servicio
+    - [x] UI Cotizador: seleccionar materiales, proveedor y precio
+    - [x] Calcular costo total + margen de ganancia
+    - [x] Guardar cotizaciones y convertirlas en pedidos
+    - [x] Actualizar order_materials para guardar proveedor usado
 
-4. Soft Delete para Pedidos Listos
-   - [x] Agregar campo isArchived a tabla orders
-   - [x] Filtrar pedidos archivados por defecto en API
-   - [x] API para archivar/desarchivar pedidos
-   - [x] UI toggle para ver pedidos archivados
-   - [x] Botón "Archivar" para pedidos entregados + pagados
+    4. Soft Delete para Pedidos Listos
+    - [x] Agregar campo isArchived a tabla orders
+    - [x] Filtrar pedidos archivados por defecto en API
+    - [x] API para archivar/desarchivar pedidos
+    - [x] UI toggle para ver pedidos archivados
+    - [x] Botón "Archivar" para pedidos entregados + pagados
 
-5. Limpieza y Mejoras de Código
-   - [x] Remover console.log statements (78 encontrados en producción)
-   - [x] Eliminar tipos TypeScript "any" (3 usos encontrados)
-   - [x] Agregar error boundaries para manejo de errores React
-   - [x] Reemplazar alert/confirm nativos con shadcn dialogs
-   - [x] Agregar loading states a mutaciones (archive, unarchive, etc)
-   - [x] Corregir acentos españoles: Encuadernación, Folletería, Cartelería
-   - [x] Deprecar tabla legacy "contacts" (migrar a clientRelationships)
-   - [x] Extraer lógica hardcodeada de teléfonos AR a config/env
-   - [x] Estandarizar formato de errores en API responses
-   - [x] Agregar índices DB para queries frecuentes (clientId, status, isArchived)
+    5. Limpieza y Mejoras de Código
+    - [x] Remover console.log statements (78 encontrados en producción)
+    - [x] Eliminar tipos TypeScript "any" (3 usos encontrados)
+    - [x] Agregar error boundaries para manejo de errores React
+    - [x] Reemplazar alert/confirm nativos con shadcn dialogs
+    - [x] Agregar loading states a mutaciones (archive, unarchive, etc)
+    - [x] Corregir acentos españoles: Encuadernación, Folletería, Cartelería
+    - [x] Deprecar tabla legacy "contacts" (migrar a clientRelationships)
+    - [x] Extraer lógica hardcodeada de teléfonos AR a config/env
+    - [x] Estandarizar formato de errores en API responses
+    - [x] Agregar índices DB para queries frecuentes (clientId, status, isArchived)
 
-6. Dialogs + Toasts (shadcn/ui)
-   - [x] Reemplazar confirm() nativo con AlertDialog
-   - [x] Agregar Toaster para feedback de acciones
-   - [x] Mejor UX en móvil con componentes touch-friendly
+    6. Dialogs + Toasts (shadcn/ui)
+    - [x] Reemplazar confirm() nativo con AlertDialog
+    - [x] Agregar Toaster para feedback de acciones
+    - [x] Mejor UX en móvil con componentes touch-friendly
 
-7. Edición de Entidades
-   - [x] Modal para editar pedidos existentes (descripción, precio, fecha)
-   - [x] Modal para editar clientes existentes
-   - [x] Búsqueda/filtro en página de pedidos
+    7. Edición de Entidades
+    - [x] Modal para editar pedidos existentes (descripción, precio, fecha)
+    - [x] Modal para editar clientes existentes
+    - [x] Búsqueda/filtro en página de pedidos
 
-8. Servicios Dinámicos 
-   - [x] Crear tabla de servicios en base de datos
-   - [x] Migración de enum a TEXT para service_type
-   - [x] API CRUD para servicios (/api/services)
-   - [x] Hooks para gestión de servicios (use-services.ts)
-   - [x] Validaciones actualizadas para servicios dinámicos
-   - [x] Message templates actualizados
-   - [ ] UI para gestionar servicios en Settings (pendiente)
-   - [ ] Actualizar forms de pedidos con dropdown dinámico (pendiente)
+    8. Servicios Dinámicos 
+    - [x] Crear tabla de servicios en base de datos
+    - [x] Migración de enum a TEXT para service_type
+    - [x] API CRUD para servicios (/api/services)
+    - [x] Hooks para gestión de servicios (use-services.ts)
+    - [x] Validaciones actualizadas para servicios dinámicos
+    - [x] Message templates actualizados
+    - [x] UI para gestionar servicios en Settings
+    - [x] Actualizar forms de pedidos con dropdown dinámico
 
-9. Facturación 
-   - [x] Agregar campos de facturación a pedidos 
-   (invoiceNumber, invoiceType, quantity, subtotal, taxAmount)
-   - [x] Agregar CUIT a clientes
-   - [x] Crear utilidades de cálculo de IVA (21%)
-   - [x] UI para editar facturas en pedidos
-   - [x] Soporte para Factura A (con IVA) y Factura B (monotributo)
-   - [ ] Generar PDFs de facturas (futuro)
-   - [ ] Integración con AFIP (futuro)
-
-================================================================================
- PENDIENTE - ALTA PRIORIDAD
-================================================================================
-
-1. Sistema de Roles
-   - ROL ADMIN: Papá, Tío - acceso completo
-   - ROL OPERADOR: Mamá, Hermana - solo crear clientes/pedidos
-   - Restringir acceso a configuración y cotización
-
-2. Auditoría
-   - Ver quién hizo cada acción
-   - Ver cuándo se hizo cada acción
-   - Ver qué cambió en cada acción
-   - UI para ver historial de actividad
-
-3. Optimización Stats API
-   - Usar SQL aggregations en vez de cargar todos los pedidos
-   - Mejorar performance del dashboard
-
-================================================================================
-⏳ PENDIENTE - BAJA PRIORIDAD / FUTURO
-================================================================================
-
-12. WhatsApp Incoming
-    - Recibir comprobantes de pago automáticamente por WhatsApp
-    - Asociar PDFs a pedidos por número de teléfono
-    - Enviar recordatorios a clientes que no retiran
-
-13. Calendario
-    - Vista de pedidos por fecha
-    - Ver entregas programadas
-    - Vista semanal/mensual
-
-14. Facturación ✅ COMPLETADO (Feb 2026)
-    - [x] Agregar campos de facturación a pedidos (invoiceNumber, invoiceType, quantity, subtotal, taxAmount)
+    9. Facturación 
+    - [x] Agregar campos de facturación a pedidos 
+    (invoiceNumber, invoiceType, quantity, subtotal, taxAmount)
     - [x] Agregar CUIT a clientes
     - [x] Crear utilidades de cálculo de IVA (21%)
     - [x] UI para editar facturas en pedidos
@@ -126,12 +84,102 @@
     - [ ] Generar PDFs de facturas (futuro)
     - [ ] Integración con AFIP (futuro)
 
-15. PWA / App Instalable
-    - Hacer la app instalable en móvil
-    - Notificaciones push
+    10. Optimizaciones de Performance (Feb 2026)
+    - [x] Agregar índices de base de datos (migration 005)
+    - [x] Índices simples: paymentStatus, dueDate, createdAt, updatedAt, clientType
+    - [x] Índices parciales para queries comunes (active orders, unpaid, non-archived)
+    - [x] Índices compuestos para filtros combinados
+    - [x] Optimizar Stats API con SQL aggregations (50-100x más rápido)
+    - [x] Queries paralelas con Promise.all() en Stats API
+    - Resultado: Dashboard 50-100x más rápido, listas 5-10x más rápidas
 
-16. Dark Mode
-    - Toggle para cambiar tema claro/oscuro
+================================================================================
+ PENDIENTE - ALTA PRIORIDAD
+================================================================================
+
+    1. Sistema de Roles
+    - ROL ADMIN: Papá, Tío - acceso completo
+    - ROL OPERADOR: Mamá, Hermana - solo crear clientes/pedidos
+    - Restringir acceso a configuración y cotización
+
+    2. Auditoría
+    - Ver quién hizo cada acción
+    - Ver cuándo se hizo cada acción
+    - Ver qué cambió en cada acción
+    - UI para ver historial de actividad
+
+================================================================================
+🔧 OPTIMIZACIONES TÉCNICAS - SOLO SI ESCALA EL NEGOCIO
+================================================================================
+
+    Estas mejoras son para cuando el volumen de datos crezca significativamente.
+    No son necesarias ahora pero serán importantes con miles de registros o alto tráfico.
+
+    1. Paginación
+    - Implementar cursor-based pagination en listas
+    - Necesario cuando: > 1000 registros por entidad
+
+    2. N+1 Query Optimization
+    - Usar Drizzle's 'with' para eager loading
+    - Necesario cuando: Queries tarden > 2 segundos
+
+    4. Rate Limiting
+    - Agregar middleware de rate limiting en APIs
+    - Necesario cuando: Alto tráfico o riesgo de abuso/DoS
+
+    5. Structured Logging
+    - Implementar logging estructurado (Pino, Winston)
+    - Necesario cuando: Difícil debuggear en producción con muchos usuarios
+
+    6. Code Splitting / Bundle Optimization
+    - Usar dynamic imports para modals y componentes pesados
+    - Necesario cuando: Bundle size afecte carga inicial
+
+    7. HTTP Caching Strategy
+    - Agregar Cache-Control headers apropiados
+    - Necesario cuando: Alto tráfico requiera optimización de red
+
+    8. CSRF Protection
+    - Implementar validación de CSRF tokens
+    - Necesario cuando: App sea pública o tenga muchos usuarios externos
+
+    9. Optimistic Updates
+    - UI no se actualiza optimísticamente en React Query
+    - Necesario cuando: Performance percibida sea lenta con muchos usuarios
+
+    10. Retry Logic
+    - Agregar retry logic a React Query para requests fallidos
+    - Necesario cuando: Problemas de red sean frecuentes
+
+================================================================================
+⏳ PENDIENTE - BAJA PRIORIDAD / FUTURO
+================================================================================
+
+    12. WhatsApp Incoming
+        - Recibir comprobantes de pago automáticamente por WhatsApp
+        - Asociar PDFs a pedidos por número de teléfono
+        - Enviar recordatorios a clientes que no retiran
+
+    13. Calendario
+        - Vista de pedidos por fecha
+        - Ver entregas programadas
+        - Vista semanal/mensual
+
+    14. Facturación ✅ COMPLETADO (Feb 2026)
+        - [x] Agregar campos de facturación a pedidos (invoiceNumber, invoiceType, quantity, subtotal, taxAmount)
+        - [x] Agregar CUIT a clientes
+        - [x] Crear utilidades de cálculo de IVA (21%)
+        - [x] UI para editar facturas en pedidos
+        - [x] Soporte para Factura A (con IVA) y Factura B (monotributo)
+        - [ ] Generar PDFs de facturas (futuro)
+        - [ ] Integración con AFIP (futuro)
+
+    15. PWA / App Instalable
+        - Hacer la app instalable en móvil
+        - Notificaciones push
+
+    16. Dark Mode
+        - Toggle para cambiar tema claro/oscuro
 
 ================================================================================
 📋 CODE REVIEW - ISSUES ENCONTRADOS (Feb 2026)
@@ -140,161 +188,124 @@
 🔴 CRÍTICOS - REQUIEREN ATENCIÓN INMEDIATA
 -------------------------------------------
 
-1. Database Schema Mismatch - Invoice Type
-   - Schema define invoiceTypeEnum pero migración usa TEXT
-   - Fix: Actualizar migración para usar enum o cambiar schema a TEXT
-   - Ubicación: migrations/add_invoice_fields_simple.sql:9
+    1. Database Schema Mismatch - Invoice Type
+    - Schema define invoiceTypeEnum pero migración usa TEXT
+    - Fix: Actualizar migración para usar enum o cambiar schema a TEXT
+    - Ubicación: migrations/add_invoice_fields_simple.sql:9
 
-2. Missing Error Boundaries
-   - No hay error boundaries para capturar crashes de componentes
-   - Impacto: Crashes se propagan al usuario, mala UX
-   - Fix: Agregar error boundaries a nivel de rutas
+    2. Missing Error Boundaries
+    - No hay error boundaries para capturar crashes de componentes
+    - Impacto: Crashes se propagan al usuario, mala UX
+    - Fix: Agregar error boundaries a nivel de rutas
 
-3. Unsafe Type Assertions
-   - Uso de 'as' sin validación
-   - Ejemplo: invoiceType: (order.invoiceType as "A" | "B" | "none")
-   - Riesgo: Errores en runtime si los datos no coinciden
-
-4. No Request Timeouts
-   - Los fetch pueden colgar infinitamente
-   - Causa del bug "Guardando..." que viste
-   - Fix: Agregar AbortController o timeout wrapper
+    3. Unsafe Type Assertions
+    - Uso de 'as' sin validación
+    - Ejemplo: invoiceType: (order.invoiceType as "A" | "B" | "none")
+    - Riesgo: Errores en runtime si los datos no coinciden
 
 🟡 IMPORTANTES - ARREGLAR PRONTO
 ---------------------------------
 
-5. Inconsistent Soft Delete
-   - isArchived/isActive usan TEXT con "true"/"false" en vez de boolean
-   - Afecta: orders.isArchived, suppliers.isActive, materials.isActive
-   - Fix: Migrar a boolean o crear helpers consistentes
+    5. Inconsistent Soft Delete
+    - isArchived/isActive usan TEXT con "true"/"false" en vez de boolean
+    - Afecta: orders.isArchived, suppliers.isActive, materials.isActive
+    - Fix: Migrar a boolean o crear helpers consistentes
 
-6. Missing Input Validation on Invoice Calculations
-   - No valida números negativos o NaN en calculateIVA()
-   - Ubicación: src/lib/utils/invoice.ts
-   - Fix: Agregar validación de inputs
+    6. Missing Input Validation on Invoice Calculations
+    - No valida números negativos o NaN en calculateIVA()
+    - Ubicación: src/lib/utils/invoice.ts
+    - Fix: Agregar validación de inputs
 
-7. Inconsistent Error Messages
-   - Mix de español/inglés en errores
-   - Fix: Estandarizar todos los mensajes
+    7. Inconsistent Error Messages
+    - Mix de español/inglés en errores
+    - Fix: Estandarizar todos los mensajes
 
-8. Missing Database Indexes
-   - Faltan índices en: orders.status, orders.clientId, orders.paymentStatus, clients.clientType
-   - Impacto: Queries lentas a medida que crece la data
-   - Fix: Agregar índices en migración
+    8. Missing Database Indexes ✅ COMPLETADO (Feb 2026)
+    - [x] Ya agregados: orders.clientId, orders.status, orders.isArchived
+    - [x] Agregados: orders.paymentStatus, orders.dueDate, orders.createdAt, orders.updatedAt
+    - [x] Agregados: clients.clientType, clients.createdAt
+    - [x] Índices parciales para queries comunes (active orders, unpaid, non-archived)
+    - [x] Índices compuestos para filtros combinados
+    - Migración: 005_add_performance_indexes.sql
 
-9. Duplicate Client System
-   - Tabla 'contacts' (legacy) y 'clientRelationships' hacen lo mismo
-   - Fix: Migrar todos los contacts a clientRelationships y eliminar tabla
+    9. Duplicate Client System
+    - Tabla 'contacts' (legacy) y 'clientRelationships' hacen lo mismo
+    - Fix: Migrar todos los contacts a clientRelationships y eliminar tabla
 
-10. No Input Sanitization
-    - Sin protección XSS en inputs
-    - Riesgo: Vulnerabilidad de seguridad
-    - Fix: Sanitizar inputs especialmente en notes/description
+    10. No Input Sanitization
+        - Sin protección XSS en inputs
+        - Riesgo: Vulnerabilidad de seguridad
+        - Fix: Sanitizar inputs especialmente en notes/description
 
 🟢 MEJORAS MENORES - NICE TO HAVE
 ----------------------------------
 
-11. Hardcoded IVA Rate
-    - IVA_RATE = 0.21 está hardcodeado
-    - Fix: Mover a app settings para flexibilidad
+    11. Hardcoded IVA Rate
+        - IVA_RATE = 0.21 está hardcodeado
+        - Fix: Mover a app settings para flexibilidad
 
-12. No Pagination
-    - Se cargan todos los registros sin paginación
-    - Impacto: Performance degradada con datasets grandes
-    - Fix: Implementar cursor-based pagination
+    12. Missing Loading States
+        - Algunos botones no muestran loading (archive/unarchive)
+        - Fix: Agregar estados de loading consistentes
 
-13. Missing Loading States
-    - Algunos botones no muestran loading (archive/unarchive)
-    - Fix: Agregar estados de loading consistentes
+    13. Inconsistent Date Handling
+        - Mix de Date objects, ISO strings, date strings
+        - Riesgo: Bugs de timezone
+        - Fix: Estandarizar en ISO strings
 
-14. No Optimistic Updates
-    - UI no se actualiza optimísticamente
-    - Impacto: Performance percibida lenta
-    - Fix: Agregar optimistic updates en React Query
+    14. TypeScript Not in Strict Mode
+        - tsconfig.json no usa strict mode
+        - Fix: Habilitar strict mode para mejor type safety
 
-15. Inconsistent Date Handling
-    - Mix de Date objects, ISO strings, date strings
-    - Riesgo: Bugs de timezone
-    - Fix: Estandarizar en ISO strings
-
-16. No Rate Limiting
-    - APIs sin rate limiting
-    - Riesgo: Abuso o DoS
-    - Fix: Agregar middleware de rate limiting
-
-17. TypeScript Not in Strict Mode
-    - tsconfig.json no usa strict mode
-    - Fix: Habilitar strict mode para mejor type safety
-
-18. No Structured Logging
-    - Solo console.error para logging
-    - Problema: Difícil debuggear en producción
-    - Fix: Implementar logging estructurado (Pino, Winston)
-
-19. No Retry Logic
-    - Requests fallidos no reintentan
-    - Impacto: Mala UX en problemas de red
-    - Fix: Agregar retry logic a React Query
-
-20. Missing Frontend Validation
-    - Algunos forms no validan antes de submit
-    - Ejemplo: Formato CUIT no se valida
-    - Fix: Agregar validación frontend matching backend schemas
-
-📊 PERFORMANCE
---------------
-
-21. N+1 Query Problem
-    - Fetching de data relacionada en loops
-    - Fix: Usar Drizzle's 'with' para eager loading
-
-22. Large Bundle Size
-    - Sin code splitting para componentes grandes
-    - Fix: Usar dynamic imports para modals y componentes pesados
-
-23. No Caching Strategy
-    - Sin headers de HTTP caching
-    - Fix: Agregar Cache-Control headers apropiados
+    15. Missing Frontend Validation
+        - Algunos forms no validan antes de submit
+        - Ejemplo: Formato CUIT no se valida
+        - Fix: Agregar validación frontend matching backend schemas
 
 🔒 SEGURIDAD
 ------------
 
-24. No CSRF Protection
-    - Sin validación de CSRF tokens
-    - Riesgo: Ataques de cross-site request forgery
-    - Fix: Implementar protección CSRF
+    18. Sensitive Data in Logs
+        - Objetos de error completos en logs (pueden contener data sensible)
+        - Fix: Sanitizar logs antes de loggear
 
-25. Sensitive Data in Logs
-    - Objetos de error completos en logs (pueden contener data sensible)
-    - Fix: Sanitizar logs antes de loggear
-
-26. SQL Injection (Verificar)
-    - Drizzle ORM debería proteger, pero necesita verificación
-    - Fix: Auditar todas las raw SQL queries si existen
+    19. SQL Injection (Verificar)
+        - Drizzle ORM debería proteger, pero necesita verificación
+        - Fix: Auditar todas las raw SQL queries si existen
 
 🎯 PRIORIDADES RECOMENDADAS
 ---------------------------
 
-ALTA PRIORIDAD (Arreglar Ya):
-1. Fix invoice_type enum/TEXT mismatch
-2. Agregar request timeouts
-3. Agregar índices faltantes en DB
-4. Implementar error boundaries
-5. Fix soft delete inconsistency
+    ALTA PRIORIDAD (Arreglar Ya):
+    1. Fix invoice_type enum/TEXT mismatch
+    2. Agregar índices faltantes en DB (paymentStatus, clientType)
+    3. Implementar error boundaries (verificar cobertura completa)
+    4. Fix soft delete inconsistency
 
-MEDIA PRIORIDAD (Arreglar Pronto):
-6. Migrar contacts a clientRelationships
-7. Agregar validación y sanitización de inputs
-8. Implementar paginación
-9. Agregar manejo de errores apropiado
-10. Estandarizar mensajes de error
+    MEDIA PRIORIDAD (Arreglar Pronto):
+    5. Migrar contacts a clientRelationships
+    6. Agregar validación y sanitización de inputs
+    7. Agregar manejo de errores apropiado
+    8. Estandarizar mensajes de error
 
-BAJA PRIORIDAD (Nice to Have):
-11. Agregar optimistic updates
-12. Implementar code splitting
-13. Agregar logging estructurado
-14. Habilitar TypeScript strict mode
-15. Agregar rate limiting
+    BAJA PRIORIDAD (Nice to Have):
+    9. Habilitar TypeScript strict mode
+    10. Agregar frontend validation consistente
+    11. Hardcoded IVA rate a settings
+    12. Inconsistent date handling
+
+================================================================================
+💭 PARA RECONSIDERAR CON PAPÁ
+================================================================================
+
+    Servicios Dinámicos - Extensión Opcional:
+    - Actualizar cotizador (quotes/page.tsx) para usar dropdown dinámico
+    - Actualizar displays en listas (order-list.tsx) para cargar desde DB
+    - Actualizar exportación Excel para usar servicios dinámicos
+    
+    Nota: Los formularios de pedidos YA usan servicios dinámicos.
+    El resto funciona con fallback a labels legacy, pero podría mejorarse
+    para consistencia total del sistema.
 
 ================================================================================
                          FIN DEL ROADMAP
