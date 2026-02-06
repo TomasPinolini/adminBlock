@@ -101,13 +101,15 @@ export function ClientFormModal() {
         }
       }
       handleClose()
-    } catch {
-      setError(isEditing ? "Error al actualizar cliente" : "Error al crear cliente")
+    } catch (error) {
+      console.error("Error saving client:", error)
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido"
+      setError(isEditing ? `Error al actualizar: ${errorMessage}` : `Error al crear: ${errorMessage}`)
     }
   }
 
   const handleClose = () => {
-    reset({ clientType: "individual", name: "", phone: "", instagramHandle: "", notes: "" })
+    reset({ clientType: "individual", name: "", phone: "", instagramHandle: "", cuit: "", notes: "" })
     setClientType("individual")
     setSelectedCompanyId(null)
     setRole("")
