@@ -43,19 +43,12 @@
    - [x] Botón "Archivar" para pedidos entregados + pagados
 
 5. Limpieza y Mejoras de Código
-   Objetivo: Mejorar calidad, seguridad y mantenibilidad del código
-   
-   Prioridad Alta (Seguridad/Calidad):
    - [x] Remover console.log statements (78 encontrados en producción)
    - [x] Eliminar tipos TypeScript "any" (3 usos encontrados)
-   - [ ] Agregar error boundaries para manejo de errores React
-   
-   Prioridad Media (UX):
+   - [x] Agregar error boundaries para manejo de errores React
    - [x] Reemplazar alert/confirm nativos con shadcn dialogs
    - [x] Agregar loading states a mutaciones (archive, unarchive, etc)
    - [x] Corregir acentos españoles: Encuadernación, Folletería, Cartelería
-   
-   Prioridad Baja (Limpieza):
    - [x] Deprecar tabla legacy "contacts" (migrar a clientRelationships)
    - [x] Extraer lógica hardcodeada de teléfonos AR a config/env
    - [x] Estandarizar formato de errores en API responses
