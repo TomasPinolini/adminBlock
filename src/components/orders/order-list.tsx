@@ -102,7 +102,7 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
     await unarchiveOrder.mutateAsync(order.id)
   }
 
-  const isArchived = order.isArchived === "true"
+  const isArchived = order.isArchived
   const canArchive = order.status === "delivered" && order.paymentStatus === "paid"
 
   const overdue = isOverdue(order.dueDate)

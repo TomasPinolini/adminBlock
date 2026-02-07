@@ -6,6 +6,7 @@ import {
   pgEnum,
   numeric,
   date,
+  boolean,
 } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
 
@@ -53,6 +54,12 @@ export const paymentStatusEnum = pgEnum("payment_status", [
 export const clientTypeEnum = pgEnum("client_type", [
   "individual",
   "company",
+])
+
+export const invoiceTypeEnum = pgEnum("invoice_type", [
+  "A",
+  "B", 
+  "none",
 ])
 
 // Tables
@@ -115,7 +122,7 @@ export const orders = pgTable("orders", {
   dueDate: date("due_date"),
   // Invoice fields
   invoiceNumber: text("invoice_number"), // e.g., "3079", "1209"
-  invoiceType: text("invoice_type").default("none"), // "A", "B", or "none"
+  invoiceType: invoiceTypeEnum("invoice_type").default("none"),
   quantity: numeric("quantity", { precision: 10, scale: 2 }), // cantidad de unidades
   subtotal: numeric("subtotal", { precision: 10, scale: 2 }), // monto sin IVA
   taxAmount: numeric("tax_amount", { precision: 10, scale: 2 }), // monto de IVA (21%)
@@ -124,7 +131,7 @@ export const orders = pgTable("orders", {
   paymentAmount: numeric("payment_amount", { precision: 10, scale: 2 }),
   receiptUrl: text("receipt_url"),
   paidAt: timestamp("paid_at"),
-  isArchived: text("is_archived").default("false").notNull(), // soft delete for delivered+paid
+  isArchived: boolean("is_archived").default(false).notNull(), // soft delete for delivered+paid
   archivedAt: timestamp("archived_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -188,7 +195,7 @@ export const suppliers = pgTable("suppliers", {
   phone: text("phone"),
   address: text("address"),
   notes: text("notes"),
-  isActive: text("is_active").default("true").notNull(), // soft delete
+  isActive: boolean("is_active").default(true).notNull(), // soft delete
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
@@ -199,7 +206,7 @@ export const services = pgTable("services", {
   name: text("name").notNull().unique(), // e.g., "copiado", "tesis", "encuadernacion"
   displayName: text("display_name").notNull(), // e.g., "Copiado", "Tesis", "Encuadernación"
   description: text("description"),
-  isActive: text("is_active").default("true").notNull(), // soft delete
+  isActive: boolean("is_active").default(true).notNull(), // soft delete
   sortOrder: numeric("sort_order", { precision: 10, scale: 0 }).default("0"), // for custom ordering
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -211,7 +218,7 @@ export const materials = pgTable("materials", {
   name: text("name").notNull(),
   unit: text("unit").notNull(), // "metro", "unidad", "hoja", "m2", etc.
   notes: text("notes"),
-  isActive: text("is_active").default("true").notNull(), // soft delete
+  isActive: boolean("is_active").default(true).notNull(), // soft delete
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })

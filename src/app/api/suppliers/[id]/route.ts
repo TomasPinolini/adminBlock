@@ -9,7 +9,7 @@ const updateSupplierSchema = z.object({
   phone: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
-  isActive: z.string().optional(),
+  isActive: z.boolean().optional(),
 })
 
 export async function GET(
@@ -94,7 +94,7 @@ export async function DELETE(
     const [deleted] = await db
       .update(suppliers)
       .set({
-        isActive: "false",
+        isActive: false,
         updatedAt: new Date(),
       })
       .where(eq(suppliers.id, id))

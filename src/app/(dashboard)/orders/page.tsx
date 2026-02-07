@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { RouteErrorBoundary } from "@/components/error-boundary-route"
 import { useUIStore } from "@/stores/ui-store"
 import {
   serviceTypes,
@@ -47,7 +48,10 @@ export default function OrdersPage() {
   }
 
   return (
-    <>
+    <RouteErrorBoundary
+      fallbackTitle="Error en Pedidos"
+      fallbackMessage="No se pudo cargar la página de pedidos. Otras secciones siguen funcionando."
+    >
       <div className="space-y-4 lg:space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
@@ -123,6 +127,6 @@ export default function OrdersPage() {
       </div>
 
       <OrderFormModal />
-    </>
+    </RouteErrorBoundary>
   )
 }

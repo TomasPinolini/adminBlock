@@ -16,7 +16,7 @@ export async function GET() {
     const allSuppliers = await db
       .select()
       .from(suppliers)
-      .where(eq(suppliers.isActive, "true"))
+      .where(eq(suppliers.isActive, true))
       .orderBy(suppliers.name)
 
     return NextResponse.json(allSuppliers)

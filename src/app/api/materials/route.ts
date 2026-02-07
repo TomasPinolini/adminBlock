@@ -15,7 +15,7 @@ export async function GET() {
     const allMaterials = await db
       .select()
       .from(materials)
-      .where(eq(materials.isActive, "true"))
+      .where(eq(materials.isActive, true))
       .orderBy(materials.name)
 
     return NextResponse.json(allMaterials)

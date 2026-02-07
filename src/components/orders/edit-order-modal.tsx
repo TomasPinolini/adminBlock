@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select"
 import { invoiceTypeLabels, invoiceTypes } from "@/lib/validations/orders"
 import { calculateInvoiceBreakdown } from "@/lib/utils/invoice"
+import { parseInvoiceType, type InvoiceType } from "@/lib/utils/validation"
 
 interface EditOrderModalProps {
   order: OrderWithClient | null
@@ -40,17 +41,14 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
     dueDate: "",
     serviceType: "",
     invoiceNumber: "",
-    invoiceType: "none" as "A" | "B" | "none",
+    invoiceType: "none" as InvoiceType,
     quantity: "",
   })
 
   useEffect(() => {
     if (order) {
-      // Validate invoice type to ensure it's one of the valid values
-      const validInvoiceTypes = ["A", "B", "none"] as const
-      const invoiceType = validInvoiceTypes.includes(order.invoiceType as any) 
-        ? (order.invoiceType as "A" | "B" | "none")
-        : "none"
+      // Safe validation with type guard
+      const invoiceType = parseInvoiceType(order.invoiceType)
       
       setFormData({
         description: order.description || "",

@@ -8,7 +8,7 @@ const updateMaterialSchema = z.object({
   name: z.string().min(1).optional(),
   unit: z.string().min(1).optional(),
   notes: z.string().optional().nullable(),
-  isActive: z.string().optional(),
+  isActive: z.boolean().optional(),
 })
 
 export async function GET(
@@ -93,7 +93,7 @@ export async function DELETE(
     const [deleted] = await db
       .update(materials)
       .set({
-        isActive: "false",
+        isActive: false,
         updatedAt: new Date(),
       })
       .where(eq(materials.id, id))

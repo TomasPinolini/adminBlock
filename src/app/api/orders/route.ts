@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     
     // By default, hide archived orders unless explicitly requested
     if (!includeArchived) {
-      filtered = filtered.filter((o) => o.isArchived !== "true")
+      filtered = filtered.filter((o) => !o.isArchived)
     }
     
     if (clientId) {

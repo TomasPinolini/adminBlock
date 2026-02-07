@@ -16,7 +16,7 @@ export async function GET() {
     const allServices = await db
       .select()
       .from(services)
-      .where(eq(services.isActive, "true"))
+      .where(eq(services.isActive, true))
       .orderBy(asc(services.sortOrder), asc(services.displayName))
 
     return NextResponse.json(allServices)

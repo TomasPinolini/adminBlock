@@ -20,7 +20,7 @@ export async function POST(
     const [updatedOrder] = await db
       .update(orders)
       .set({
-        isArchived: "true",
+        isArchived: true,
         archivedAt: new Date(),
         updatedAt: new Date(),
       })
@@ -70,7 +70,7 @@ export async function DELETE(
     const [updatedOrder] = await db
       .update(orders)
       .set({
-        isArchived: "false",
+        isArchived: false,
         archivedAt: null,
         updatedAt: new Date(),
       })

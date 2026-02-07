@@ -6,6 +6,7 @@ import { useState } from "react"
 import { Plus, Download, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { RouteErrorBoundary } from "@/components/error-boundary-route"
 import { useUIStore } from "@/stores/ui-store"
 import { ClientList } from "@/components/clients/client-list"
 import { ClientFormModal } from "@/components/clients/client-form-modal"
@@ -18,7 +19,10 @@ export default function ClientsPage() {
   const [searchQuery, setSearchQuery] = useState("")
 
   return (
-    <>
+    <RouteErrorBoundary
+      fallbackTitle="Error en Clientes"
+      fallbackMessage="No se pudo cargar la página de clientes. Otras secciones siguen funcionando."
+    >
       <div className="space-y-4 lg:space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
@@ -61,6 +65,6 @@ export default function ClientsPage() {
       <ClientFormModal />
       <ClientOrdersModal />
       <ContactsModal />
-    </>
+    </RouteErrorBoundary>
   )
 }

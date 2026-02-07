@@ -9,7 +9,7 @@ const updateServiceSchema = z.object({
   displayName: z.string().min(1).optional(),
   description: z.string().optional().nullable(),
   sortOrder: z.number().optional(),
-  isActive: z.string().optional(),
+  isActive: z.boolean().optional(),
 })
 
 export async function GET(
@@ -95,13 +95,14 @@ export async function DELETE(
   try {
     const { id } = await params
     // Soft delete - just mark as inactive
-    const [updated] = await db
+    const [deleted] = await db
       .update(services)
-      .set({ isActive: "false", updatedAt: new Date() })
+      .set({
+        isActive: false, updatedAt: new Date() })
       .where(eq(services.id, id))
       .returning()
 
-    if (!updated) {
+    if (!deleted) {
       return NextResponse.json(
         { error: "Servicio no encontrado" },
         { status: 404 }
