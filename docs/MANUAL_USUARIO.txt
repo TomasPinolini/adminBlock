@@ -132,14 +132,7 @@ CAMPOS A COMPLETAR:
     Esto es opcional pero útil para saber quién contactar.
 
   • TIPO DE SERVICIO: Elegí qué tipo de trabajo es
-    - Copiado
-    - Tesis
-    - Encuadernación
-    - Cartelería
-    - Placas
-    - Calcos
-    - Folletería
-    - Ploteo
+    (Los servicios disponibles se configuran en Ajustes)
 
   • DESCRIPCIÓN: Detalles del trabajo
     Ejemplo: "150 copias doble faz, papel común"
@@ -504,16 +497,8 @@ PASO 5: Copiar el mensaje
 
 PRECIOS CONFIGURADOS:
 ---------------------
-  • Copiado:        $50 por página
-  • Tesis:          $2.000 base + $30 por página
-  • Encuadernación: $500 fijo
-  • Cartelería:     $800 por m²
-  • Placas:         $1.500 fijo
-  • Calcos:         $200 por unidad
-  • Folletería:     $150 por unidad
-  • Ploteo:         $1.200 por m²
-
-  (Los precios se pueden actualizar - hablá con Tomás)
+  Los precios se configuran en el sistema y pueden variar según materiales.
+  Consultá con el administrador para precios actuales.
 
 ================================================================================
 9. LOS FILTROS RÁPIDOS

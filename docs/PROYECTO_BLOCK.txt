@@ -173,14 +173,7 @@ COMUNICACIÓN
 
 TIPOS DE SERVICIO DISPONIBLES
 -----------------------------
-  • Copiado
-  • Tesis
-  • Encuadernación
-  • Cartelería
-  • Placas
-  • Calcos
-  • Folletería
-  • Ploteos
+  Ver lista completa en BUSINESS_UNDERSTANDING.txt
 
 ================================================================================
 3. ¿CÓMO FUNCIONA?
@@ -195,31 +188,9 @@ ACCESO
 
 FLUJO DE TRABAJO TÍPICO
 -----------------------
-
-  1. LLEGA UN PEDIDO (por Instagram/WhatsApp)
-     → La persona que recibe el mensaje crea el pedido en AdminBlock
-     → Estado inicial: "Pendiente de cotización"
-
-  2. SE COTIZA
-     → Se agrega el precio al pedido
-     → Se cambia estado a "Cotizado"
-     → Se envía presupuesto al cliente (manual o automático)
-
-  3. CLIENTE APRUEBA
-     → Se cambia estado a "Aprobado"
-
-  4. SE TRABAJA
-     → Se cambia estado a "En proceso"
-     → (Opcional) Se puede notificar al cliente automáticamente
-
-  5. ESTÁ LISTO
-     → Se cambia estado a "Listo"
-     → Se avisa al cliente para que retire
-
-  6. SE ENTREGA Y COBRA
-     → Se registra el pago
-     → Se sube comprobante si hay
-     → Se cambia estado a "Entregado"
+  Ver flujo detallado en BUSINESS_UNDERSTANDING.txt
+  
+  Resumen: Recepción → Cotización → Aprobación → Producción → Listo → Entrega
 
 USUARIOS
 --------

@@ -12,7 +12,7 @@ function createClient() {
   return postgres(connectionString, {
     prepare: false,
     ssl: 'require',
-    max: 1,
+    max: 6,
   })
 }
 
