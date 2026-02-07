@@ -46,14 +46,14 @@ function ClientCard({ client }: { client: ClientWithStats }) {
   const isCompany = client.clientType === "company"
 
   return (
-    <div className="rounded-lg border bg-background p-4">
-      <div className="flex items-start justify-between gap-3">
+    <div className="rounded-lg border bg-background p-3 sm:p-4">
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
         <div className="min-w-0 flex-1">
           {/* Client name and contact info */}
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-medium">{client.name}</h3>
+                <h3 className="font-medium text-sm sm:text-base">{client.name}</h3>
                 {isCompany && (
                   <Badge variant="outline" className="text-xs gap-1">
                     <Building2 className="h-3 w-3" />
@@ -61,7 +61,7 @@ function ClientCard({ client }: { client: ClientWithStats }) {
                   </Badge>
                 )}
               </div>
-              <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+              <div className="mt-0.5 sm:mt-1 flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-0.5 text-sm text-muted-foreground">
                 {client.phone && (
                   <a
                     href={`tel:${client.phone}`}
@@ -93,7 +93,7 @@ function ClientCard({ client }: { client: ClientWithStats }) {
           </div>
 
           {/* Order statistics */}
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1 text-sm">
             <div className="flex items-center gap-1.5">
               <Package className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="font-medium">{client.orderCount}</span>
@@ -116,22 +116,22 @@ function ClientCard({ client }: { client: ClientWithStats }) {
 
           {/* Notes */}
           {client.notes && (
-            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+            <p className="mt-1.5 sm:mt-2 text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2">
               {client.notes}
             </p>
           )}
 
           {/* Quick contact buttons */}
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-1.5 sm:gap-2">
             {hasPhone && (
               <a
                 href={getWhatsAppLink(client.phone!, messageTemplates.thanks(clientFirstName))}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 transition-colors"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-green-600 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-white hover:bg-green-700 transition-colors"
               >
                 <MessageCircle className="h-3.5 w-3.5" />
-                WhatsApp
+                <span className="hidden sm:inline">WhatsApp</span>
               </a>
             )}
             {hasInstagram && (
@@ -139,31 +139,32 @@ function ClientCard({ client }: { client: ClientWithStats }) {
                 href={getInstagramLink(client.instagramHandle!)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1.5 text-xs font-medium text-white hover:from-purple-600 hover:to-pink-600 transition-colors"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-white hover:from-purple-600 hover:to-pink-600 transition-colors"
               >
                 <Send className="h-3.5 w-3.5" />
-                Instagram
+                <span className="hidden sm:inline">Instagram</span>
               </a>
             )}
             {hasPhone && (
               <a
                 href={`tel:${client.phone}`}
-                className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-xs font-medium hover:bg-muted/80 transition-colors"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-muted px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium hover:bg-muted/80 transition-colors"
               >
-                Llamar
+                <Phone className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Llamar</span>
               </a>
             )}
             <button
               onClick={() => setViewingClientOrders(client)}
-              className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-blue-600 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
             >
               <FileText className="h-3.5 w-3.5" />
-              Ver pedidos
+              <span className="hidden sm:inline">Ver</span> pedidos
             </button>
           </div>
 
           {/* Created at */}
-          <p className="mt-2 text-xs text-muted-foreground">
+          <p className="mt-1.5 sm:mt-2 text-xs text-muted-foreground">
             Cliente desde {formatRelative(client.createdAt)}
           </p>
         </div>

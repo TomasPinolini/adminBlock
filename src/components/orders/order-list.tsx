@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
-import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit } from "lucide-react"
+import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -130,16 +130,16 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
   }
 
   return (
-    <div className="rounded-lg border bg-background p-4">
-      <div className="flex items-start justify-between gap-3">
+    <div className="rounded-lg border bg-background p-3 sm:p-4">
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
         <div className="min-w-0 flex-1">
           {/* Client name */}
-          <h3 className="font-medium">
+          <h3 className="font-medium text-sm sm:text-base">
             {order.client?.name || "Cliente desconocido"}
           </h3>
 
           {/* Service type and status */}
-          <div className="mt-1 flex flex-wrap items-center gap-2">
+          <div className="mt-1 flex flex-wrap items-center gap-1.5 sm:gap-2">
             <Badge variant="outline">
               {serviceTypeLabels[order.serviceType]}
             </Badge>
@@ -153,13 +153,13 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
 
           {/* Description */}
           {order.description && (
-            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+            <p className="mt-1.5 sm:mt-2 text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2">
               {order.description}
             </p>
           )}
 
           {/* Price and payment status */}
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+          <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1 text-sm">
             {order.price && (
               <span className="font-medium">
                 ${Number(order.price).toLocaleString("es-AR")}
@@ -189,7 +189,7 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
 
           {/* Invoice information */}
           {(order.invoiceNumber || order.invoiceType !== "none" || order.quantity) && (
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1 text-xs text-muted-foreground">
               {order.invoiceNumber && (
                 <span className="inline-flex items-center gap-1">
                   <Receipt className="h-3 w-3" />
@@ -209,16 +209,16 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
           )}
 
           {/* Quick message buttons */}
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-1.5 sm:gap-2">
             {hasPhone && (
               <a
                 href={getWhatsAppLink(order.client!.phone!, getQuickMessage())}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 transition-colors"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-green-600 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-white hover:bg-green-700 transition-colors"
               >
                 <MessageCircle className="h-3.5 w-3.5" />
-                WhatsApp
+                <span className="hidden sm:inline">WhatsApp</span>
               </a>
             )}
             {hasInstagram && (
@@ -226,27 +226,28 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
                 href={getInstagramLink(order.client!.instagramHandle!)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1.5 text-xs font-medium text-white hover:from-purple-600 hover:to-pink-600 transition-colors"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-white hover:from-purple-600 hover:to-pink-600 transition-colors"
               >
                 <Send className="h-3.5 w-3.5" />
-                Instagram
+                <span className="hidden sm:inline">Instagram</span>
               </a>
             )}
             {hasPrice && paymentStatus !== "paid" && (
               <button
                 onClick={() => onPayment(order)}
-                className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-blue-600 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
               >
                 <Receipt className="h-3.5 w-3.5" />
-                Registrar Pago
+                <span className="hidden sm:inline">Registrar</span> Pago
               </button>
             )}
             {hasPhone && (
               <a
                 href={`tel:${order.client!.phone}`}
-                className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-xs font-medium hover:bg-muted/80 transition-colors"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-muted px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium hover:bg-muted/80 transition-colors"
               >
-                Llamar
+                <Phone className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Llamar</span>
               </a>
             )}
           </div>
@@ -257,7 +258,7 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
               href={order.receiptUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
+              className="mt-1.5 inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
             >
               <Receipt className="h-3 w-3" />
               Ver comprobante
@@ -265,7 +266,7 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
           )}
 
           {/* Created at */}
-          <p className="mt-2 text-xs text-muted-foreground">
+          <p className="mt-1.5 sm:mt-2 text-xs text-muted-foreground">
             {formatRelative(order.createdAt)}
           </p>
         </div>
