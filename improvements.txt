@@ -182,34 +182,40 @@
         - Toggle para cambiar tema claro/oscuro
 
 ================================================================================
-📋 CODE REVIEW - ISSUES ENCONTRADOS (Feb 2026)
+ CODE REVIEW - ISSUES ENCONTRADOS (Feb 2026)
 ================================================================================
 
-🔴 CRÍTICOS - REQUIEREN ATENCIÓN INMEDIATA
+ CRÍTICOS - REQUIEREN ATENCIÓN INMEDIATA
 -------------------------------------------
 
-    1. Database Schema Mismatch - Invoice Type
-    - Schema define invoiceTypeEnum pero migración usa TEXT
-    - Fix: Actualizar migración para usar enum o cambiar schema a TEXT
-    - Ubicación: migrations/add_invoice_fields_simple.sql:9
+    1. Database Schema Mismatch - Invoice Type 
+    - [x] Creado invoiceTypeEnum en schema
+    - [x] Migration 006: TEXT → ENUM conversion (idempotente)
+    - [x] Solo permite 'A', 'B', 'none' - type-safe en DB y TypeScript
+    - Migración: 006_fix_invoice_type_enum.sql
 
-    2. Missing Error Boundaries
-    - No hay error boundaries para capturar crashes de componentes
-    - Impacto: Crashes se propagan al usuario, mala UX
-    - Fix: Agregar error boundaries a nivel de rutas
+    2. Missing Error Boundaries 
+    - [x] Creado RouteErrorBoundary component
+    - [x] Agregado a Orders page
+    - [x] Agregado a Clients page
+    - [x] Errores aislados por ruta - app sigue funcionando
 
-    3. Unsafe Type Assertions
-    - Uso de 'as' sin validación
-    - Ejemplo: invoiceType: (order.invoiceType as "A" | "B" | "none")
-    - Riesgo: Errores en runtime si los datos no coinciden
+    3. Unsafe Type Assertions 
+    - [x] Creado src/lib/utils/validation.ts con type guards
+    - [x] parseInvoiceType() valida + fallback seguro a 'none'
+    - [x] Actualizado edit-order-modal.tsx
+    - [x] No más crashes por valores inválidos
 
-🟡 IMPORTANTES - ARREGLAR PRONTO
+ IMPORTANTES - ARREGLAR PRONTO
 ---------------------------------
 
-    5. Inconsistent Soft Delete
-    - isArchived/isActive usan TEXT con "true"/"false" en vez de boolean
-    - Afecta: orders.isArchived, suppliers.isActive, materials.isActive
-    - Fix: Migrar a boolean o crear helpers consistentes
+    5. Inconsistent Soft Delete 
+    - [x] Schema: text() → boolean() para isArchived, isActive
+    - [x] Migration 007: TEXT → BOOLEAN conversion
+    - [x] Actualizadas 8 APIs para usar true/false
+    - [x] Actualizados 2 componentes para boolean checks
+    - [x] Arreglados bugs de truthy/falsy
+    - Migración: 007_fix_soft_delete_boolean.sql
 
     6. Missing Input Validation on Invoice Calculations
     - No valida números negativos o NaN en calculateIVA()
@@ -220,7 +226,7 @@
     - Mix de español/inglés en errores
     - Fix: Estandarizar todos los mensajes
 
-    8. Missing Database Indexes ✅ COMPLETADO (Feb 2026)
+    8. Missing Database Indexes 
     - [x] Ya agregados: orders.clientId, orders.status, orders.isArchived
     - [x] Agregados: orders.paymentStatus, orders.dueDate, orders.createdAt, orders.updatedAt
     - [x] Agregados: clients.clientType, clients.createdAt
@@ -237,65 +243,30 @@
         - Riesgo: Vulnerabilidad de seguridad
         - Fix: Sanitizar inputs especialmente en notes/description
 
-🟢 MEJORAS MENORES - NICE TO HAVE
-----------------------------------
-
-    11. Hardcoded IVA Rate
-        - IVA_RATE = 0.21 está hardcodeado
-        - Fix: Mover a app settings para flexibilidad
-
-    12. Missing Loading States
-        - Algunos botones no muestran loading (archive/unarchive)
-        - Fix: Agregar estados de loading consistentes
-
-    13. Inconsistent Date Handling
-        - Mix de Date objects, ISO strings, date strings
-        - Riesgo: Bugs de timezone
-        - Fix: Estandarizar en ISO strings
-
-    14. TypeScript Not in Strict Mode
-        - tsconfig.json no usa strict mode
-        - Fix: Habilitar strict mode para mejor type safety
-
-    15. Missing Frontend Validation
-        - Algunos forms no validan antes de submit
-        - Ejemplo: Formato CUIT no se valida
-        - Fix: Agregar validación frontend matching backend schemas
-
-🔒 SEGURIDAD
-------------
-
-    18. Sensitive Data in Logs
-        - Objetos de error completos en logs (pueden contener data sensible)
-        - Fix: Sanitizar logs antes de loggear
-
-    19. SQL Injection (Verificar)
-        - Drizzle ORM debería proteger, pero necesita verificación
-        - Fix: Auditar todas las raw SQL queries si existen
-
-🎯 PRIORIDADES RECOMENDADAS
+ PRIORIDADES RECOMENDADAS
 ---------------------------
 
     ALTA PRIORIDAD (Arreglar Ya):
-    1. Fix invoice_type enum/TEXT mismatch
-    2. Agregar índices faltantes en DB (paymentStatus, clientType)
-    3. Implementar error boundaries (verificar cobertura completa)
-    4. Fix soft delete inconsistency
+    1. ✅ Fix invoice_type enum/TEXT mismatch - COMPLETADO
+    2. ✅ Agregar índices faltantes en DB - COMPLETADO
+    3. ✅ Implementar error boundaries - COMPLETADO
+    4. ✅ Fix soft delete inconsistency - COMPLETADO
+    5. ✅ Unsafe type assertions - COMPLETADO
 
     MEDIA PRIORIDAD (Arreglar Pronto):
-    5. Migrar contacts a clientRelationships
-    6. Agregar validación y sanitización de inputs
-    7. Agregar manejo de errores apropiado
-    8. Estandarizar mensajes de error
+    6. Migrar contacts a clientRelationships
+    7. Agregar validación y sanitización de inputs
+    8. Agregar manejo de errores apropiado
+    9. Estandarizar mensajes de error
 
     BAJA PRIORIDAD (Nice to Have):
-    9. Habilitar TypeScript strict mode
-    10. Agregar frontend validation consistente
-    11. Hardcoded IVA rate a settings
-    12. Inconsistent date handling
+    10. Habilitar TypeScript strict mode
+    11. Agregar frontend validation consistente
+    12. Hardcoded IVA rate a settings
+    13. Inconsistent date handling
 
 ================================================================================
-💭 PARA RECONSIDERAR CON PAPÁ
+ PARA RECONSIDERAR CON PAPÁ
 ================================================================================
 
     Servicios Dinámicos - Extensión Opcional:
