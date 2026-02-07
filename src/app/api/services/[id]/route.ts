@@ -54,7 +54,7 @@ export async function PATCH(
     if (validated.name !== undefined) updateData.name = validated.name
     if (validated.displayName !== undefined) updateData.displayName = validated.displayName
     if (validated.description !== undefined) updateData.description = validated.description
-    if (validated.sortOrder !== undefined) updateData.sortOrder = validated.sortOrder.toString()
+    if (validated.sortOrder !== undefined) updateData.sortOrder = validated.sortOrder
     if (validated.isActive !== undefined) updateData.isActive = validated.isActive
     
     updateData.updatedAt = new Date()

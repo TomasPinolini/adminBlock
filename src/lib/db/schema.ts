@@ -5,6 +5,7 @@ import {
   timestamp,
   pgEnum,
   numeric,
+  integer,
   date,
   boolean,
 } from "drizzle-orm/pg-core"
@@ -179,7 +180,7 @@ export const services = pgTable("services", {
   displayName: text("display_name").notNull(), // e.g., "Copiado", "Tesis", "Encuadernación"
   description: text("description"),
   isActive: boolean("is_active").default(true).notNull(), // soft delete
-  sortOrder: numeric("sort_order", { precision: 10, scale: 0 }).default("0"), // for custom ordering
+  sortOrder: integer("sort_order").default(0), // for custom ordering
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })

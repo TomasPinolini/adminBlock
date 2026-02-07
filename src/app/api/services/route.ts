@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         name: validated.name,
         displayName: validated.displayName,
         description: validated.description || null,
-        sortOrder: validated.sortOrder?.toString() || "0",
+        sortOrder: validated.sortOrder ?? 0,
       })
       .returning()
 

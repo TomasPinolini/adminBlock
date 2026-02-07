@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { orders, clients } from "@/lib/db/schema"
 import { createOrderSchema } from "@/lib/validations/orders"
-import { desc, eq } from "drizzle-orm"
+import { and, desc, eq, type SQL } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
 
@@ -14,7 +14,22 @@ export async function GET(request: NextRequest) {
     const clientId = searchParams.get("clientId")
     const includeArchived = searchParams.get("includeArchived") === "true"
 
-    const allOrders = await db
+    // Build WHERE conditions
+    const conditions: SQL[] = []
+    if (!includeArchived) {
+      conditions.push(eq(orders.isArchived, false))
+    }
+    if (clientId) {
+      conditions.push(eq(orders.clientId, clientId))
+    }
+    if (status && status !== "all") {
+      conditions.push(eq(orders.status, status as typeof orders.status.dataType))
+    }
+    if (serviceType && serviceType !== "all") {
+      conditions.push(eq(orders.serviceType, serviceType))
+    }
+
+    const result = await db
       .select({
         id: orders.id,
         clientId: orders.clientId,
@@ -24,13 +39,11 @@ export async function GET(request: NextRequest) {
         description: orders.description,
         price: orders.price,
         dueDate: orders.dueDate,
-        // Invoice fields
         invoiceNumber: orders.invoiceNumber,
         invoiceType: orders.invoiceType,
         quantity: orders.quantity,
         subtotal: orders.subtotal,
         taxAmount: orders.taxAmount,
-        // Payment fields
         paymentStatus: orders.paymentStatus,
         paymentAmount: orders.paymentAmount,
         receiptUrl: orders.receiptUrl,
@@ -48,27 +61,10 @@ export async function GET(request: NextRequest) {
       })
       .from(orders)
       .leftJoin(clients, eq(orders.clientId, clients.id))
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(orders.createdAt))
 
-    // Filter in JS for now (can optimize with SQL later)
-    let filtered = allOrders
-    
-    // By default, hide archived orders unless explicitly requested
-    if (!includeArchived) {
-      filtered = filtered.filter((o) => !o.isArchived)
-    }
-    
-    if (clientId) {
-      filtered = filtered.filter((o) => o.clientId === clientId)
-    }
-    if (status && status !== "all") {
-      filtered = filtered.filter((o) => o.status === status)
-    }
-    if (serviceType && serviceType !== "all") {
-      filtered = filtered.filter((o) => o.serviceType === serviceType)
-    }
-
-    return NextResponse.json(filtered)
+    return NextResponse.json(result)
   } catch (error) {
     console.error("Error fetching orders:", error)
     return NextResponse.json(
