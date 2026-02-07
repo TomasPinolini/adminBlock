@@ -11,17 +11,6 @@ import {
 import { relations } from "drizzle-orm"
 
 // Enums
-export const serviceTypeEnum = pgEnum("service_type", [
-  "copiado",
-  "tesis",
-  "encuadernacion",
-  "carteleria",
-  "placas",
-  "calcos",
-  "folleteria",
-  "ploteo",
-])
-
 export const orderStatusEnum = pgEnum("order_status", [
   "pending_quote",
   "quoted",
@@ -457,7 +446,7 @@ export type NewQuote = typeof quotes.$inferInsert
 export type QuoteMaterial = typeof quoteMaterials.$inferSelect
 export type NewQuoteMaterial = typeof quoteMaterials.$inferInsert
 
-export type ServiceType = (typeof serviceTypeEnum.enumValues)[number]
+export type ServiceType = string // Dynamic - loaded from services table
 export type OrderStatus = (typeof orderStatusEnum.enumValues)[number]
 export type ActivityType = (typeof activityTypeEnum.enumValues)[number]
 export type PaymentStatus = (typeof paymentStatusEnum.enumValues)[number]

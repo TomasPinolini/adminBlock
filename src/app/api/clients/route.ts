@@ -17,6 +17,7 @@ export async function GET() {
         cuit: clients.cuit,
         notes: clients.notes,
         createdAt: clients.createdAt,
+        updatedAt: clients.updatedAt,
         orderCount: sql<number>`COALESCE(COUNT(${orders.id}), 0)::int`,
         totalSpent: sql<string>`COALESCE(SUM(CASE WHEN ${orders.status} = 'delivered' THEN ${orders.price}::numeric ELSE 0 END), 0)::text`,
         lastOrderDate: sql<string | null>`MAX(${orders.createdAt})::text`,

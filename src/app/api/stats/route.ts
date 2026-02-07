@@ -84,7 +84,7 @@ export async function GET() {
       // Revenue this week (delivered orders)
       db
         .select({ 
-          revenue: sql<number>`cast(coalesce(sum(cast(${orders.price} as decimal)), 0) as decimal)` 
+          revenue: sql<number>`coalesce(sum(${orders.price}), 0)::numeric`
         })
         .from(orders)
         .where(
@@ -97,8 +97,8 @@ export async function GET() {
 
       // Revenue this month (delivered orders)
       db
-        .select({ 
-          revenue: sql<number>`cast(coalesce(sum(cast(${orders.price} as decimal)), 0) as decimal)` 
+        .select({
+          revenue: sql<number>`coalesce(sum(${orders.price}), 0)::numeric`
         })
         .from(orders)
         .where(

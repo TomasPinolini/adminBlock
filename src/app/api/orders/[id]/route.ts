@@ -7,7 +7,6 @@ import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
 import { sendWhatsAppBackground, whatsappTemplates } from "@/lib/whatsapp"
 import { isWhatsAppAutoEnabled } from "@/lib/settings"
-import type { ServiceType } from "@/lib/db/schema"
 
 export async function GET(
   request: NextRequest,
@@ -120,7 +119,7 @@ export async function PATCH(
     // Send WhatsApp notification for specific status changes
     if (isStatusChange && currentOrderWithClient?.clientPhone) {
       const clientName = currentOrderWithClient.clientName || "Cliente"
-      const serviceLabel = serviceTypeLabels[updatedOrder.serviceType as ServiceType]
+      const serviceLabel = serviceTypeLabels[updatedOrder.serviceType]
       const notifyStatuses = ["ready", "quoted", "in_progress"]
 
       if (notifyStatuses.includes(validated.status!)) {
