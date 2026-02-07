@@ -20,7 +20,7 @@ import { getWhatsAppLink, getInstagramLink, messageTemplates } from "@/lib/utils
 function ClientCard({ client }: { client: ClientWithStats }) {
   const { confirm, ConfirmDialog } = useConfirmDialog()
   const deleteClient = useDeleteClient()
-  const { setEditingClient, setViewingClientOrders, setManagingContactsFor } = useUIStore()
+  const { setEditingClient, setViewingClientOrders } = useUIStore()
 
   const handleDelete = async () => {
     const confirmed = await confirm({
@@ -160,15 +160,6 @@ function ClientCard({ client }: { client: ClientWithStats }) {
               <FileText className="h-3.5 w-3.5" />
               Ver pedidos
             </button>
-            {isCompany && (
-              <button
-                onClick={() => setManagingContactsFor(client)}
-                className="inline-flex items-center gap-1.5 rounded-md bg-orange-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-orange-700 transition-colors"
-              >
-                <Users className="h-3.5 w-3.5" />
-                Contactos
-              </button>
-            )}
           </div>
 
           {/* Created at */}
@@ -189,12 +180,6 @@ function ClientCard({ client }: { client: ClientWithStats }) {
               <FileText className="mr-2 h-4 w-4" />
               Ver pedidos
             </DropdownMenuItem>
-            {isCompany && (
-              <DropdownMenuItem onClick={() => setManagingContactsFor(client)}>
-                <Users className="mr-2 h-4 w-4" />
-                Contactos
-              </DropdownMenuItem>
-            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleEdit}>
               <Pencil className="mr-2 h-4 w-4" />

@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { OrderStatus, ServiceType, Client, Contact } from "@/lib/db/schema"
+import { OrderStatus, ServiceType, Client } from "@/lib/db/schema"
 
 export type QuickFilter = "overdue" | "due_today" | null
 
@@ -29,10 +29,6 @@ interface UIState {
   setEditingClient: (client: Client | null) => void
   viewingClientOrders: Client | null
   setViewingClientOrders: (client: Client | null) => void
-  managingContactsFor: Client | null
-  setManagingContactsFor: (client: Client | null) => void
-  editingContact: Contact | null
-  setEditingContact: (contact: Contact | null) => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -61,8 +57,4 @@ export const useUIStore = create<UIState>((set) => ({
   setEditingClient: (client) => set({ editingClient: client, createClientModalOpen: client !== null }),
   viewingClientOrders: null,
   setViewingClientOrders: (client) => set({ viewingClientOrders: client }),
-  managingContactsFor: null,
-  setManagingContactsFor: (client) => set({ managingContactsFor: client, editingContact: null }),
-  editingContact: null,
-  setEditingContact: (contact) => set({ editingContact: contact }),
 }))

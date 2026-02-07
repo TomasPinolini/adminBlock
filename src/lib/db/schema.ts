@@ -75,21 +75,6 @@ export const clients = pgTable("clients", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
-// Contacts for companies (people who call from a company) - LEGACY, use clientRelationships instead
-export const contacts = pgTable("contacts", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  clientId: uuid("client_id")
-    .references(() => clients.id, { onDelete: "cascade" })
-    .notNull(),
-  name: text("name").notNull(),
-  phone: text("phone"),
-  instagramHandle: text("instagram_handle"),
-  role: text("role"), // e.g., "Secretaria", "Gerente", "Encargado"
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-})
-
 // Links individual clients to company clients (many-to-many)
 export const clientRelationships = pgTable("client_relationships", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -110,8 +95,6 @@ export const orders = pgTable("orders", {
   clientId: uuid("client_id")
     .references(() => clients.id)
     .notNull(),
-  contactId: uuid("contact_id")
-    .references(() => contacts.id, { onDelete: "set null" }),
   // Person who made the order (when clientId is a company)
   personId: uuid("person_id")
     .references(() => clients.id, { onDelete: "set null" }),
@@ -302,7 +285,6 @@ export const orderMaterials = pgTable("order_materials", {
 // Relations
 export const clientsRelations = relations(clients, ({ many }) => ({
   orders: many(orders),
-  contacts: many(contacts),
   // Relationships where this client is the person (individual)
   employments: many(clientRelationships, { relationName: "person" }),
   // Relationships where this client is the company
@@ -322,23 +304,12 @@ export const clientRelationshipsRelations = relations(clientRelationships, ({ on
   }),
 }))
 
-export const contactsRelations = relations(contacts, ({ one, many }) => ({
-  client: one(clients, {
-    fields: [contacts.clientId],
-    references: [clients.id],
-  }),
-  orders: many(orders),
-}))
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   client: one(clients, {
     fields: [orders.clientId],
     references: [clients.id],
     relationName: "orderClient",
-  }),
-  contact: one(contacts, {
-    fields: [orders.contactId],
-    references: [contacts.id],
   }),
   person: one(clients, {
     fields: [orders.personId],
@@ -440,9 +411,6 @@ export const orderAttachmentsRelations = relations(orderAttachments, ({ one }) =
 // Types
 export type Client = typeof clients.$inferSelect
 export type NewClient = typeof clients.$inferInsert
-
-export type Contact = typeof contacts.$inferSelect
-export type NewContact = typeof contacts.$inferInsert
 
 export type ClientRelationship = typeof clientRelationships.$inferSelect
 export type NewClientRelationship = typeof clientRelationships.$inferInsert

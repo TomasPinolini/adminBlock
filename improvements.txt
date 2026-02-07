@@ -234,9 +234,15 @@
     - [x] Índices compuestos para filtros combinados
     - Migración: 005_add_performance_indexes.sql
 
-    9. Duplicate Client System
-    - Tabla 'contacts' (legacy) y 'clientRelationships' hacen lo mismo
-    - Fix: Migrar todos los contacts a clientRelationships y eliminar tabla
+    9. Duplicate Client System ✅ COMPLETADO
+    - [x] Migración 008: Migrar datos de contacts a clientRelationships
+    - [x] Actualizar orders.contact_id a orders.person_id
+    - [x] Eliminar tabla contacts de schema
+    - [x] Eliminar APIs de contacts (/api/contacts)
+    - [x] Eliminar ContactsModal component
+    - [x] Eliminar use-contacts hook
+    - [x] Limpiar referencias en UI store
+    - Sistema consolidado: solo clientRelationships
 
     10. No Input Sanitization
         - Sin protección XSS en inputs
@@ -254,7 +260,7 @@
     5. ✅ Unsafe type assertions - COMPLETADO
 
     MEDIA PRIORIDAD (Arreglar Pronto):
-    6. Migrar contacts a clientRelationships
+    6. ✅ Migrar contacts a clientRelationships - COMPLETADO
     7. Agregar validación y sanitización de inputs
     8. Agregar manejo de errores apropiado
     9. Estandarizar mensajes de error
