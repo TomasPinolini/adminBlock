@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { orders, clients, type OrderStatus } from "@/lib/db/schema"
+import { orders, clients } from "@/lib/db/schema"
 import { createOrderSchema } from "@/lib/validations/orders"
-import { and, desc, eq, or, isNull, type SQL } from "drizzle-orm"
+import { and, desc, eq, or, isNull, sql, type SQL } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
 
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       conditions.push(eq(orders.clientId, clientId))
     }
     if (status && status !== "all") {
-      conditions.push(eq(orders.status, status as OrderStatus))
+      conditions.push(sql`${orders.status} = ${status}`)
     }
     if (serviceType && serviceType !== "all") {
       conditions.push(eq(orders.serviceType, serviceType))
