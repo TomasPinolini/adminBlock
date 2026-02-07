@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { clientRelationships } from "@/lib/db/schema"
 import { updateRelationshipSchema } from "@/lib/validations/relationships"
 import { eq } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 export async function PATCH(
   request: NextRequest,
@@ -31,7 +32,7 @@ export async function PATCH(
 
     return NextResponse.json(updated)
   } catch (error) {
-    console.error("Error updating relationship:", error)
+    logApiError("/api/relationships/[id]", "PATCH", error)
     return NextResponse.json(
       { error: "Error al actualizar relación" },
       { status: 500 }
@@ -60,7 +61,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting relationship:", error)
+    logApiError("/api/relationships/[id]", "DELETE", error)
     return NextResponse.json(
       { error: "Error al eliminar relación" },
       { status: 500 }

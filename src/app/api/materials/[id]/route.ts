@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { materials } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
+import { logApiError } from "@/lib/logger"
 
 const updateMaterialSchema = z.object({
   name: z.string().min(1).optional(),
@@ -33,7 +34,7 @@ export async function GET(
 
     return NextResponse.json(material)
   } catch (error) {
-    console.error("Error fetching material:", error)
+    logApiError("/api/materials/[id]", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener material" },
       { status: 500 }
@@ -74,7 +75,7 @@ export async function PATCH(
         { status: 400 }
       )
     }
-    console.error("Error updating material:", error)
+    logApiError("/api/materials/[id]", "PATCH", error)
     return NextResponse.json(
       { error: "Error al actualizar material" },
       { status: 500 }
@@ -108,7 +109,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting material:", error)
+    logApiError("/api/materials/[id]", "DELETE", error)
     return NextResponse.json(
       { error: "Error al eliminar material" },
       { status: 500 }

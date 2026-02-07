@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { clientRelationships, clients } from "@/lib/db/schema"
 import { createRelationshipSchema } from "@/lib/validations/relationships"
 import { desc, eq, and } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 export async function GET(request: NextRequest) {
   try {
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json([])
   } catch (error) {
-    console.error("Error fetching relationships:", error)
+    logApiError("/api/relationships", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener relaciones" },
       { status: 500 }
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newRelationship, { status: 201 })
   } catch (error) {
-    console.error("Error creating relationship:", error)
+    logApiError("/api/relationships", "POST", error)
     return NextResponse.json(
       { error: "Error al crear relación" },
       { status: 500 }

@@ -7,6 +7,7 @@ import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
 import { sendWhatsAppBackground, whatsappTemplates } from "@/lib/whatsapp"
 import { isWhatsAppAutoEnabled } from "@/lib/settings"
+import { logApiError } from "@/lib/logger"
 
 export async function GET(
   request: NextRequest,
@@ -53,7 +54,7 @@ export async function GET(
 
     return NextResponse.json({ ...order, comments })
   } catch (error) {
-    console.error("Error fetching order:", error)
+    logApiError("/api/orders/[id]", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener pedido" },
       { status: 500 }
@@ -160,7 +161,7 @@ export async function PATCH(
 
     return NextResponse.json(updatedOrder)
   } catch (error) {
-    console.error("Error updating order:", error)
+    logApiError("/api/orders/[id]", "PATCH", error)
     return NextResponse.json(
       { error: "Error al actualizar pedido" },
       { status: 500 }
@@ -204,7 +205,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting order:", error)
+    logApiError("/api/orders/[id]", "DELETE", error)
     return NextResponse.json(
       { error: "Error al eliminar pedido" },
       { status: 500 }

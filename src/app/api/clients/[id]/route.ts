@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { clients } from "@/lib/db/schema"
 import { updateClientSchema } from "@/lib/validations/clients"
 import { eq } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 export async function GET(
   request: NextRequest,
@@ -24,7 +25,7 @@ export async function GET(
 
     return NextResponse.json(client)
   } catch (error) {
-    console.error("Error fetching client:", error)
+    logApiError("/api/clients/[id]", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener cliente" },
       { status: 500 }
@@ -56,7 +57,7 @@ export async function PATCH(
 
     return NextResponse.json(updatedClient)
   } catch (error) {
-    console.error("Error updating client:", error)
+    logApiError("/api/clients/[id]", "PATCH", error)
     return NextResponse.json(
       { error: "Error al actualizar cliente" },
       { status: 500 }
@@ -84,7 +85,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting client:", error)
+    logApiError("/api/clients/[id]", "DELETE", error)
     return NextResponse.json(
       { error: "Error al eliminar cliente" },
       { status: 500 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { activityLogs } from "@/lib/db/schema"
 import { desc, eq, and } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(logs)
   } catch (error) {
-    console.error("Error fetching activity logs:", error)
+    logApiError("/api/activity", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener actividad" },
       { status: 500 }

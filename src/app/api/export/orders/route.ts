@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { orders, clients } from "@/lib/db/schema"
 import { eq, and, gte, lte } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 export async function GET(request: NextRequest) {
   try {
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error("Error exporting orders:", error)
+    logApiError("/api/export/orders", "GET", error)
     return NextResponse.json(
       { error: "Error al exportar pedidos" },
       { status: 500 }

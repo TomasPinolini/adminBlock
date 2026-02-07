@@ -24,14 +24,14 @@ SERVICIOS QUE OFRECEN:
 MODELO DE NEGOCIO:
   - Clientes llegan por Instagram, WhatsApp, email, o en persona
   - Se cotiza el trabajo según el costo actual de materiales (varía según proveedores)
-  - Cliente aprueba
+  - Cliente aprueba / vos
   - Se realiza el trabajo
-  - Cliente retira y paga (a veces seña por adelantado)
-  - Cliente envía comprobante de pago por WhatsApp (PDF)
+  - Cliente retira y paga
+  - Cliente envía comprobante de pago por WhatsApp o mail (PDF)
 
 PRICING:
   - NO hay precios fijos - cada trabajo se cotiza individualmente
-  - El costo depende de los materiales que se usen
+  - El costo depende de los materiales que se usen, y tiempo que te lleve, o si terciarizado.
   - Los precios de materiales varían según lo que cobren los proveedores
   - Se agrega margen de ganancia (% o monto fijo)
 
@@ -226,7 +226,7 @@ Necesito entender cómo funcionan los proveedores para diseñar bien el sistema:
 
 SOBRE LOS PROVEEDORES:
   [ ] ¿Cuántos proveedores tienen aproximadamente?
-  100 como máximo, de los cuales el decide a quien comprarle, 
+  10 como máximo, de los cuales el decide a quien comprarle, 
   depediendo si ofrecen ese material y el precio en el momento.
   
   [ ] ¿Un mismo material puede venir de diferentes proveedores?
@@ -235,10 +235,7 @@ SOBRE LOS PROVEEDORES:
   Sería útil guardar la compra de ese material.
 
   [ ] ¿El precio del mismo material varía mucho entre proveedores?
-  Si.
-
-  [ ] ¿Cambian de proveedor seguido o suelen comprar siempre al mismo?
-  Cambian, mi padre decide en el momento.
+  no tanto, pero siempre busca el menor precio. siempre chequea con todos los que provean ese material
 
 SOBRE LA COTIZACIÓN:
   [ ] Cuando tu papá cotiza, ¿elige de qué proveedor va a comprar el material?
@@ -250,15 +247,15 @@ SOBRE LA COTIZACIÓN:
   
   [ ] ¿Quiere ver el historial de precios de un material? 
       (Ej: "La lona costaba $X hace un mes, ahora cuesta $Y")
-  No. Pero si quiero que el sistema guarde el precio de cada material para cada pedido.
+    Si, esta buenisimo
 
 SOBRE EL REGISTRO:
   [ ] ¿Qué datos necesitan guardar de cada proveedor?
-      - Nombre
+      - Nombre de la empresa
+      - Nombre del empleado que me atiende / contacto
       - Teléfono/WhatsApp
       - Dirección
-      - Notas
-      - ¿Algo más? -> No se, todavía, lo defino en la reunión. 
+      - CBU
   
   [ ] ¿Necesitan saber a qué proveedor le compraron para cada pedido?
       (Para saber dónde reclamar si hay problemas)

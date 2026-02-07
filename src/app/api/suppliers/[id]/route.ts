@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { suppliers } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
+import { logApiError } from "@/lib/logger"
 
 const updateSupplierSchema = z.object({
   name: z.string().min(1).optional(),
@@ -34,7 +35,7 @@ export async function GET(
 
     return NextResponse.json(supplier)
   } catch (error) {
-    console.error("Error fetching supplier:", error)
+    logApiError("/api/suppliers/[id]", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener proveedor" },
       { status: 500 }
@@ -75,7 +76,7 @@ export async function PATCH(
         { status: 400 }
       )
     }
-    console.error("Error updating supplier:", error)
+    logApiError("/api/suppliers/[id]", "PATCH", error)
     return NextResponse.json(
       { error: "Error al actualizar proveedor" },
       { status: 500 }
@@ -109,7 +110,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting supplier:", error)
+    logApiError("/api/suppliers/[id]", "DELETE", error)
     return NextResponse.json(
       { error: "Error al eliminar proveedor" },
       { status: 500 }

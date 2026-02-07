@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { serviceMaterials } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
+import { logApiError } from "@/lib/logger"
 
 const updateServiceMaterialSchema = z.object({
   defaultQuantity: z.string().or(z.number()).transform(String).optional(),
@@ -39,7 +40,7 @@ export async function PATCH(
         { status: 400 }
       )
     }
-    console.error("Error updating service material:", error)
+    logApiError("/api/service-materials/[id]", "PATCH", error)
     return NextResponse.json(
       { error: "Error al actualizar material de servicio" },
       { status: 500 }
@@ -68,7 +69,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting service material:", error)
+    logApiError("/api/service-materials/[id]", "DELETE", error)
     return NextResponse.json(
       { error: "Error al eliminar material de servicio" },
       { status: 500 }

@@ -4,6 +4,7 @@ import { orders } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
+import { logApiError } from "@/lib/logger"
 
 export async function POST(
   request: NextRequest,
@@ -55,7 +56,7 @@ export async function POST(
 
     return NextResponse.json(newOrder, { status: 201 })
   } catch (error) {
-    console.error("Error duplicating order:", error)
+    logApiError("/api/orders/[id]/duplicate", "POST", error)
     return NextResponse.json(
       { error: "Error al duplicar pedido" },
       { status: 500 }

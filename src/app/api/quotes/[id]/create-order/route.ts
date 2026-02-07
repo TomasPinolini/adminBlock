@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { quotes, quoteMaterials, orders, orderMaterials } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 export async function POST(
   request: NextRequest,
@@ -84,7 +85,7 @@ export async function POST(
       order: newOrder,
     })
   } catch (error) {
-    console.error("Error creating order from quote:", error)
+    logApiError("/api/quotes/[id]/create-order", "POST", error)
     return NextResponse.json(
       { error: "Error al crear pedido desde cotización" },
       { status: 500 }

@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { serviceMaterials, materials } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
+import { logApiError } from "@/lib/logger"
 
 const createServiceMaterialSchema = z.object({
   serviceType: z.string().min(1, "Tipo de servicio requerido"),
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
     const result = await query
     return NextResponse.json(result)
   } catch (error) {
-    console.error("Error fetching service materials:", error)
+    logApiError("/api/service-materials", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener materiales de servicio" },
       { status: 500 }
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    console.error("Error creating service material:", error)
+    logApiError("/api/service-materials", "POST", error)
     return NextResponse.json(
       { error: "Error al crear material de servicio" },
       { status: 500 }

@@ -5,6 +5,7 @@ import { createOrderSchema } from "@/lib/validations/orders"
 import { and, desc, eq, or, isNull, sql, type SQL } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
+import { logApiError } from "@/lib/logger"
 
 export async function GET(request: NextRequest) {
   try {
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error("Error fetching orders:", error)
+    logApiError("/api/orders", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener pedidos" },
       { status: 500 }
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newOrder, { status: 201 })
   } catch (error) {
-    console.error("Error creating order:", error)
+    logApiError("/api/orders", "POST", error)
     return NextResponse.json(
       { error: "Error al crear pedido" },
       { status: 500 }

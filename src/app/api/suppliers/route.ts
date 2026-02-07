@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { suppliers } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
+import { logApiError } from "@/lib/logger"
 
 const createSupplierSchema = z.object({
   name: z.string().min(1, "Nombre requerido"),
@@ -21,7 +22,7 @@ export async function GET() {
 
     return NextResponse.json(allSuppliers)
   } catch (error) {
-    console.error("Error fetching suppliers:", error)
+    logApiError("/api/suppliers", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener proveedores" },
       { status: 500 }
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    console.error("Error creating supplier:", error)
+    logApiError("/api/suppliers", "POST", error)
     return NextResponse.json(
       { error: "Error al crear proveedor" },
       { status: 500 }

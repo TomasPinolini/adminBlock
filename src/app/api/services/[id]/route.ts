@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { services } from "@/lib/db/schema"
 import { z } from "zod"
 import { eq } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 const updateServiceSchema = z.object({
   name: z.string().min(1).toLowerCase().optional(),
@@ -33,7 +34,7 @@ export async function GET(
 
     return NextResponse.json(service)
   } catch (error) {
-    console.error("Error fetching service:", error)
+    logApiError("/api/services/[id]", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener servicio" },
       { status: 500 }
@@ -80,7 +81,7 @@ export async function PATCH(
         { status: 400 }
       )
     }
-    console.error("Error updating service:", error)
+    logApiError("/api/services/[id]", "PATCH", error)
     return NextResponse.json(
       { error: "Error al actualizar servicio" },
       { status: 500 }
@@ -111,7 +112,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting service:", error)
+    logApiError("/api/services/[id]", "DELETE", error)
     return NextResponse.json(
       { error: "Error al eliminar servicio" },
       { status: 500 }

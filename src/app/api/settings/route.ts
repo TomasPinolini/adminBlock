@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { appSettings } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 // Default notification settings
 const DEFAULT_SETTINGS = {
@@ -23,7 +24,7 @@ export async function GET() {
 
     return NextResponse.json(settingsMap)
   } catch (error) {
-    console.error("Error fetching settings:", error)
+    logApiError("/api/settings", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener configuración" },
       { status: 500 }
@@ -64,7 +65,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ success: true, key, value })
   } catch (error) {
-    console.error("Error updating setting:", error)
+    logApiError("/api/settings", "PATCH", error)
     return NextResponse.json(
       { error: "Error al actualizar configuración" },
       { status: 500 }

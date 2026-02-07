@@ -10,6 +10,7 @@ export function useMaterials() {
       if (!res.ok) throw new Error("Error al obtener materiales")
       return res.json()
     },
+    staleTime: 60 * 1000,
   })
 }
 

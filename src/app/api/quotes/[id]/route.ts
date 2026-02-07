@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { quotes, quoteMaterials, materials, suppliers, orders } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 export async function GET(
   request: NextRequest,
@@ -46,7 +47,7 @@ export async function GET(
       materials: quoteWithMaterials,
     })
   } catch (error) {
-    console.error("Error fetching quote:", error)
+    logApiError("/api/quotes/[id]", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener cotización" },
       { status: 500 }
@@ -75,7 +76,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting quote:", error)
+    logApiError("/api/quotes/[id]", "DELETE", error)
     return NextResponse.json(
       { error: "Error al eliminar cotización" },
       { status: 500 }

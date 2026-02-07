@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { orders } from "@/lib/db/schema"
 import { sql, eq, and, gte, lt, notInArray } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 export async function GET() {
   try {
@@ -130,7 +131,7 @@ export async function GET() {
 
     return NextResponse.json(stats)
   } catch (error) {
-    console.error("Error fetching stats:", error)
+    logApiError("/api/stats", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener estadísticas" },
       { status: 500 }

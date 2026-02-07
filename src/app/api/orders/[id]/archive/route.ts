@@ -4,6 +4,7 @@ import { orders } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
+import { logApiError } from "@/lib/logger"
 
 // Archive an order (soft delete)
 export async function POST(
@@ -47,7 +48,7 @@ export async function POST(
 
     return NextResponse.json({ success: true, order: updatedOrder })
   } catch (error) {
-    console.error("Error archiving order:", error)
+    logApiError("/api/orders/[id]/archive", "POST", error)
     return NextResponse.json(
       { error: "Error al archivar pedido" },
       { status: 500 }
@@ -97,7 +98,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, order: updatedOrder })
   } catch (error) {
-    console.error("Error unarchiving order:", error)
+    logApiError("/api/orders/[id]/archive", "DELETE", error)
     return NextResponse.json(
       { error: "Error al desarchivar pedido" },
       { status: 500 }

@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { supplierMaterials } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
+import { logApiError } from "@/lib/logger"
 
 const updateSupplierMaterialSchema = z.object({
   currentPrice: z.string().or(z.number()).transform(String).optional(),
@@ -42,7 +43,7 @@ export async function PATCH(
         { status: 400 }
       )
     }
-    console.error("Error updating supplier material:", error)
+    logApiError("/api/supplier-materials/[id]", "PATCH", error)
     return NextResponse.json(
       { error: "Error al actualizar material del proveedor" },
       { status: 500 }
@@ -71,7 +72,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting supplier material:", error)
+    logApiError("/api/supplier-materials/[id]", "DELETE", error)
     return NextResponse.json(
       { error: "Error al eliminar material del proveedor" },
       { status: 500 }

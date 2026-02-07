@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { services } from "@/lib/db/schema"
 import { z } from "zod"
 import { asc, eq } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 const createServiceSchema = z.object({
   name: z.string().min(1, "Nombre requerido").toLowerCase(),
@@ -21,7 +22,7 @@ export async function GET() {
 
     return NextResponse.json(allServices)
   } catch (error) {
-    console.error("Error fetching services:", error)
+    logApiError("/api/services", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener servicios" },
       { status: 500 }
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    console.error("Error creating service:", error)
+    logApiError("/api/services", "POST", error)
     return NextResponse.json(
       { error: "Error al crear servicio" },
       { status: 500 }

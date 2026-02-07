@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { quotes, quoteMaterials, materials, suppliers, clients } from "@/lib/db/schema"
 import { eq, desc } from "drizzle-orm"
 import { z } from "zod"
+import { logApiError } from "@/lib/logger"
 
 const quoteMaterialSchema = z.object({
   materialId: z.string().uuid(),
@@ -43,7 +44,7 @@ export async function GET() {
 
     return NextResponse.json(allQuotes)
   } catch (error) {
-    console.error("Error fetching quotes:", error)
+    logApiError("/api/quotes", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener cotizaciones" },
       { status: 500 }
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    console.error("Error creating quote:", error)
+    logApiError("/api/quotes", "POST", error)
     return NextResponse.json(
       { error: "Error al crear cotización" },
       { status: 500 }

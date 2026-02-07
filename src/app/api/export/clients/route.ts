@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { clients, orders } from "@/lib/db/schema"
 import { eq, sql } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 export async function GET() {
   try {
@@ -25,7 +26,7 @@ export async function GET() {
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error("Error exporting clients:", error)
+    logApiError("/api/export/clients", "GET", error)
     return NextResponse.json(
       { error: "Error al exportar clientes" },
       { status: 500 }

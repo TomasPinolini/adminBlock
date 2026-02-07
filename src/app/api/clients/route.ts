@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { clients, orders } from "@/lib/db/schema"
 import { createClientSchema } from "@/lib/validations/clients"
 import { desc, eq, sql } from "drizzle-orm"
+import { logApiError } from "@/lib/logger"
 
 export async function GET() {
   try {
@@ -29,10 +30,9 @@ export async function GET() {
 
     return NextResponse.json(allClients)
   } catch (error) {
-    console.error("Error fetching clients:", error)
-    const errorMessage = error instanceof Error ? error.message : "Unknown error"
+    logApiError("/api/clients", "GET", error)
     return NextResponse.json(
-      { error: "Error al obtener clientes", details: errorMessage },
+      { error: "Error al obtener clientes" },
       { status: 500 }
     )
   }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newClient, { status: 201 })
   } catch (error) {
-    console.error("Error creating client:", error)
+    logApiError("/api/clients", "POST", error)
     return NextResponse.json(
       { error: "Error al crear cliente" },
       { status: 500 }

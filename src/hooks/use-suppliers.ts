@@ -10,6 +10,7 @@ export function useSuppliers() {
       if (!res.ok) throw new Error("Error al obtener proveedores")
       return res.json()
     },
+    staleTime: 60 * 1000,
   })
 }
 

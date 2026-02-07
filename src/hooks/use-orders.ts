@@ -86,6 +86,7 @@ export function useOrders(params?: FetchOrdersParams) {
   return useQuery({
     queryKey: ["orders", params],
     queryFn: () => fetchOrders(params),
+    staleTime: 30 * 1000,
   })
 }
 
@@ -94,6 +95,7 @@ export function useClientOrders(clientId: string | null) {
     queryKey: ["orders", "client", clientId],
     queryFn: () => fetchOrders({ clientId: clientId! }),
     enabled: !!clientId,
+    staleTime: 30 * 1000,
   })
 }
 
@@ -102,6 +104,7 @@ export function useOrder(id: string) {
     queryKey: ["orders", id],
     queryFn: () => fetchOrder(id),
     enabled: !!id,
+    staleTime: 60 * 1000,
   })
 }
 

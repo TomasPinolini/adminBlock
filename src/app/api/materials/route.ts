@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { materials } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
+import { logApiError } from "@/lib/logger"
 
 const createMaterialSchema = z.object({
   name: z.string().min(1, "Nombre requerido"),
@@ -20,7 +21,7 @@ export async function GET() {
 
     return NextResponse.json(allMaterials)
   } catch (error) {
-    console.error("Error fetching materials:", error)
+    logApiError("/api/materials", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener materiales" },
       { status: 500 }
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    console.error("Error creating material:", error)
+    logApiError("/api/materials", "POST", error)
     return NextResponse.json(
       { error: "Error al crear material" },
       { status: 500 }

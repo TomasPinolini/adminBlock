@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 import { sendWhatsAppBackground, whatsappTemplates } from "@/lib/whatsapp"
 import { isPaymentNotificationEnabled } from "@/lib/settings"
+import { logApiError } from "@/lib/logger"
 import type { PaymentStatus } from "@/lib/db/schema"
 
 export async function POST(
@@ -76,7 +77,7 @@ export async function POST(
         })
 
       if (uploadError) {
-        console.error("Upload error:", uploadError)
+        logApiError("/api/orders/[id]/payment", "POST", new Error(uploadError.message), { step: "upload_receipt" })
         return NextResponse.json(
           { error: "Error al subir comprobante", details: uploadError.message },
           { status: 500 }
@@ -139,7 +140,7 @@ export async function POST(
       },
     })
   } catch (error) {
-    console.error("Error registering payment:", error)
+    logApiError("/api/orders/[id]/payment", "POST", error)
     return NextResponse.json(
       { error: "Error al registrar pago" },
       { status: 500 }
@@ -188,7 +189,7 @@ export async function GET(
       },
     })
   } catch (error) {
-    console.error("Error fetching payment:", error)
+    logApiError("/api/orders/[id]/payment", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener pago" },
       { status: 500 }

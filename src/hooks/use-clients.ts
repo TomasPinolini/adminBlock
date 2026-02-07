@@ -54,6 +54,7 @@ export function useClients() {
   return useQuery({
     queryKey: ["clients"],
     queryFn: fetchClients,
+    staleTime: 30 * 1000,
   })
 }
 
@@ -109,6 +110,7 @@ export function useClientStats() {
   return useQuery({
     queryKey: ["clients", "stats"],
     queryFn: fetchClientStats,
-    refetchInterval: 30000,
+    staleTime: 30 * 1000,
+    refetchInterval: 60000,
   })
 }

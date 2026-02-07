@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { supplierMaterials, materials, suppliers } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
+import { logApiError } from "@/lib/logger"
 
 const createSupplierMaterialSchema = z.object({
   supplierId: z.string().uuid("ID de proveedor inválido"),
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
     const result = await query
     return NextResponse.json(result)
   } catch (error) {
-    console.error("Error fetching supplier materials:", error)
+    logApiError("/api/supplier-materials", "GET", error)
     return NextResponse.json(
       { error: "Error al obtener materiales del proveedor" },
       { status: 500 }
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    console.error("Error creating supplier material:", error)
+    logApiError("/api/supplier-materials", "POST", error)
     return NextResponse.json(
       { error: "Error al agregar material al proveedor" },
       { status: 500 }
