@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { orders, clients, type OrderStatus } from "@/lib/db/schema"
 import { createOrderSchema } from "@/lib/validations/orders"
-import { and, desc, eq, type SQL } from "drizzle-orm"
+import { and, desc, eq, or, isNull, type SQL } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     // Build WHERE conditions
     const conditions: SQL[] = []
     if (!includeArchived) {
-      conditions.push(eq(orders.isArchived, false))
+      conditions.push(or(eq(orders.isArchived, false), isNull(orders.isArchived))!)
     }
     if (clientId) {
       conditions.push(eq(orders.clientId, clientId))
