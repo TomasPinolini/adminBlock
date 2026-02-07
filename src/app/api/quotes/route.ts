@@ -5,8 +5,10 @@ import { eq, desc } from "drizzle-orm"
 import { z } from "zod"
 import { logApiError } from "@/lib/logger"
 
-const quoteMaterialSchema = z.object({
-  materialId: z.string().uuid(),
+const quoteLineItemSchema = z.object({
+  lineType: z.enum(["material", "service"]).default("material"),
+  materialId: z.string().uuid().optional(),
+  description: z.string().optional(),
   supplierId: z.string().uuid().optional(),
   quantity: z.string().or(z.number()).transform(String),
   unitPrice: z.string().or(z.number()).transform(String),
@@ -18,7 +20,10 @@ const createQuoteSchema = z.object({
   description: z.string().optional(),
   profitMargin: z.string().or(z.number()).transform(String).optional(),
   profitType: z.enum(["fixed", "percentage"]).optional(),
-  materials: z.array(quoteMaterialSchema).min(1, "Debe agregar al menos un material"),
+  isOutsourced: z.boolean().optional(),
+  outsourcedSupplierId: z.string().uuid().optional(),
+  outsourcedCost: z.string().or(z.number()).transform(String).optional(),
+  materials: z.array(quoteLineItemSchema).optional(),
 })
 
 export async function GET() {
@@ -33,13 +38,17 @@ export async function GET() {
         profitMargin: quotes.profitMargin,
         profitType: quotes.profitType,
         totalPrice: quotes.totalPrice,
+        isOutsourced: quotes.isOutsourced,
+        outsourcedSupplierId: quotes.outsourcedSupplierId,
         orderId: quotes.orderId,
         createdAt: quotes.createdAt,
         updatedAt: quotes.updatedAt,
         clientName: clients.name,
+        supplierName: suppliers.name,
       })
       .from(quotes)
       .leftJoin(clients, eq(quotes.clientId, clients.id))
+      .leftJoin(suppliers, eq(quotes.outsourcedSupplierId, suppliers.id))
       .orderBy(desc(quotes.createdAt))
 
     return NextResponse.json(allQuotes)
@@ -57,21 +66,44 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validated = createQuoteSchema.parse(body)
 
-    // Calculate materials cost
     let materialsCost = 0
-    const materialsToInsert = validated.materials.map((m) => {
-      const quantity = parseFloat(m.quantity)
-      const unitPrice = parseFloat(m.unitPrice)
-      const subtotal = quantity * unitPrice
-      materialsCost += subtotal
-      return {
-        materialId: m.materialId,
-        supplierId: m.supplierId,
-        quantity: m.quantity,
-        unitPrice: m.unitPrice,
-        subtotal: subtotal.toFixed(2),
+    let materialsToInsert: Array<{
+      lineType: string
+      materialId?: string
+      description?: string
+      supplierId?: string
+      quantity: string
+      unitPrice: string
+      subtotal: string
+    }> = []
+
+    if (validated.isOutsourced) {
+      // Outsourced: cost is the supplier's price
+      materialsCost = validated.outsourcedCost ? parseFloat(validated.outsourcedCost) : 0
+    } else {
+      // Normal: calculate from line items
+      if (!validated.materials || validated.materials.length === 0) {
+        return NextResponse.json(
+          { error: "Debe agregar al menos una línea" },
+          { status: 400 }
+        )
       }
-    })
+      materialsToInsert = validated.materials.map((m) => {
+        const quantity = parseFloat(m.quantity)
+        const unitPrice = parseFloat(m.unitPrice)
+        const subtotal = quantity * unitPrice
+        materialsCost += subtotal
+        return {
+          lineType: m.lineType || "material",
+          materialId: m.materialId,
+          description: m.description,
+          supplierId: m.supplierId,
+          quantity: m.quantity,
+          unitPrice: m.unitPrice,
+          subtotal: subtotal.toFixed(2),
+        }
+      })
+    }
 
     // Calculate total price with profit
     let totalPrice = materialsCost
@@ -94,10 +126,12 @@ export async function POST(request: NextRequest) {
         profitMargin: validated.profitMargin,
         profitType: validated.profitType || "fixed",
         totalPrice: totalPrice.toFixed(2),
+        isOutsourced: validated.isOutsourced || false,
+        outsourcedSupplierId: validated.outsourcedSupplierId,
       })
       .returning()
 
-    // Insert quote materials
+    // Insert line items (only for non-outsourced quotes)
     if (materialsToInsert.length > 0) {
       await db.insert(quoteMaterials).values(
         materialsToInsert.map((m) => ({

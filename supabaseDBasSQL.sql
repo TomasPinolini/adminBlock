@@ -75,12 +75,14 @@ CREATE TABLE public.order_comments (
 CREATE TABLE public.order_materials (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   order_id uuid NOT NULL,
-  material_id uuid NOT NULL,
+  line_type text NOT NULL DEFAULT 'material'::text,
+  material_id uuid,
+  description text,
+  supplier_id uuid,
   quantity numeric NOT NULL,
   unit_price numeric NOT NULL,
   subtotal numeric NOT NULL,
   created_at timestamp without time zone NOT NULL DEFAULT now(),
-  supplier_id uuid,
   CONSTRAINT order_materials_pkey PRIMARY KEY (id),
   CONSTRAINT order_materials_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id),
   CONSTRAINT order_materials_material_id_fkey FOREIGN KEY (material_id) REFERENCES public.materials(id),
@@ -115,7 +117,9 @@ CREATE TABLE public.orders (
 CREATE TABLE public.quote_materials (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   quote_id uuid NOT NULL,
-  material_id uuid NOT NULL,
+  line_type text NOT NULL DEFAULT 'material'::text,
+  material_id uuid,
+  description text,
   supplier_id uuid,
   quantity numeric NOT NULL,
   unit_price numeric NOT NULL,
@@ -134,13 +138,16 @@ CREATE TABLE public.quotes (
   profit_margin numeric,
   profit_type text DEFAULT 'fixed'::text,
   total_price numeric,
+  is_outsourced boolean NOT NULL DEFAULT false,
+  outsourced_supplier_id uuid,
   order_id uuid,
   created_at timestamp without time zone NOT NULL DEFAULT now(),
   updated_at timestamp without time zone NOT NULL DEFAULT now(),
   service_type text,
   CONSTRAINT quotes_pkey PRIMARY KEY (id),
   CONSTRAINT quotes_client_id_fkey FOREIGN KEY (client_id) REFERENCES public.clients(id),
-  CONSTRAINT quotes_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id)
+  CONSTRAINT quotes_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id),
+  CONSTRAINT quotes_outsourced_supplier_id_fkey FOREIGN KEY (outsourced_supplier_id) REFERENCES public.suppliers(id)
 );
 CREATE TABLE public.service_materials (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

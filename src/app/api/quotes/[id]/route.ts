@@ -28,7 +28,9 @@ export async function GET(
     const quoteWithMaterials = await db
       .select({
         id: quoteMaterials.id,
+        lineType: quoteMaterials.lineType,
         materialId: quoteMaterials.materialId,
+        description: quoteMaterials.description,
         supplierId: quoteMaterials.supplierId,
         quantity: quoteMaterials.quantity,
         unitPrice: quoteMaterials.unitPrice,

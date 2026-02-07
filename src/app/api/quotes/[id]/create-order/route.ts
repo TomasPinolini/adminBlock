@@ -57,12 +57,14 @@ export async function POST(
       })
       .returning()
 
-    // Copy materials to order
+    // Copy line items to order
     if (qMaterials.length > 0) {
       await db.insert(orderMaterials).values(
         qMaterials.map((m) => ({
           orderId: newOrder.id,
+          lineType: m.lineType || "material",
           materialId: m.materialId,
+          description: m.description,
           supplierId: m.supplierId,
           quantity: m.quantity,
           unitPrice: m.unitPrice,

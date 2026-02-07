@@ -35,6 +35,14 @@ PRICING:
   - Los precios de materiales varían según lo que cobren los proveedores
   - Se agrega margen de ganancia (% o monto fijo)
 
+TIPOS DE COTIZACIÓN:
+  - NORMAL: Se detallan líneas de materiales y/o servicios contratados.
+    Cada línea puede ser:
+      • Material: se elige del catálogo, con proveedor, cantidad y precio.
+      • Servicio: descripción libre, cantidad (default 1) y precio.
+  - TERCERIZADA: El trabajo se delega completamente a un proveedor externo.
+    Solo se indica el proveedor y cuánto cobra. Se agrega ganancia encima.
+
 ================================================================================
 2. USUARIOS DEL SISTEMA
 ================================================================================
@@ -106,18 +114,25 @@ CASO 1: Crear pedido nuevo
     4. (Opcional) Agregar fecha de entrega
     5. Estado inicial: "Pendiente de cotización"
 
-CASO 2: Cotizar un pedido (NUEVO FLUJO CON MATERIALES)
+CASO 2: Cotizar un pedido (FLUJO CON MATERIALES Y SERVICIOS)
   Actor: Papá
   Trigger: Pedido en estado "Pendiente de cotización"
   Pasos:
-    1. Abrir pedido
-    2. Seleccionar materiales del catálogo (según tipo de servicio)
-    3. Ingresar cantidad de cada material
-    4. Actualizar precio unitario si cambió (precio del proveedor)
-    5. Sistema calcula: Σ(cantidad × precio) = Costo total
-    6. Agregar margen de ganancia (% o monto fijo)
-    7. Precio final = Costo + Margen
-    8. Guardar → Estado cambia a "Cotizado"
+    1. Abrir cotizador
+    2. (Opcional) Marcar "Tercerizado" si el trabajo lo hace un proveedor
+    3A. Si TERCERIZADO:
+        - Seleccionar proveedor
+        - Ingresar costo del proveedor
+    3B. Si NORMAL:
+        - Elegir tipo de línea: Material o Servicio
+        - Material: seleccionar del catálogo, proveedor, cantidad, precio
+        - Servicio: descripción libre, cantidad (default 1), precio
+        - Agregar tantas líneas como sea necesario
+    4. Sistema calcula costo total
+    5. Agregar margen de ganancia (% o monto fijo)
+    6. Precio final = Costo + Margen
+    7. Guardar cotización
+    8. (Opcional) Crear pedido desde la cotización
     9. Enviar presupuesto al cliente (botón WhatsApp)
 
 CASO 3: Marcar pedido como listo
@@ -274,6 +289,18 @@ Nota: Mi idea es que mi viejo pueda:
   - luego agregarle materiales que ofrece.
   - y a la hora de agregar los materiales para el pedido, pueda seleccionar el proveedor y el precio que le sale en ese momento.
   
+CASO 8: Cotización tercerizada
+  Actor: Papá
+  Trigger: Cliente pide un trabajo que se delega a un proveedor externo
+  Pasos:
+    1. Abrir cotizador
+    2. Marcar checkbox "Tercerizado"
+    3. Seleccionar proveedor que hará el trabajo
+    4. Ingresar el costo que cobra el proveedor
+    5. Agregar margen de ganancia
+    6. Guardar cotización
+    7. Crear pedido si el cliente aprueba
+
 ================================================================================
                          FIN DEL DOCUMENTO
 ================================================================================

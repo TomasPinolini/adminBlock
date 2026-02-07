@@ -229,24 +229,27 @@ export const quotes = pgTable("quotes", {
   clientId: uuid("client_id").references(() => clients.id),
   serviceType: text("service_type"), // migrated from enum to text
   description: text("description"),
-  materialsCost: numeric("materials_cost", { precision: 10, scale: 2 }), // sum of all materials
+  materialsCost: numeric("materials_cost", { precision: 10, scale: 2 }), // sum of all materials/cost
   profitMargin: numeric("profit_margin", { precision: 10, scale: 2 }), // profit amount
   profitType: text("profit_type").default("fixed"), // "fixed" or "percentage"
   totalPrice: numeric("total_price", { precision: 10, scale: 2 }), // materialsCost + profit
+  isOutsourced: boolean("is_outsourced").default(false).notNull(), // tercerizado
+  outsourcedSupplierId: uuid("outsourced_supplier_id").references(() => suppliers.id), // proveedor que hace el trabajo
   orderId: uuid("order_id").references(() => orders.id), // if converted to order
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
-// Materials in a quote
+// Line items in a quote (materials or services)
 export const quoteMaterials = pgTable("quote_materials", {
   id: uuid("id").primaryKey().defaultRandom(),
   quoteId: uuid("quote_id")
     .references(() => quotes.id, { onDelete: "cascade" })
     .notNull(),
+  lineType: text("line_type").default("material").notNull(), // "material" or "service"
   materialId: uuid("material_id")
-    .references(() => materials.id, { onDelete: "restrict" })
-    .notNull(),
+    .references(() => materials.id, { onDelete: "restrict" }), // nullable for service lines
+  description: text("description"), // used for service line items
   supplierId: uuid("supplier_id")
     .references(() => suppliers.id, { onDelete: "restrict" }),
   quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
@@ -255,15 +258,16 @@ export const quoteMaterials = pgTable("quote_materials", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
-// Materials used in a specific order (for quoting)
+// Line items used in a specific order (materials or services)
 export const orderMaterials = pgTable("order_materials", {
   id: uuid("id").primaryKey().defaultRandom(),
   orderId: uuid("order_id")
     .references(() => orders.id, { onDelete: "cascade" })
     .notNull(),
+  lineType: text("line_type").default("material").notNull(), // "material" or "service"
   materialId: uuid("material_id")
-    .references(() => materials.id, { onDelete: "restrict" })
-    .notNull(),
+    .references(() => materials.id, { onDelete: "restrict" }), // nullable for service lines
+  description: text("description"), // used for service line items
   supplierId: uuid("supplier_id")
     .references(() => suppliers.id, { onDelete: "restrict" }),
   quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
@@ -321,6 +325,10 @@ export const quotesRelations = relations(quotes, ({ one, many }) => ({
   client: one(clients, {
     fields: [quotes.clientId],
     references: [clients.id],
+  }),
+  outsourcedSupplier: one(suppliers, {
+    fields: [quotes.outsourcedSupplierId],
+    references: [suppliers.id],
   }),
   order: one(orders, {
     fields: [quotes.orderId],

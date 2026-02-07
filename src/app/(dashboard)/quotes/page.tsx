@@ -2,13 +2,14 @@
 
 export const dynamic = "force-dynamic"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
-import { Plus, Trash2, Copy, Check, FileText, ShoppingCart } from "lucide-react"
+import { Plus, Trash2, Copy, Check, FileText, ShoppingCart, Wrench, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
 import {
   Select,
   SelectContent,
@@ -21,12 +22,15 @@ import { useMaterials } from "@/hooks/use-materials"
 import { useSuppliers, useSupplierMaterials } from "@/hooks/use-suppliers"
 import { useQuotes, useCreateQuote, useDeleteQuote, useCreateOrderFromQuote } from "@/hooks/use-quotes"
 import { useClients } from "@/hooks/use-clients"
+import { logApiError } from "@/lib/logger"
 
-interface QuoteMaterialItem {
+interface QuoteLineItem {
   id: string
-  materialId: string
-  materialName: string
-  materialUnit: string
+  lineType: "material" | "service"
+  materialId?: string
+  materialName?: string
+  materialUnit?: string
+  description?: string
   supplierId?: string
   supplierName?: string
   quantity: string
@@ -45,11 +49,16 @@ export default function QuotesPage() {
   const createOrderFromQuote = useCreateOrderFromQuote()
 
   // Form state
+  const [isOutsourced, setIsOutsourced] = useState(false)
+  const [outsourcedSupplierId, setOutsourcedSupplierId] = useState("")
+  const [outsourcedCost, setOutsourcedCost] = useState("")
+  const [lineType, setLineType] = useState<"material" | "service">("material")
   const [selectedMaterialId, setSelectedMaterialId] = useState("")
   const [selectedSupplierId, setSelectedSupplierId] = useState("")
+  const [lineDescription, setLineDescription] = useState("")
   const [quantity, setQuantity] = useState("")
   const [unitPrice, setUnitPrice] = useState("")
-  const [quoteMaterials, setQuoteMaterials] = useState<QuoteMaterialItem[]>([])
+  const [quoteLines, setQuoteLines] = useState<QuoteLineItem[]>([])
   const [profitMargin, setProfitMargin] = useState("")
   const [profitType, setProfitType] = useState<"fixed" | "percentage">("fixed")
   const [clientId, setClientId] = useState("")
@@ -68,47 +77,73 @@ export default function QuotesPage() {
   )?.currentPrice
 
   // Calculate totals
-  const materialsCost = quoteMaterials.reduce((sum, m) => sum + m.subtotal, 0)
+  const baseCost = isOutsourced
+    ? parseFloat(outsourcedCost) || 0
+    : quoteLines.reduce((sum, m) => sum + m.subtotal, 0)
   const profit = profitType === "percentage"
-    ? materialsCost * (parseFloat(profitMargin) || 0) / 100
+    ? baseCost * (parseFloat(profitMargin) || 0) / 100
     : parseFloat(profitMargin) || 0
-  const totalPrice = materialsCost + profit
+  const totalPrice = baseCost + profit
 
-  const handleAddMaterial = () => {
-    if (!selectedMaterialId || !quantity || !unitPrice) return
+  const handleAddLine = () => {
+    if (lineType === "material") {
+      if (!selectedMaterialId || !quantity || !unitPrice) return
+      const material = materials.find((m) => m.id === selectedMaterialId)
+      const supplier = suppliers.find((s) => s.id === selectedSupplierId)
+      const qty = parseFloat(quantity)
+      const price = parseFloat(unitPrice)
+      if (!material || isNaN(qty) || isNaN(price)) return
 
-    const material = materials.find((m) => m.id === selectedMaterialId)
-    const supplier = suppliers.find((s) => s.id === selectedSupplierId)
-    const qty = parseFloat(quantity)
-    const price = parseFloat(unitPrice)
+      const newItem: QuoteLineItem = {
+        id: crypto.randomUUID(),
+        lineType: "material",
+        materialId: selectedMaterialId,
+        materialName: material.name,
+        materialUnit: material.unit,
+        supplierId: selectedSupplierId || undefined,
+        supplierName: supplier?.name,
+        quantity,
+        unitPrice,
+        subtotal: qty * price,
+      }
+      setQuoteLines([...quoteLines, newItem])
+      setSelectedMaterialId("")
+      setSelectedSupplierId("")
+      setQuantity("")
+      setUnitPrice("")
+    } else {
+      // Service line
+      if (!lineDescription || !unitPrice) return
+      const supplier = suppliers.find((s) => s.id === selectedSupplierId)
+      const qty = parseFloat(quantity) || 1
+      const price = parseFloat(unitPrice)
+      if (isNaN(price)) return
 
-    if (!material || isNaN(qty) || isNaN(price)) return
-
-    const newItem: QuoteMaterialItem = {
-      id: crypto.randomUUID(),
-      materialId: selectedMaterialId,
-      materialName: material.name,
-      materialUnit: material.unit,
-      supplierId: selectedSupplierId || undefined,
-      supplierName: supplier?.name,
-      quantity,
-      unitPrice,
-      subtotal: qty * price,
+      const newItem: QuoteLineItem = {
+        id: crypto.randomUUID(),
+        lineType: "service",
+        description: lineDescription,
+        supplierId: selectedSupplierId || undefined,
+        supplierName: supplier?.name,
+        quantity: String(qty),
+        unitPrice,
+        subtotal: qty * price,
+      }
+      setQuoteLines([...quoteLines, newItem])
+      setLineDescription("")
+      setSelectedSupplierId("")
+      setQuantity("")
+      setUnitPrice("")
     }
-
-    setQuoteMaterials([...quoteMaterials, newItem])
-    setSelectedMaterialId("")
-    setSelectedSupplierId("")
-    setQuantity("")
-    setUnitPrice("")
   }
 
-  const handleRemoveMaterial = (id: string) => {
-    setQuoteMaterials(quoteMaterials.filter((m) => m.id !== id))
+  const handleRemoveLine = (id: string) => {
+    setQuoteLines(quoteLines.filter((m) => m.id !== id))
   }
 
   const handleSaveQuote = async () => {
-    if (quoteMaterials.length === 0) return
+    if (!isOutsourced && quoteLines.length === 0) return
+    if (isOutsourced && (!outsourcedSupplierId || !outsourcedCost)) return
 
     try {
       await createQuote.mutateAsync({
@@ -117,8 +152,13 @@ export default function QuotesPage() {
         description: description || undefined,
         profitMargin: profitMargin || "0",
         profitType,
-        materials: quoteMaterials.map((m) => ({
+        isOutsourced,
+        outsourcedSupplierId: isOutsourced ? outsourcedSupplierId : undefined,
+        outsourcedCost: isOutsourced ? outsourcedCost : undefined,
+        materials: isOutsourced ? undefined : quoteLines.map((m) => ({
+          lineType: m.lineType,
           materialId: m.materialId,
+          description: m.description,
           supplierId: m.supplierId,
           quantity: m.quantity,
           unitPrice: m.unitPrice,
@@ -126,13 +166,18 @@ export default function QuotesPage() {
       })
 
       // Reset form
-      setQuoteMaterials([])
+      setQuoteLines([])
       setProfitMargin("")
       setClientId("")
       setServiceType("")
       setDescription("")
+      setIsOutsourced(false)
+      setOutsourcedSupplierId("")
+      setOutsourcedCost("")
+      toast.success("Cotización guardada")
     } catch (error) {
-      console.error("Error saving quote:", error)
+      logApiError("/quotes", "SAVE", error)
+      toast.error("Error al guardar cotización")
     }
   }
 
@@ -171,21 +216,45 @@ export default function QuotesPage() {
     }
   }
 
+  const canSave = isOutsourced
+    ? !!(outsourcedSupplierId && outsourcedCost)
+    : quoteLines.length > 0
+  const showTotals = isOutsourced
+    ? !!(outsourcedCost && parseFloat(outsourcedCost) > 0)
+    : quoteLines.length > 0
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-xl lg:text-2xl font-bold">Cotizador</h1>
         <p className="text-sm text-muted-foreground">
-          Crea cotizaciones con materiales y proveedores
+          Crea cotizaciones con materiales, servicios, o trabajos terciarizados
         </p>
       </div>
 
       {/* Quote Form */}
       <div className="rounded-lg border bg-background p-4 lg:p-6 space-y-4">
-        <h2 className="font-semibold">Nueva Cotización</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold">Nueva Cotización</h2>
+          {/* Tercerizado toggle */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isOutsourced}
+              onChange={(e) => {
+                setIsOutsourced(e.target.checked)
+                setQuoteLines([])
+                setOutsourcedSupplierId("")
+                setOutsourcedCost("")
+              }}
+              className="h-4 w-4 rounded border-gray-300"
+            />
+            <span className="text-sm font-medium">Tercerizado</span>
+          </label>
+        </div>
 
-        {/* Optional: Client and Service */}
+        {/* Client, Service, Description */}
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <Label>Cliente (opcional)</Label>
@@ -227,84 +296,164 @@ export default function QuotesPage() {
           </div>
         </div>
 
-        {/* Add Material */}
-        <div className="space-y-2">
-          <Label>Agregar Material</Label>
-          <div className="flex flex-wrap gap-2">
-            <Select value={selectedMaterialId} onValueChange={(v) => {
-              setSelectedMaterialId(v)
-              setUnitPrice("")
-            }}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Material" />
-              </SelectTrigger>
-              <SelectContent>
-                {materials.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {m.name} ({m.unit})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={selectedSupplierId} onValueChange={(v) => {
-              setSelectedSupplierId(v)
-              // Auto-fill price from supplier
-              const sm = supplierMaterials.find((sm) => sm.materialId === selectedMaterialId)
-              if (sm?.currentPrice) {
-                setUnitPrice(sm.currentPrice)
-              }
-            }}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Proveedor" />
-              </SelectTrigger>
-              <SelectContent>
-                {suppliers.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Input
-              type="number"
-              placeholder="Cantidad"
-              className="w-24"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-            />
-
-            <Input
-              type="number"
-              placeholder={suggestedPrice ? `$${suggestedPrice}` : "Precio"}
-              className="w-28"
-              value={unitPrice}
-              onChange={(e) => setUnitPrice(e.target.value)}
-            />
-
-            <Button onClick={handleAddMaterial} disabled={!selectedMaterialId || !quantity || !unitPrice}>
-              <Plus className="h-4 w-4" />
-            </Button>
+        {/* === OUTSOURCED MODE === */}
+        {isOutsourced && (
+          <div className="space-y-2 rounded-lg border border-dashed p-4 bg-muted/30">
+            <Label>Trabajo tercerizado</Label>
+            <p className="text-xs text-muted-foreground">Seleccioná el proveedor que hace el trabajo e ingresá el costo.</p>
+            <div className="flex flex-wrap gap-2">
+              <Select value={outsourcedSupplierId} onValueChange={setOutsourcedSupplierId}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Proveedor" />
+                </SelectTrigger>
+                <SelectContent>
+                  {suppliers.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                type="number"
+                placeholder="Costo del proveedor"
+                className="w-40"
+                value={outsourcedCost}
+                onChange={(e) => setOutsourcedCost(e.target.value)}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Materials List */}
-        {quoteMaterials.length > 0 && (
+        {/* === NORMAL MODE: Add Line Items === */}
+        {!isOutsourced && (
           <div className="space-y-2">
-            <Label>Materiales agregados</Label>
+            <div className="flex items-center gap-2">
+              <Label>Agregar línea</Label>
+              {/* Line type toggle */}
+              <div className="flex rounded-md border overflow-hidden text-xs">
+                <button
+                  type="button"
+                  onClick={() => { setLineType("material"); setLineDescription("") }}
+                  className={`px-2.5 py-1 flex items-center gap-1 transition-colors ${
+                    lineType === "material" ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/80"
+                  }`}
+                >
+                  <Package className="h-3 w-3" /> Material
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setLineType("service"); setSelectedMaterialId(""); setQuantity("1") }}
+                  className={`px-2.5 py-1 flex items-center gap-1 transition-colors ${
+                    lineType === "service" ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/80"
+                  }`}
+                >
+                  <Wrench className="h-3 w-3" /> Servicio
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {lineType === "material" ? (
+                <Select value={selectedMaterialId} onValueChange={(v) => {
+                  setSelectedMaterialId(v)
+                  setUnitPrice("")
+                }}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Material" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {materials.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.name} ({m.unit})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  placeholder="Descripción del servicio"
+                  className="w-48"
+                  value={lineDescription}
+                  onChange={(e) => setLineDescription(e.target.value)}
+                />
+              )}
+
+              <Select value={selectedSupplierId} onValueChange={(v) => {
+                setSelectedSupplierId(v)
+                // Auto-fill price from supplier (only for materials)
+                if (lineType === "material") {
+                  const sm = supplierMaterials.find((sm) => sm.materialId === selectedMaterialId)
+                  if (sm?.currentPrice) {
+                    setUnitPrice(sm.currentPrice)
+                  }
+                }
+              }}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Proveedor" />
+                </SelectTrigger>
+                <SelectContent>
+                  {suppliers.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Input
+                type="number"
+                placeholder={lineType === "service" ? "Cant (1)" : "Cantidad"}
+                className="w-24"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+
+              <Input
+                type="number"
+                placeholder={suggestedPrice ? `$${suggestedPrice}` : "Precio"}
+                className="w-28"
+                value={unitPrice}
+                onChange={(e) => setUnitPrice(e.target.value)}
+              />
+
+              <Button
+                onClick={handleAddLine}
+                disabled={
+                  lineType === "material"
+                    ? !selectedMaterialId || !quantity || !unitPrice
+                    : !lineDescription || !unitPrice
+                }
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Line Items List */}
+        {!isOutsourced && quoteLines.length > 0 && (
+          <div className="space-y-2">
+            <Label>Líneas agregadas</Label>
             <div className="rounded-lg border divide-y">
-              {quoteMaterials.map((m) => (
+              {quoteLines.map((m) => (
                 <div key={m.id} className="flex items-center justify-between p-3">
                   <div className="flex-1">
-                    <span className="font-medium">{m.materialName}</span>
-                    {m.supplierName && (
-                      <span className="text-sm text-muted-foreground ml-2">
-                        ({m.supplierName})
+                    <div className="flex items-center gap-2">
+                      <Badge variant={m.lineType === "service" ? "secondary" : "outline"} className="text-xs">
+                        {m.lineType === "service" ? "Servicio" : "Material"}
+                      </Badge>
+                      <span className="font-medium">
+                        {m.lineType === "material" ? m.materialName : m.description}
                       </span>
-                    )}
+                      {m.supplierName && (
+                        <span className="text-sm text-muted-foreground">
+                          ({m.supplierName})
+                        </span>
+                      )}
+                    </div>
                     <div className="text-sm text-muted-foreground">
-                      {m.quantity} {m.materialUnit} × ${parseFloat(m.unitPrice).toLocaleString("es-AR")}
+                      {m.quantity} {m.materialUnit || "u."} × ${parseFloat(m.unitPrice).toLocaleString("es-AR")}
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -314,7 +463,7 @@ export default function QuotesPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleRemoveMaterial(m.id)}
+                      onClick={() => handleRemoveLine(m.id)}
                       className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -326,13 +475,13 @@ export default function QuotesPage() {
           </div>
         )}
 
-        {/* Profit Margin */}
-        {quoteMaterials.length > 0 && (
+        {/* Profit Margin & Totals */}
+        {showTotals && (
           <div className="flex flex-wrap items-end gap-4 pt-2">
             <div className="space-y-2">
-              <Label>Costo materiales</Label>
+              <Label>{isOutsourced ? "Costo proveedor" : "Costo"}</Label>
               <p className="text-lg font-semibold">
-                ${materialsCost.toLocaleString("es-AR")}
+                ${baseCost.toLocaleString("es-AR")}
               </p>
             </div>
             <div className="space-y-2">
@@ -366,7 +515,7 @@ export default function QuotesPage() {
         )}
 
         {/* Actions */}
-        {quoteMaterials.length > 0 && (
+        {canSave && (
           <div className="flex flex-wrap gap-3 pt-4 border-t">
             <Button onClick={handleSaveQuote} disabled={createQuote.isPending}>
               {createQuote.isPending ? "Guardando..." : "Guardar Cotización"}
@@ -415,7 +564,7 @@ export default function QuotesPage() {
                 className="flex items-center justify-between rounded-lg border bg-background p-4"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {quote.clientName && (
                       <span className="font-medium">{quote.clientName}</span>
                     )}
@@ -426,6 +575,12 @@ export default function QuotesPage() {
                     )}
                     {!quote.clientName && !quote.serviceType && (
                       <span className="text-muted-foreground">Sin cliente</span>
+                    )}
+                    {quote.isOutsourced && (
+                      <Badge variant="secondary" className="text-xs">Tercerizado</Badge>
+                    )}
+                    {quote.isOutsourced && quote.supplierName && (
+                      <span className="text-xs text-muted-foreground">→ {quote.supplierName}</span>
                     )}
                   </div>
                   <div className="text-sm text-muted-foreground">
