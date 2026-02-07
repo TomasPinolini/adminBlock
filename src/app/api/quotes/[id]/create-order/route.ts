@@ -50,7 +50,7 @@ export async function POST(
       .values({
         clientId: quote.clientId,
         serviceType: quote.serviceType || "copiado",
-        status: "quoted",
+        status: "quoted" as const,
         description: quote.description,
         price: quote.totalPrice,
       })

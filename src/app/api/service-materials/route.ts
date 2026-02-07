@@ -8,7 +8,7 @@ const createServiceMaterialSchema = z.object({
   serviceType: z.string().min(1, "Tipo de servicio requerido"),
   materialId: z.string().uuid("ID de material inválido"),
   defaultQuantity: z.string().or(z.number()).transform(String).optional(),
-  isRequired: z.string().optional(),
+  isRequired: z.boolean().optional(),
 })
 
 // Get all service materials, optionally filtered by serviceType
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         serviceType: validated.serviceType as any,
         materialId: validated.materialId,
         defaultQuantity: validated.defaultQuantity,
-        isRequired: validated.isRequired || "false",
+        isRequired: validated.isRequired ?? false,
       })
       .returning()
 

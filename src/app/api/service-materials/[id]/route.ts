@@ -6,7 +6,7 @@ import { z } from "zod"
 
 const updateServiceMaterialSchema = z.object({
   defaultQuantity: z.string().or(z.number()).transform(String).optional(),
-  isRequired: z.string().optional(),
+  isRequired: z.boolean().optional(),
 })
 
 export async function PATCH(

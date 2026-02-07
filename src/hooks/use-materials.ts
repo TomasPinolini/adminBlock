@@ -102,7 +102,7 @@ interface ServiceMaterialWithMaterial {
   serviceType: string
   materialId: string
   defaultQuantity: string | null
-  isRequired: string
+  isRequired: boolean
   createdAt: Date
   material: {
     id: string
@@ -135,7 +135,7 @@ export function useAddServiceMaterial() {
       serviceType: string
       materialId: string
       defaultQuantity?: string
-      isRequired?: string
+      isRequired?: boolean
     }) => {
       const res = await fetch("/api/service-materials", {
         method: "POST",

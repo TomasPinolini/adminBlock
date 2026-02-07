@@ -98,7 +98,7 @@ export const orders = pgTable("orders", {
   // Person who made the order (when clientId is a company)
   personId: uuid("person_id")
     .references(() => clients.id, { onDelete: "set null" }),
-  serviceType: text("service_type").notNull(), // references services.name
+  serviceType: text("service_type").notNull(), // references services.name (migrated from enum to text)
   status: orderStatusEnum("status").default("pending_quote").notNull(),
   description: text("description"),
   price: numeric("price", { precision: 10, scale: 2 }),
@@ -142,7 +142,7 @@ export const orderAttachments = pgTable("order_attachments", {
 
 export const servicePrices = pgTable("service_prices", {
   id: uuid("id").primaryKey().defaultRandom(),
-  serviceType: serviceTypeEnum("service_type").notNull(),
+  serviceType: text("service_type").notNull(), // migrated from enum to text
   variantName: text("variant_name").notNull(),
   basePrice: numeric("base_price", { precision: 10, scale: 2 }),
   pricePerUnit: numeric("price_per_unit", { precision: 10, scale: 2 }),
@@ -224,12 +224,12 @@ export const supplierMaterials = pgTable("supplier_materials", {
 // Which materials are typically used for each service type
 export const serviceMaterials = pgTable("service_materials", {
   id: uuid("id").primaryKey().defaultRandom(),
-  serviceType: serviceTypeEnum("service_type").notNull(),
+  serviceType: text("service_type").notNull(), // migrated from enum to text
   materialId: uuid("material_id")
     .references(() => materials.id, { onDelete: "cascade" })
     .notNull(),
   defaultQuantity: numeric("default_quantity", { precision: 10, scale: 2 }),
-  isRequired: text("is_required").default("false").notNull(),
+  isRequired: boolean("is_required").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
@@ -237,7 +237,7 @@ export const serviceMaterials = pgTable("service_materials", {
 export const quotes = pgTable("quotes", {
   id: uuid("id").primaryKey().defaultRandom(),
   clientId: uuid("client_id").references(() => clients.id),
-  serviceType: serviceTypeEnum("service_type"),
+  serviceType: text("service_type"), // migrated from enum to text
   description: text("description"),
   materialsCost: numeric("materials_cost", { precision: 10, scale: 2 }), // sum of all materials
   profitMargin: numeric("profit_margin", { precision: 10, scale: 2 }), // profit amount
