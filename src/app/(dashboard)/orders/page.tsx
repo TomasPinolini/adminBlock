@@ -16,16 +16,16 @@ import {
 import { RouteErrorBoundary } from "@/components/error-boundary-route"
 import { useUIStore } from "@/stores/ui-store"
 import {
-  serviceTypes,
-  serviceTypeLabels,
   orderStatuses,
 } from "@/lib/validations/orders"
+import { useServices } from "@/hooks/use-services"
 import { OrderList } from "@/components/orders/order-list"
 import { OrderFormModal } from "@/components/orders/order-form-modal"
 import { DashboardStats } from "@/components/orders/dashboard-stats"
 import { QuickFilters } from "@/components/orders/quick-filters"
 
 export default function OrdersPage() {
+  const { data: services = [] } = useServices()
   const {
     serviceFilter,
     showArchived,
@@ -103,9 +103,9 @@ export default function OrdersPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los servicios</SelectItem>
-              {serviceTypes.map((service) => (
-                <SelectItem key={service} value={service}>
-                  {serviceTypeLabels[service]}
+              {services.map((s) => (
+                <SelectItem key={s.id} value={s.name}>
+                  {s.displayName}
                 </SelectItem>
               ))}
             </SelectContent>

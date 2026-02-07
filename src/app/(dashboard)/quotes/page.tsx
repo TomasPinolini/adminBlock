@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { serviceTypes, serviceTypeLabels } from "@/lib/validations/orders"
+import { useServices } from "@/hooks/use-services"
 import { useMaterials } from "@/hooks/use-materials"
 import { useSuppliers, useSupplierMaterials } from "@/hooks/use-suppliers"
 import { useQuotes, useCreateQuote, useDeleteQuote, useCreateOrderFromQuote } from "@/hooks/use-quotes"
@@ -43,6 +43,7 @@ export default function QuotesPage() {
   const { data: materials = [] } = useMaterials()
   const { data: suppliers = [] } = useSuppliers()
   const { data: clients = [] } = useClients()
+  const { data: services = [] } = useServices()
   const { data: quotes = [], isLoading: quotesLoading } = useQuotes()
   const createQuote = useCreateQuote()
   const deleteQuote = useDeleteQuote()
@@ -204,8 +205,13 @@ export default function QuotesPage() {
     }
   }
 
+  const getServiceLabel = (name: string) => {
+    const svc = services.find((s) => s.name === name)
+    return svc?.displayName || name
+  }
+
   const quoteText = totalPrice > 0
-    ? `Hola! Tu cotización${serviceType ? ` para ${serviceTypeLabels[serviceType as keyof typeof serviceTypeLabels]}` : ""}: $${totalPrice.toLocaleString("es-AR")}`
+    ? `Hola! Tu cotización${serviceType ? ` para ${getServiceLabel(serviceType)}` : ""}: $${totalPrice.toLocaleString("es-AR")}`
     : ""
 
   const handleCopy = async () => {
@@ -278,9 +284,9 @@ export default function QuotesPage() {
                 <SelectValue placeholder="Tipo de servicio" />
               </SelectTrigger>
               <SelectContent>
-                {serviceTypes.map((service) => (
-                  <SelectItem key={service} value={service}>
-                    {serviceTypeLabels[service]}
+                {services.map((s) => (
+                  <SelectItem key={s.id} value={s.name}>
+                    {s.displayName}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -570,7 +576,7 @@ export default function QuotesPage() {
                     )}
                     {quote.serviceType && (
                       <span className="text-sm text-muted-foreground">
-                        {serviceTypeLabels[quote.serviceType as keyof typeof serviceTypeLabels]}
+                        {services.find((s) => s.name === quote.serviceType)?.displayName || quote.serviceType}
                       </span>
                     )}
                     {!quote.clientName && !quote.serviceType && (

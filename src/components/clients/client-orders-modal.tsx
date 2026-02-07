@@ -13,9 +13,9 @@ import { useOrders } from "@/hooks/use-orders"
 import { useCompanyEmployees } from "@/hooks/use-relationships"
 import { formatDate, formatRelative } from "@/lib/utils/dates"
 import {
-  serviceTypeLabels,
   orderStatusLabels,
 } from "@/lib/validations/orders"
+import { useServices } from "@/hooks/use-services"
 import type { OrderStatus, PaymentStatus } from "@/lib/db/schema"
 import { Package, DollarSign, Calendar, Clock, User } from "lucide-react"
 
@@ -43,6 +43,7 @@ const paymentStatusVariants: Record<PaymentStatus, "destructive" | "warning" | "
 
 export function ClientOrdersModal() {
   const { viewingClientOrders, setViewingClientOrders } = useUIStore()
+  const { data: services = [] } = useServices()
   const isCompany = viewingClientOrders?.clientType === "company"
 
   // For companies, fetch linked individuals
@@ -154,7 +155,7 @@ export function ClientOrdersModal() {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge variant="outline" className="text-xs">
-                            {serviceTypeLabels[order.serviceType]}
+                            {services.find((s) => s.name === order.serviceType)?.displayName || order.serviceType}
                           </Badge>
                           <Badge variant={statusVariants[order.status]}>
                             {orderStatusLabels[order.status]}

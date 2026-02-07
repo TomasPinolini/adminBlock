@@ -1,4 +1,3 @@
-import { serviceTypeLabels, orderStatusLabels } from "@/lib/validations/orders"
 import type { OrderStatus } from "@/lib/db/schema"
 import { formatPhoneForWhatsApp } from "@/config/phone"
 
@@ -23,18 +22,15 @@ export function getInstagramLink(handle: string): string {
 // Message templates - now accepts dynamic service types
 export const messageTemplates = {
   orderReady: (clientName: string, serviceType: string) => {
-    const serviceLabel = serviceTypeLabels[serviceType] || serviceType
-    return `Hola ${clientName}! Tu ${serviceLabel.toLowerCase()} esta listo para retirar. Te esperamos!`
+    return `Hola ${clientName}! Tu ${serviceType.toLowerCase()} esta listo para retirar. Te esperamos!`
   },
 
   quote: (clientName: string, serviceType: string, price: string) => {
-    const serviceLabel = serviceTypeLabels[serviceType] || serviceType
-    return `Hola ${clientName}! La cotizacion para ${serviceLabel.toLowerCase()} es de $${price}. Avisame si queres que avancemos!`
+    return `Hola ${clientName}! La cotizacion para ${serviceType.toLowerCase()} es de $${price}. Avisame si queres que avancemos!`
   },
 
   inProgress: (clientName: string, serviceType: string) => {
-    const serviceLabel = serviceTypeLabels[serviceType] || serviceType
-    return `Hola ${clientName}! Ya estamos trabajando en tu ${serviceLabel.toLowerCase()}. Te aviso cuando este listo!`
+    return `Hola ${clientName}! Ya estamos trabajando en tu ${serviceType.toLowerCase()}. Te aviso cuando este listo!`
   },
 
   reminder: (clientName: string) =>

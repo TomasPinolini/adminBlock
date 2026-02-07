@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx"
 import { Order, Client } from "@/lib/db/schema"
 import { formatDate } from "./dates"
-import { serviceTypeLabels, orderStatusLabels } from "@/lib/validations/orders"
+import { orderStatusLabels } from "@/lib/validations/orders"
 
 interface OrderWithClient extends Order {
   client: Client | null
@@ -16,7 +16,7 @@ export function exportOrdersToExcel(
     "Cliente": order.client?.name ?? "-",
     "Telefono": order.client?.phone ?? "-",
     "Instagram": order.client?.instagramHandle ?? "-",
-    "Servicio": serviceTypeLabels[order.serviceType],
+    "Servicio": order.serviceType,
     "Descripcion": order.description ?? "-",
     "Estado": orderStatusLabels[order.status],
     "Precio": order.price ? `$${order.price}` : "-",

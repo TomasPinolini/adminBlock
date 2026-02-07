@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
-import { MessageCircle, Bell, BellOff, Package, ChevronRight, Layers, Truck } from "lucide-react"
+import { MessageCircle, Bell, BellOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface NotificationSetting {
@@ -98,64 +97,6 @@ export default function SettingsPage() {
         <p className="text-sm text-muted-foreground">
           Configuración del sistema
         </p>
-      </div>
-
-      {/* Quick Links */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Configuración</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Link
-            href="/settings/materials"
-            className="flex items-center justify-between rounded-lg border bg-background p-4 hover:bg-muted transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-900">
-                <Package className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <div>
-                <h3 className="font-medium">Materiales</h3>
-                <p className="text-sm text-muted-foreground">
-                  Catálogo de materiales y precios
-                </p>
-              </div>
-            </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-          </Link>
-          <Link
-            href="/settings/suppliers"
-            className="flex items-center justify-between rounded-lg border bg-background p-4 hover:bg-muted transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900">
-                <Truck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <h3 className="font-medium">Proveedores</h3>
-                <p className="text-sm text-muted-foreground">
-                  Proveedores y precios de materiales
-                </p>
-              </div>
-            </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-          </Link>
-          <Link
-            href="/settings/services"
-            className="flex items-center justify-between rounded-lg border bg-background p-4 hover:bg-muted transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-purple-100 p-2 dark:bg-purple-900">
-                <Layers className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <h3 className="font-medium">Servicios</h3>
-                <p className="text-sm text-muted-foreground">
-                  Materiales por tipo de servicio
-                </p>
-              </div>
-            </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-          </Link>
-        </div>
       </div>
 
       {/* WhatsApp Notifications Section */}

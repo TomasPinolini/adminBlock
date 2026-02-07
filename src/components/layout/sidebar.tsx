@@ -19,7 +19,7 @@ const navItems = [
   },
   {
     href: "/clients",
-    label: "Clientes",
+    label: "Directorio",
     icon: Users,
   },
   {

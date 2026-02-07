@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { orders, clients, orderComments } from "@/lib/db/schema"
-import { updateOrderSchema, serviceTypeLabels } from "@/lib/validations/orders"
+import { orders, clients, orderComments, services } from "@/lib/db/schema"
+import { updateOrderSchema } from "@/lib/validations/orders"
 import { eq, desc } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
@@ -120,7 +120,9 @@ export async function PATCH(
     // Send WhatsApp notification for specific status changes
     if (isStatusChange && currentOrderWithClient?.clientPhone) {
       const clientName = currentOrderWithClient.clientName || "Cliente"
-      const serviceLabel = serviceTypeLabels[updatedOrder.serviceType]
+      // Look up display name from services table
+      const [svc] = await db.select({ displayName: services.displayName }).from(services).where(eq(services.name, updatedOrder.serviceType)).limit(1)
+      const serviceLabel = svc?.displayName || updatedOrder.serviceType
       const notifyStatuses = ["ready", "quoted", "in_progress"]
 
       if (notifyStatuses.includes(validated.status!)) {

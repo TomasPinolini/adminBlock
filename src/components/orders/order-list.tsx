@@ -25,11 +25,11 @@ import { useUIStore } from "@/stores/ui-store"
 import { formatDate, formatRelative, isOverdue } from "@/lib/utils/dates"
 import { getWhatsAppLink, getInstagramLink, messageTemplates } from "@/lib/utils/messaging"
 import {
-  serviceTypeLabels,
   orderStatusLabels,
   orderStatuses,
 } from "@/lib/validations/orders"
-import type { OrderStatus, PaymentStatus } from "@/lib/db/schema"
+import { useServices } from "@/hooks/use-services"
+import type { OrderStatus, PaymentStatus, Service } from "@/lib/db/schema"
 import { PaymentModal } from "./payment-modal"
 import { EditOrderModal } from "./edit-order-modal"
 import { cn } from "@/lib/utils"
@@ -64,6 +64,7 @@ interface OrderCardProps {
 
 function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
   const { confirm, ConfirmDialog } = useConfirmDialog()
+  const { data: services = [] } = useServices()
   const updateOrder = useUpdateOrder()
   const deleteOrder = useDeleteOrder()
   const duplicateOrder = useDuplicateOrder()
@@ -141,7 +142,7 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
           {/* Service type and status */}
           <div className="mt-1 flex flex-wrap items-center gap-1.5 sm:gap-2">
             <Badge variant="outline">
-              {serviceTypeLabels[order.serviceType]}
+              {services.find((s) => s.name === order.serviceType)?.displayName || order.serviceType}
             </Badge>
             <Badge variant={statusVariants[order.status]}>
               {orderStatusLabels[order.status]}
