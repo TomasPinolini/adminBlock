@@ -9,24 +9,28 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
+  Pencil,
+  Check,
+  X,
   Trash2,
-  Download,
   DollarSign,
   Receipt,
+  Package,
   TrendingUp,
   TrendingDown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useServices } from "@/hooks/use-services"
 import {
-  useMonthlyOrders,
+  useMonthlyReport,
   useMonthlyExpenses,
   useCreateExpense,
+  useUpdateExpense,
   useDeleteExpense,
 } from "@/hooks/use-monthly-report"
+import type { MaterialCost } from "@/hooks/use-monthly-report"
 import { cn } from "@/lib/utils"
 
 const monthNames = [
@@ -56,15 +60,24 @@ export default function ReportsPage() {
   const { data: services = [] } = useServices()
 
   // Data
-  const { data: orders = [], isLoading: ordersLoading } = useMonthlyOrders(year, month)
+  const { data: reportData, isLoading: reportLoading } = useMonthlyReport(year, month)
+  const orders = reportData?.orders ?? []
+  const materialCosts = reportData?.materialCosts ?? []
   const { data: expenses = [], isLoading: expensesLoading } = useMonthlyExpenses(year, month)
   const createExpense = useCreateExpense()
+  const updateExpense = useUpdateExpense()
   const deleteExpense = useDeleteExpense()
 
   // New expense form
   const [newCategory, setNewCategory] = useState("")
   const [newAmount, setNewAmount] = useState("")
   const [newDescription, setNewDescription] = useState("")
+
+  // Edit expense state
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editCategory, setEditCategory] = useState("")
+  const [editDescription, setEditDescription] = useState("")
+  const [editAmount, setEditAmount] = useState("")
 
   // Navigation
   const goToPrevMonth = () => {
@@ -93,8 +106,20 @@ export default function ReportsPage() {
   const totalVentas = orders.reduce((sum, o) => sum + (parseFloat(o.price || "0") || 0), 0)
   const totalSubtotal = orders.reduce((sum, o) => sum + (parseFloat(o.subtotal || "0") || 0), 0)
   const totalIVA = orders.reduce((sum, o) => sum + (parseFloat(o.taxAmount || "0") || 0), 0)
-  const totalGastos = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0)
+  const totalMaterialCosts = materialCosts.reduce((sum, m) => sum + (parseFloat(m.subtotal) || 0), 0)
+  const totalManualExpenses = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0)
+  const totalGastos = totalManualExpenses + totalMaterialCosts
   const balance = totalVentas - totalGastos
+
+  // Group material costs by order for display
+  const materialCostsByOrder = materialCosts.reduce<Record<string, { clientName: string; items: MaterialCost[] }>>((acc, m) => {
+    if (!acc[m.orderId]) {
+      const order = orders.find((o) => o.id === m.orderId)
+      acc[m.orderId] = { clientName: order?.clientName || "?", items: [] }
+    }
+    acc[m.orderId].items.push(m)
+    return acc
+  }, {})
 
   const getServiceLabel = (name: string) => {
     const svc = services.find((s) => s.name === name)
@@ -120,6 +145,31 @@ export default function ReportsPage() {
     }
   }
 
+  const startEditing = (e: { id: string; category: string; description: string | null; amount: string }) => {
+    setEditingId(e.id)
+    setEditCategory(e.category)
+    setEditDescription(e.description || "")
+    setEditAmount(e.amount)
+  }
+
+  const cancelEditing = () => setEditingId(null)
+
+  const handleSaveExpense = async () => {
+    if (!editingId || !editCategory.trim() || !editAmount.trim()) return
+    try {
+      await updateExpense.mutateAsync({
+        id: editingId,
+        category: editCategory.trim().toUpperCase(),
+        description: editDescription.trim() || undefined,
+        amount: editAmount,
+      })
+      setEditingId(null)
+      toast.success("Gasto actualizado")
+    } catch {
+      toast.error("Error al actualizar gasto")
+    }
+  }
+
   const handleDeleteExpense = async (id: string, category: string) => {
     const confirmed = await confirm({
       title: "Eliminar gasto",
@@ -137,7 +187,7 @@ export default function ReportsPage() {
     }
   }
 
-  const isLoading = ordersLoading || expensesLoading
+  const isLoading = reportLoading || expensesLoading
 
   return (
     <div className="space-y-4 lg:space-y-6">
@@ -180,7 +230,12 @@ export default function ReportsPage() {
             Gastos
           </div>
           <p className="mt-1 text-lg font-bold text-red-600">{formatCurrency(totalGastos)}</p>
-          <p className="text-xs text-muted-foreground">{expenses.length} gastos</p>
+          <p className="text-xs text-muted-foreground">
+            {totalMaterialCosts > 0 && <span className="text-orange-600">Mat: {formatCurrency(totalMaterialCosts)}</span>}
+            {totalMaterialCosts > 0 && totalManualExpenses > 0 && " + "}
+            {totalManualExpenses > 0 && <span>Otros: {formatCurrency(totalManualExpenses)}</span>}
+            {totalGastos === 0 && "Sin gastos"}
+          </p>
         </div>
         <div className="rounded-lg border bg-background p-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -366,44 +421,170 @@ export default function ReportsPage() {
           Gastos de {monthNames[month - 1]}
         </h2>
 
-        {/* Expenses list */}
-        {expenses.length > 0 && (
-          <div className="overflow-x-auto rounded-lg border">
-            <table className="w-full text-sm">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  <th className="px-3 py-2 text-left font-medium">Categoría</th>
-                  <th className="px-3 py-2 text-left font-medium hidden sm:table-cell">Descripción</th>
-                  <th className="px-3 py-2 text-right font-medium">Monto</th>
-                  <th className="px-3 py-2 w-10" />
-                </tr>
-              </thead>
-              <tbody>
-                {expenses.map((e) => (
-                  <tr key={e.id} className="border-b last:border-0 hover:bg-muted/30">
-                    <td className="px-3 py-2 font-medium">{e.category}</td>
-                    <td className="px-3 py-2 text-muted-foreground hidden sm:table-cell">{e.description || "-"}</td>
-                    <td className="px-3 py-2 text-right font-semibold text-red-600">{formatCurrency(e.amount)}</td>
-                    <td className="px-3 py-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-destructive hover:text-destructive"
-                        onClick={() => handleDeleteExpense(e.id, e.category)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
+        {/* Material costs from orders */}
+        {materialCosts.length > 0 && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium flex items-center gap-2">
+              <Package className="h-4 w-4 text-orange-600" />
+              Costo de materiales (automático desde pedidos)
+            </h3>
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="w-full text-sm">
+                <thead className="border-b bg-muted/50">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium">Material</th>
+                    <th className="px-3 py-2 text-left font-medium hidden sm:table-cell">Proveedor</th>
+                    <th className="px-3 py-2 text-left font-medium hidden lg:table-cell">Pedido (cliente)</th>
+                    <th className="px-3 py-2 text-right font-medium hidden sm:table-cell">Cant.</th>
+                    <th className="px-3 py-2 text-right font-medium hidden sm:table-cell">P/U</th>
+                    <th className="px-3 py-2 text-right font-medium">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {materialCosts.map((m) => {
+                    const orderGroup = materialCostsByOrder[m.orderId]
+                    return (
+                      <tr key={m.id} className="border-b last:border-0 hover:bg-muted/30">
+                        <td className="px-3 py-2 font-medium">
+                          {m.materialName || m.description || "Material"}
+                        </td>
+                        <td className="px-3 py-2 text-muted-foreground hidden sm:table-cell">
+                          {m.supplierName || "-"}
+                        </td>
+                        <td className="px-3 py-2 text-muted-foreground hidden lg:table-cell">
+                          {orderGroup?.clientName || "-"}
+                        </td>
+                        <td className="px-3 py-2 text-right hidden sm:table-cell">{m.quantity}</td>
+                        <td className="px-3 py-2 text-right hidden sm:table-cell">{formatCurrency(m.unitPrice)}</td>
+                        <td className="px-3 py-2 text-right font-semibold text-orange-600">
+                          {formatCurrency(m.subtotal)}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  <tr className="bg-muted/50 font-semibold">
+                    <td colSpan={5} className="px-3 py-2">Subtotal materiales</td>
+                    <td className="px-3 py-2 text-right text-orange-600">
+                      {formatCurrency(totalMaterialCosts)}
                     </td>
                   </tr>
-                ))}
-                <tr className="bg-muted/50 font-semibold">
-                  <td className="px-3 py-2">Total Gastos</td>
-                  <td className="hidden sm:table-cell" />
-                  <td className="px-3 py-2 text-right text-red-600">{formatCurrency(totalGastos)}</td>
-                  <td />
-                </tr>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Manual expenses list */}
+        {expenses.length > 0 && (
+          <div className="space-y-2">
+            {materialCosts.length > 0 && (
+              <h3 className="text-sm font-medium">Gastos manuales</h3>
+            )}
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="w-full text-sm">
+                <thead className="border-b bg-muted/50">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium">Categoría</th>
+                    <th className="px-3 py-2 text-left font-medium hidden sm:table-cell">Descripción</th>
+                    <th className="px-3 py-2 text-right font-medium">Monto</th>
+                    <th className="px-3 py-2 w-10" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {expenses.map((e) =>
+                    editingId === e.id ? (
+                      <tr key={e.id} className="border-b last:border-0 bg-muted/20">
+                        <td className="px-2 py-1">
+                          <Input
+                            className="h-8 text-sm"
+                            value={editCategory}
+                            onChange={(ev) => setEditCategory(ev.target.value)}
+                          />
+                        </td>
+                        <td className="px-2 py-1 hidden sm:table-cell">
+                          <Input
+                            className="h-8 text-sm"
+                            value={editDescription}
+                            onChange={(ev) => setEditDescription(ev.target.value)}
+                            placeholder="Descripción"
+                          />
+                        </td>
+                        <td className="px-2 py-1">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            className="h-8 text-sm text-right"
+                            value={editAmount}
+                            onChange={(ev) => setEditAmount(ev.target.value)}
+                          />
+                        </td>
+                        <td className="px-2 py-1">
+                          <div className="flex gap-0.5">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-green-600 hover:text-green-600"
+                              onClick={handleSaveExpense}
+                              disabled={updateExpense.isPending}
+                            >
+                              <Check className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              onClick={cancelEditing}
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr key={e.id} className="border-b last:border-0 hover:bg-muted/30">
+                        <td className="px-3 py-2 font-medium">{e.category}</td>
+                        <td className="px-3 py-2 text-muted-foreground hidden sm:table-cell">{e.description || "-"}</td>
+                        <td className="px-3 py-2 text-right font-semibold text-red-600">{formatCurrency(e.amount)}</td>
+                        <td className="px-3 py-2">
+                          <div className="flex gap-0.5">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              onClick={() => startEditing(e)}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteExpense(e.id, e.category)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                  <tr className="bg-muted/50 font-semibold">
+                    <td className="px-3 py-2">Subtotal gastos manuales</td>
+                    <td className="hidden sm:table-cell" />
+                    <td className="px-3 py-2 text-right text-red-600">{formatCurrency(totalManualExpenses)}</td>
+                    <td />
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Total gastos combined */}
+        {(expenses.length > 0 || materialCosts.length > 0) && (
+          <div className="rounded-lg border bg-red-50 dark:bg-red-950/20 p-3 flex justify-between items-center">
+            <span className="font-semibold">Total gastos del mes</span>
+            <span className="text-lg font-bold text-red-600">{formatCurrency(totalGastos)}</span>
           </div>
         )}
 

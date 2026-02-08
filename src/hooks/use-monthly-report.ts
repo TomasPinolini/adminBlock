@@ -20,6 +20,23 @@ interface MonthlyOrder {
   clientCuit: string | null
 }
 
+export interface MaterialCost {
+  id: string
+  orderId: string
+  lineType: string
+  materialName: string | null
+  supplierName: string | null
+  description: string | null
+  quantity: string
+  unitPrice: string
+  subtotal: string
+}
+
+interface MonthlyReportResponse {
+  orders: MonthlyOrder[]
+  materialCosts: MaterialCost[]
+}
+
 interface MonthlyExpense {
   id: string
   year: number
@@ -45,12 +62,12 @@ interface UpdateExpenseData {
   amount?: string
 }
 
-export function useMonthlyOrders(year: number, month: number) {
-  return useQuery<MonthlyOrder[]>({
-    queryKey: ["monthly-orders", year, month],
+export function useMonthlyReport(year: number, month: number) {
+  return useQuery<MonthlyReportResponse>({
+    queryKey: ["monthly-report", year, month],
     queryFn: async () => {
       const res = await fetch(`/api/reports/monthly?year=${year}&month=${month}`)
-      if (!res.ok) throw new Error("Error al obtener pedidos del mes")
+      if (!res.ok) throw new Error("Error al obtener reporte del mes")
       return res.json()
     },
     enabled: !!year && !!month,

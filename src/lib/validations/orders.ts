@@ -72,15 +72,15 @@ export const createOrderSchema = z.object({
 export const updateOrderSchema = z.object({
   serviceType: z.string().min(1).optional(),
   status: z.enum(orderStatuses).optional(),
-  description: z.string().min(1).optional(),
-  price: z.string().optional(),
-  dueDate: z.string().optional(),
+  description: z.string().min(1).nullable().optional(),
+  price: z.string().nullable().optional(),
+  dueDate: z.string().nullable().optional(),
   // Invoice fields
-  invoiceNumber: z.string().optional(),
-  invoiceType: z.enum(invoiceTypes).optional(),
-  quantity: z.string().optional(),
-  subtotal: z.string().optional(),
-  taxAmount: z.string().optional(),
+  invoiceNumber: z.string().nullable().optional(),
+  invoiceType: z.enum(invoiceTypes).nullable().optional(),
+  quantity: z.string().nullable().optional(),
+  subtotal: z.string().nullable().optional(),
+  taxAmount: z.string().nullable().optional(),
 })
 
 export const createCommentSchema = z.object({
