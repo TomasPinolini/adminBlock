@@ -34,7 +34,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#2ea3f2",
+  themeColor: "#1a1a2e",
 }
 
 export default function RootLayout({
@@ -43,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

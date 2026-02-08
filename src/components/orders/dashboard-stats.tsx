@@ -23,9 +23,9 @@ interface StatCardProps {
 function StatCard({ label, value, icon, variant = "default", onClick }: StatCardProps) {
   const variantStyles = {
     default: "bg-card border border-border",
-    warning: "bg-orange-50 border-orange-200 dark:bg-orange-950/30 dark:border-orange-800/50",
-    success: "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800/50",
-    info: "bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800/50",
+    warning: "bg-orange-50 border-orange-200 dark:bg-orange-950/40 dark:border-orange-700/40",
+    success: "bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-700/40",
+    info: "bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-700/40",
   }
 
   const iconStyles = {
