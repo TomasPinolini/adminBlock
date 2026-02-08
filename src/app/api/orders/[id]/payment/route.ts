@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server"
 import { sendWhatsAppBackground, whatsappTemplates } from "@/lib/whatsapp"
 import { isPaymentNotificationEnabled } from "@/lib/settings"
 import { logApiError } from "@/lib/logger"
+import { logActivity } from "@/lib/activity"
 import type { PaymentStatus } from "@/lib/db/schema"
 
 export async function POST(
@@ -104,6 +105,19 @@ export async function POST(
       })
       .where(eq(orders.id, id))
       .returning()
+
+    // Log activity
+    const supabaseAuth = await createClient()
+    const { data: { user } } = await supabaseAuth.auth.getUser()
+    await logActivity({
+      type: "payment_registered",
+      userId: user?.id,
+      userEmail: user?.email,
+      entityType: "order",
+      entityId: id,
+      description: `Pago registrado: $${paidAmount.toLocaleString("es-AR")} (${paymentStatus === "paid" ? "pagado" : "parcial"})`,
+      metadata: { amount: paidAmount, totalPaid, paymentStatus },
+    })
 
     // Return validation info
     const amountMatch = totalPaid >= orderPrice

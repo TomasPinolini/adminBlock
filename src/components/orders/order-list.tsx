@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
-import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone } from "lucide-react"
+import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -32,6 +32,7 @@ import { useServices } from "@/hooks/use-services"
 import type { OrderStatus, PaymentStatus, Service } from "@/lib/db/schema"
 import { PaymentModal } from "./payment-modal"
 import { EditOrderModal } from "./edit-order-modal"
+import { ActivityModal } from "./activity-modal"
 import { cn } from "@/lib/utils"
 
 const statusVariants: Record<OrderStatus, "pending" | "info" | "warning" | "success" | "secondary" | "destructive"> = {
@@ -60,9 +61,10 @@ interface OrderCardProps {
   order: OrderWithClient
   onPayment: (order: OrderWithClient) => void
   onEdit: (order: OrderWithClient) => void
+  onHistory: (order: OrderWithClient) => void
 }
 
-function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
+function OrderCard({ order, onPayment, onEdit, onHistory }: OrderCardProps) {
   const { confirm, ConfirmDialog } = useConfirmDialog()
   const { data: services = [] } = useServices()
   const updateOrder = useUpdateOrder()
@@ -332,6 +334,10 @@ function OrderCard({ order, onPayment, onEdit }: OrderCardProps) {
                 <Edit className="mr-2 h-4 w-4" />
                 Editar
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onHistory(order)}>
+                <History className="mr-2 h-4 w-4" />
+                Historial
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDuplicate} disabled={duplicateOrder.isPending}>
                 <Copy className="mr-2 h-4 w-4" />
                 {duplicateOrder.isPending ? "Duplicando..." : "Duplicar"}
@@ -373,6 +379,7 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
   const { statusFilter, serviceFilter, quickFilter, showArchived } = useUIStore()
   const [paymentOrder, setPaymentOrder] = useState<OrderWithClient | null>(null)
   const [editingOrder, setEditingOrder] = useState<OrderWithClient | null>(null)
+  const [historyOrder, setHistoryOrder] = useState<OrderWithClient | null>(null)
 
   const { data: orders = [], isLoading, error } = useOrders({
     status: statusFilter !== "all" ? statusFilter : undefined,
@@ -460,6 +467,7 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
             order={order}
             onPayment={setPaymentOrder}
             onEdit={setEditingOrder}
+            onHistory={setHistoryOrder}
           />
         ))}
       </div>
@@ -474,6 +482,13 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
         order={editingOrder}
         open={!!editingOrder}
         onOpenChange={(open) => !open && setEditingOrder(null)}
+      />
+
+      <ActivityModal
+        orderId={historyOrder?.id ?? null}
+        orderLabel={historyOrder?.client?.name}
+        open={!!historyOrder}
+        onOpenChange={(open) => !open && setHistoryOrder(null)}
       />
     </>
   )
