@@ -1,4 +1,12 @@
 import { z } from "zod"
+import {
+  sanitize,
+  numericString,
+  numericStringNullable,
+  MAX_TEXT_SHORT,
+  MAX_TEXT_MEDIUM,
+  MAX_TEXT_LONG,
+} from "@/lib/utils/validation"
 
 // Legacy service types - kept for backward compatibility
 // Services are now dynamic and loaded from the database
@@ -57,35 +65,35 @@ export const orderStatusLabels: Record<(typeof orderStatuses)[number], string> =
 export const createOrderSchema = z.object({
   clientId: z.string().uuid("Cliente inválido"),
   personId: z.string().uuid().optional().nullable(),
-  serviceType: z.string().min(1, "Tipo de servicio requerido"),
-  description: z.string().min(1, "Descripción requerida"),
-  price: z.string().optional(),
-  dueDate: z.string().optional(),
+  serviceType: z.string().min(1, "Tipo de servicio requerido").max(MAX_TEXT_SHORT),
+  description: z.string().min(1, "Descripción requerida").max(MAX_TEXT_MEDIUM).transform(sanitize),
+  price: numericString.optional(),
+  dueDate: z.string().max(20).optional(),
   // Invoice fields
-  invoiceNumber: z.string().optional(),
+  invoiceNumber: z.string().max(50).optional(),
   invoiceType: z.enum(invoiceTypes).optional(),
-  quantity: z.string().optional(),
-  subtotal: z.string().optional(),
-  taxAmount: z.string().optional(),
+  quantity: numericString.optional(),
+  subtotal: numericString.optional(),
+  taxAmount: numericString.optional(),
 })
 
 export const updateOrderSchema = z.object({
-  serviceType: z.string().min(1).optional(),
+  serviceType: z.string().min(1).max(MAX_TEXT_SHORT).optional(),
   status: z.enum(orderStatuses).optional(),
-  description: z.string().min(1).nullable().optional(),
-  price: z.string().nullable().optional(),
-  dueDate: z.string().nullable().optional(),
+  description: z.string().min(1).max(MAX_TEXT_MEDIUM).transform(sanitize).nullable().optional(),
+  price: numericStringNullable.optional(),
+  dueDate: z.string().max(20).nullable().optional(),
   // Invoice fields
-  invoiceNumber: z.string().nullable().optional(),
+  invoiceNumber: z.string().max(50).nullable().optional(),
   invoiceType: z.enum(invoiceTypes).nullable().optional(),
-  quantity: z.string().nullable().optional(),
-  subtotal: z.string().nullable().optional(),
-  taxAmount: z.string().nullable().optional(),
+  quantity: numericStringNullable.optional(),
+  subtotal: numericStringNullable.optional(),
+  taxAmount: numericStringNullable.optional(),
 })
 
 export const createCommentSchema = z.object({
   orderId: z.string().uuid(),
-  content: z.string().min(1, "El comentario no puede estar vacio"),
+  content: z.string().min(1, "El comentario no puede estar vacio").max(MAX_TEXT_LONG).transform(sanitize),
 })
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>

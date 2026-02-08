@@ -4,12 +4,13 @@ import { services } from "@/lib/db/schema"
 import { z } from "zod"
 import { eq } from "drizzle-orm"
 import { logApiError } from "@/lib/logger"
+import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validation"
 
 const updateServiceSchema = z.object({
-  name: z.string().min(1).toLowerCase().optional(),
-  displayName: z.string().min(1).optional(),
-  description: z.string().optional().nullable(),
-  sortOrder: z.number().optional(),
+  name: z.string().min(1).max(MAX_TEXT_SHORT).toLowerCase().optional(),
+  displayName: z.string().min(1).max(MAX_TEXT_SHORT).transform(sanitize).optional(),
+  description: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional().nullable(),
+  sortOrder: z.number().int().min(0).max(999).optional(),
   isActive: z.boolean().optional(),
 })
 

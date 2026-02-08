@@ -4,11 +4,12 @@ import { materials } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 import { logApiError } from "@/lib/logger"
+import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validation"
 
 const createMaterialSchema = z.object({
-  name: z.string().min(1, "Nombre requerido"),
-  unit: z.string().min(1, "Unidad requerida"),
-  notes: z.string().optional(),
+  name: z.string().min(1, "Nombre requerido").max(MAX_TEXT_SHORT).transform(sanitize),
+  unit: z.string().min(1, "Unidad requerida").max(50),
+  notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
 })
 
 export async function GET() {

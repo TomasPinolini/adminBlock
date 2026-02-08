@@ -4,10 +4,14 @@ import { supplierMaterials } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 import { logApiError } from "@/lib/logger"
+import { sanitize, MAX_TEXT_MEDIUM } from "@/lib/utils/validation"
 
 const updateSupplierMaterialSchema = z.object({
-  currentPrice: z.string().or(z.number()).transform(String).optional(),
-  notes: z.string().optional().nullable(),
+  currentPrice: z.string().or(z.number()).transform(String).refine(
+    (val) => { const n = parseFloat(val); return Number.isFinite(n) && n >= 0 },
+    { message: "Precio debe ser un número válido (≥ 0)" }
+  ).optional(),
+  notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional().nullable(),
 })
 
 export async function PATCH(

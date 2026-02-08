@@ -6,7 +6,10 @@ import { z } from "zod"
 import { logApiError } from "@/lib/logger"
 
 const updateServiceMaterialSchema = z.object({
-  defaultQuantity: z.string().or(z.number()).transform(String).optional(),
+  defaultQuantity: z.string().or(z.number()).transform(String).refine(
+    (val) => { const n = parseFloat(val); return Number.isFinite(n) && n >= 0 },
+    { message: "Cantidad debe ser un número válido (≥ 0)" }
+  ).optional(),
   isRequired: z.boolean().optional(),
 })
 

@@ -4,12 +4,13 @@ import { services } from "@/lib/db/schema"
 import { z } from "zod"
 import { asc, eq } from "drizzle-orm"
 import { logApiError } from "@/lib/logger"
+import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validation"
 
 const createServiceSchema = z.object({
-  name: z.string().min(1, "Nombre requerido").toLowerCase(),
-  displayName: z.string().min(1, "Nombre de visualización requerido"),
-  description: z.string().optional(),
-  sortOrder: z.number().optional(),
+  name: z.string().min(1, "Nombre requerido").max(MAX_TEXT_SHORT).toLowerCase(),
+  displayName: z.string().min(1, "Nombre de visualización requerido").max(MAX_TEXT_SHORT).transform(sanitize),
+  description: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
+  sortOrder: z.number().int().min(0).max(999).optional(),
 })
 
 export async function GET() {

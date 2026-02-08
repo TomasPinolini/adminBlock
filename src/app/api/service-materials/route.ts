@@ -4,11 +4,15 @@ import { serviceMaterials, materials } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 import { logApiError } from "@/lib/logger"
+import { MAX_TEXT_SHORT } from "@/lib/utils/validation"
 
 const createServiceMaterialSchema = z.object({
-  serviceType: z.string().min(1, "Tipo de servicio requerido"),
+  serviceType: z.string().min(1, "Tipo de servicio requerido").max(MAX_TEXT_SHORT),
   materialId: z.string().uuid("ID de material inválido"),
-  defaultQuantity: z.string().or(z.number()).transform(String).optional(),
+  defaultQuantity: z.string().or(z.number()).transform(String).refine(
+    (val) => { const n = parseFloat(val); return Number.isFinite(n) && n >= 0 },
+    { message: "Cantidad debe ser un número válido (≥ 0)" }
+  ).optional(),
   isRequired: z.boolean().optional(),
 })
 

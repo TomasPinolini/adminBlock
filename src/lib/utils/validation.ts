@@ -1,4 +1,67 @@
 // Runtime validation utilities
+import { z } from "zod"
+
+// ─── Text Sanitization ──────────────────────────────────────────────
+
+/**
+ * Strip HTML tags and trim whitespace to prevent XSS in stored text.
+ * Does NOT strip markdown or normal punctuation — only HTML-like tags.
+ */
+export function sanitizeText(input: string): string {
+  return input
+    .replace(/<[^>]*>/g, "") // strip HTML tags
+    .replace(/javascript:/gi, "") // strip JS protocol
+    .replace(/on\w+\s*=/gi, "") // strip inline event handlers
+    .trim()
+}
+
+/**
+ * Zod transform that sanitizes a string. Use with .transform(sanitize).
+ */
+export function sanitize(val: string): string {
+  return sanitizeText(val)
+}
+
+// ─── Numeric Validation ──────────────────────────────────────────────
+
+/**
+ * Parse a value to a finite non-NaN number. Returns 0 for invalid input.
+ */
+export function safeParseNumber(value: unknown): number {
+  const num = typeof value === "string" ? parseFloat(value) : Number(value)
+  if (!Number.isFinite(num)) return 0
+  return num
+}
+
+/**
+ * Zod schema for a numeric string (e.g. "123.45").
+ * Rejects NaN, Infinity, and negative values.
+ */
+export const numericString = z
+  .string()
+  .refine(
+    (val) => { const n = parseFloat(val); return Number.isFinite(n) && n >= 0 },
+    { message: "Debe ser un número válido (≥ 0)" }
+  )
+
+/**
+ * Zod schema for a numeric string that also allows null (for update schemas).
+ */
+export const numericStringNullable = z
+  .string()
+  .refine(
+    (val) => { const n = parseFloat(val); return Number.isFinite(n) && n >= 0 },
+    { message: "Debe ser un número válido (≥ 0)" }
+  )
+  .nullable()
+
+// ─── Shared field constraints ────────────────────────────────────────
+
+export const MAX_TEXT_SHORT = 200  // names, categories, roles
+export const MAX_TEXT_MEDIUM = 500 // descriptions, notes
+export const MAX_TEXT_LONG = 2000  // comments, long notes
+
+// ─── Type Guards ─────────────────────────────────────────────────────
 
 /**
  * Valid invoice types

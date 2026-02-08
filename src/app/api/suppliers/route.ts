@@ -4,12 +4,13 @@ import { suppliers } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 import { logApiError } from "@/lib/logger"
+import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validation"
 
 const createSupplierSchema = z.object({
-  name: z.string().min(1, "Nombre requerido"),
-  phone: z.string().optional(),
-  address: z.string().optional(),
-  notes: z.string().optional(),
+  name: z.string().min(1, "Nombre requerido").max(MAX_TEXT_SHORT).transform(sanitize),
+  phone: z.string().max(30).optional(),
+  address: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
+  notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
 })
 
 export async function GET() {

@@ -7,32 +7,42 @@ export const IVA_RATE = 0.21 // 21% IVA in Argentina
 export type InvoiceType = "A" | "B" | "none"
 
 /**
+ * Ensure a value is a finite non-negative number. Returns 0 for invalid input.
+ */
+function safeNum(value: number): number {
+  if (!Number.isFinite(value) || value < 0) return 0
+  return value
+}
+
+/**
  * Calculate IVA amount from subtotal
  */
 export function calculateIVA(subtotal: number): number {
-  return subtotal * IVA_RATE
+  return safeNum(subtotal) * IVA_RATE
 }
 
 /**
  * Calculate total from subtotal (subtotal + IVA)
  */
 export function calculateTotal(subtotal: number): number {
-  return subtotal + calculateIVA(subtotal)
+  const s = safeNum(subtotal)
+  return s + s * IVA_RATE
 }
 
 /**
  * Calculate subtotal from total (reverse calculation)
  */
 export function calculateSubtotalFromTotal(total: number): number {
-  return total / (1 + IVA_RATE)
+  return safeNum(total) / (1 + IVA_RATE)
 }
 
 /**
  * Calculate IVA from total (reverse calculation)
  */
 export function calculateIVAFromTotal(total: number): number {
-  const subtotal = calculateSubtotalFromTotal(total)
-  return total - subtotal
+  const t = safeNum(total)
+  const subtotal = t / (1 + IVA_RATE)
+  return t - subtotal
 }
 
 /**
@@ -44,7 +54,7 @@ export function formatCurrency(amount: number): string {
     currency: "ARS",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount)
+  }).format(safeNum(amount))
 }
 
 /**
@@ -58,21 +68,23 @@ export function calculateInvoiceBreakdown(
   taxAmount: number
   total: number
 } {
+  const p = safeNum(price)
+
   if (invoiceType === "A") {
     // Factura A: price is the total, need to extract IVA
-    const subtotal = calculateSubtotalFromTotal(price)
-    const taxAmount = calculateIVAFromTotal(price)
+    const subtotal = p / (1 + IVA_RATE)
+    const taxAmount = p - subtotal
     return {
       subtotal,
       taxAmount,
-      total: price,
+      total: p,
     }
   } else {
-    // Factura B or none: price is the final amount (no IVA breakdown)
+    // Factura B/C or none: price is the final amount (no IVA breakdown)
     return {
-      subtotal: price,
+      subtotal: p,
       taxAmount: 0,
-      total: price,
+      total: p,
     }
   }
 }

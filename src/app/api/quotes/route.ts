@@ -4,26 +4,32 @@ import { quotes, quoteMaterials, materials, suppliers, clients } from "@/lib/db/
 import { eq, desc } from "drizzle-orm"
 import { z } from "zod"
 import { logApiError } from "@/lib/logger"
+import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validation"
+
+const positiveNumStr = z.string().or(z.number()).transform(String).refine(
+  (val) => { const n = parseFloat(val); return Number.isFinite(n) && n >= 0 },
+  { message: "Debe ser un número válido (≥ 0)" }
+)
 
 const quoteLineItemSchema = z.object({
   lineType: z.enum(["material", "service"]).default("material"),
   materialId: z.string().uuid().optional(),
-  description: z.string().optional(),
+  description: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
   supplierId: z.string().uuid().optional(),
-  quantity: z.string().or(z.number()).transform(String),
-  unitPrice: z.string().or(z.number()).transform(String),
+  quantity: positiveNumStr,
+  unitPrice: positiveNumStr,
 })
 
 const createQuoteSchema = z.object({
   clientId: z.string().uuid().optional(),
-  serviceType: z.string().optional(),
-  description: z.string().optional(),
-  profitMargin: z.string().or(z.number()).transform(String).optional(),
+  serviceType: z.string().max(MAX_TEXT_SHORT).optional(),
+  description: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
+  profitMargin: positiveNumStr.optional(),
   profitType: z.enum(["fixed", "percentage"]).optional(),
   isOutsourced: z.boolean().optional(),
   outsourcedSupplierId: z.string().uuid().optional(),
-  outsourcedCost: z.string().or(z.number()).transform(String).optional(),
-  materials: z.array(quoteLineItemSchema).optional(),
+  outsourcedCost: positiveNumStr.optional(),
+  materials: z.array(quoteLineItemSchema).max(50).optional(),
 })
 
 export async function GET() {

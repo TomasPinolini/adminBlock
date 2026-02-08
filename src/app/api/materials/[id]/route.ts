@@ -4,11 +4,12 @@ import { materials } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 import { logApiError } from "@/lib/logger"
+import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validation"
 
 const updateMaterialSchema = z.object({
-  name: z.string().min(1).optional(),
-  unit: z.string().min(1).optional(),
-  notes: z.string().optional().nullable(),
+  name: z.string().min(1).max(MAX_TEXT_SHORT).transform(sanitize).optional(),
+  unit: z.string().min(1).max(50).optional(),
+  notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional().nullable(),
   isActive: z.boolean().optional(),
 })
 

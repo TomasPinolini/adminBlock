@@ -4,12 +4,13 @@ import { suppliers } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 import { logApiError } from "@/lib/logger"
+import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validation"
 
 const updateSupplierSchema = z.object({
-  name: z.string().min(1).optional(),
-  phone: z.string().optional().nullable(),
-  address: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
+  name: z.string().min(1).max(MAX_TEXT_SHORT).transform(sanitize).optional(),
+  phone: z.string().max(30).optional().nullable(),
+  address: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional().nullable(),
+  notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional().nullable(),
   isActive: z.boolean().optional(),
 })
 

@@ -1,26 +1,27 @@
 import { z } from "zod"
+import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validation"
 
 export const clientTypeEnum = z.enum(["individual", "company"])
 
 export const createClientSchema = z.object({
   clientType: clientTypeEnum,
-  name: z.string().min(1, "Nombre requerido"),
-  phone: z.string().optional(),
-  instagramHandle: z.string().optional(),
-  cuit: z.string().optional(),
-  notes: z.string().optional(),
+  name: z.string().min(1, "Nombre requerido").max(MAX_TEXT_SHORT).transform(sanitize),
+  phone: z.string().max(30).optional(),
+  instagramHandle: z.string().max(50).optional(),
+  cuit: z.string().max(20).optional(),
+  notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
   // Optional: link individual to a company on creation
   companyId: z.string().uuid().optional().nullable(),
-  role: z.string().optional(),
+  role: z.string().max(MAX_TEXT_SHORT).optional(),
 })
 
 export const updateClientSchema = z.object({
   clientType: clientTypeEnum.optional(),
-  name: z.string().min(1, "Nombre requerido").optional(),
-  phone: z.string().optional(),
-  instagramHandle: z.string().optional(),
-  cuit: z.string().optional(),
-  notes: z.string().optional(),
+  name: z.string().min(1, "Nombre requerido").max(MAX_TEXT_SHORT).transform(sanitize).optional(),
+  phone: z.string().max(30).nullable().optional(),
+  instagramHandle: z.string().max(50).nullable().optional(),
+  cuit: z.string().max(20).nullable().optional(),
+  notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).nullable().optional(),
 })
 
 export const clientTypeLabels: Record<z.infer<typeof clientTypeEnum>, string> = {

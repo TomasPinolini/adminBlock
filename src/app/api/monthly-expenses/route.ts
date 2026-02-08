@@ -4,13 +4,17 @@ import { monthlyExpenses } from "@/lib/db/schema"
 import { eq, and, desc } from "drizzle-orm"
 import { z } from "zod"
 import { logApiError } from "@/lib/logger"
+import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validation"
 
 const createExpenseSchema = z.object({
   year: z.number().int().min(2020).max(2099),
   month: z.number().int().min(1).max(12),
-  category: z.string().min(1),
-  description: z.string().optional(),
-  amount: z.string().or(z.number()).transform(String),
+  category: z.string().min(1).max(MAX_TEXT_SHORT).transform(sanitize),
+  description: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
+  amount: z.string().or(z.number()).transform(String).refine(
+    (val) => { const n = parseFloat(val); return Number.isFinite(n) && n >= 0 },
+    { message: "Monto debe ser un número válido (≥ 0)" }
+  ),
 })
 
 export async function GET(request: NextRequest) {
