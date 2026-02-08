@@ -105,7 +105,7 @@
         - Flechas: navegar entre pedidos
         - Esc: cerrar modales
 
-    17. Exportacion Avanzada
+    17. Exportacion Avanzada  [COMPLETADO]
         - Exportar reporte mensual como Excel (formato IVA AFIP)
         - Exportar libro de IVA ventas/compras
         - Backup completo de datos en JSON/CSV
