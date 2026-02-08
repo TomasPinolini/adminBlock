@@ -18,6 +18,9 @@ import {
   Package,
   TrendingUp,
   TrendingDown,
+  Download,
+  FileSpreadsheet,
+  Database,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,6 +35,7 @@ import {
 } from "@/hooks/use-monthly-report"
 import type { MaterialCost } from "@/hooks/use-monthly-report"
 import { cn } from "@/lib/utils"
+import { exportMonthlyReport, exportLibroIVA, exportBackupJSON } from "@/lib/utils/export"
 
 const monthNames = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -187,6 +191,38 @@ export default function ReportsPage() {
     }
   }
 
+  const handleExportReport = () => {
+    if (!orders.length && !expenses.length && !materialCosts.length) {
+      toast.error("No hay datos para exportar")
+      return
+    }
+    exportMonthlyReport(year, month, orders, materialCosts, expenses, getServiceLabel)
+    toast.success("Reporte exportado")
+  }
+
+  const handleExportIVA = () => {
+    const invoiced = orders.filter((o) => o.invoiceType && o.invoiceType !== "none")
+    if (!invoiced.length) {
+      toast.error("No hay comprobantes con factura en este periodo")
+      return
+    }
+    exportLibroIVA(year, month, orders, getServiceLabel)
+    toast.success("Libro IVA exportado")
+  }
+
+  const handleBackup = async () => {
+    try {
+      toast.info("Generando backup...")
+      const res = await fetch("/api/backup")
+      if (!res.ok) throw new Error("Error")
+      const data = await res.json()
+      exportBackupJSON(data)
+      toast.success("Backup descargado")
+    } catch {
+      toast.error("Error al generar backup")
+    }
+  }
+
   const isLoading = reportLoading || expensesLoading
 
   return (
@@ -201,16 +237,32 @@ export default function ReportsPage() {
             Libro mensual de ventas y gastos
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-lg border bg-background p-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToPrevMonth}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="min-w-[160px] text-center font-semibold text-sm">
-            {monthNames[month - 1]} {year}
-          </span>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToNextMonth}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 rounded-lg border bg-background p-1">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToPrevMonth}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="min-w-[160px] text-center font-semibold text-sm">
+              {monthNames[month - 1]} {year}
+            </span>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToNextMonth}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex gap-1.5">
+            <Button variant="outline" size="sm" onClick={handleExportReport} title="Exportar reporte mensual">
+              <Download className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Reporte</span>
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportIVA} title="Exportar libro IVA ventas">
+              <FileSpreadsheet className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Libro IVA</span>
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleBackup} title="Backup completo de datos">
+              <Database className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Backup</span>
+            </Button>
+          </div>
         </div>
       </div>
 
