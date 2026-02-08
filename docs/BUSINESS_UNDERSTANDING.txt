@@ -204,7 +204,8 @@ WHATSAPP:
   - Recordatorios a clientes: útil para el futuro
 
 FACTURACIÓN:
-  - Por evaluar (no es prioridad inmediata)
+  - ✅ Implementado: Factura A (con IVA 21%), Factura B/C (monotributo), campos en pedidos
+  - Pendiente: Generación de PDFs, integración AFIP
 
 ================================================================================
 6. PROBLEMAS QUE RESUELVE ADMINBLOCK
