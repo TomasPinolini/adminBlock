@@ -28,6 +28,7 @@ import {
 import { useClients, useDeleteClient, type ClientWithStats } from "@/hooks/use-clients"
 import { useUIStore } from "@/stores/ui-store"
 import { getWhatsAppLink, messageTemplates } from "@/lib/utils/messaging"
+import { EmailComposeModal } from "@/components/email-compose-modal"
 import { cn } from "@/lib/utils"
 
 interface LinkedPerson {
@@ -81,7 +82,7 @@ function CompanyEmployees({ companyId }: { companyId: string }) {
   )
 }
 
-function ClientCard({ client }: { client: ClientWithStats }) {
+function ClientCard({ client, onEmail }: { client: ClientWithStats; onEmail: (client: ClientWithStats) => void }) {
   const { confirm, ConfirmDialog } = useConfirmDialog()
   const deleteClient = useDeleteClient()
   const { setEditingClient, setViewingClientOrders } = useUIStore()
@@ -143,14 +144,15 @@ function ClientCard({ client }: { client: ClientWithStats }) {
             </a>
           )}
           {hasEmail && (
-            <a
-              href={`mailto:${client.email}`}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-blue-500 hover:text-blue-500"
+              onClick={() => onEmail(client)}
               title="Email"
             >
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-blue-500 hover:text-blue-500">
-                <Mail className="h-3.5 w-3.5" />
-              </Button>
-            </a>
+              <Mail className="h-3.5 w-3.5" />
+            </Button>
           )}
           <Button
             variant="ghost"
@@ -230,6 +232,7 @@ type ClientTypeFilter = "all" | "individual" | "company"
 export function ClientList({ searchQuery }: { searchQuery: string }) {
   const { data: clients = [], isLoading, error } = useClients()
   const [typeFilter, setTypeFilter] = useState<ClientTypeFilter>("all")
+  const [emailClient, setEmailClient] = useState<ClientWithStats | null>(null)
 
   if (isLoading) {
     return (
@@ -323,9 +326,18 @@ export function ClientList({ searchQuery }: { searchQuery: string }) {
       ) : (
         <div className="space-y-1.5">
           {filtered.map((client) => (
-            <ClientCard key={client.id} client={client} />
+            <ClientCard key={client.id} client={client} onEmail={setEmailClient} />
           ))}
         </div>
+      )}
+
+      {emailClient?.email && (
+        <EmailComposeModal
+          open={!!emailClient}
+          onClose={() => setEmailClient(null)}
+          to={emailClient.email}
+          clientName={emailClient.name}
+        />
       )}
     </div>
   )

@@ -24,7 +24,8 @@ import { useOrders, useUpdateOrder, useDeleteOrder, useDuplicateOrder, useArchiv
 import { useUIStore } from "@/stores/ui-store"
 import { formatDate, formatRelative, isOverdue } from "@/lib/utils/dates"
 import { getWhatsAppLink, messageTemplates } from "@/lib/utils/messaging"
-import { sendEmail, emailTemplates } from "@/lib/utils/email"
+import { emailTemplates } from "@/lib/utils/email"
+import { EmailComposeModal } from "@/components/email-compose-modal"
 import {
   orderStatusLabels,
   orderStatuses,
@@ -63,9 +64,10 @@ interface OrderCardProps {
   onPayment: (order: OrderWithClient) => void
   onEdit: (order: OrderWithClient) => void
   onHistory: (order: OrderWithClient) => void
+  onEmail: (order: OrderWithClient) => void
 }
 
-function OrderCard({ order, onPayment, onEdit, onHistory }: OrderCardProps) {
+function OrderCard({ order, onPayment, onEdit, onHistory, onEmail }: OrderCardProps) {
   const { confirm, ConfirmDialog } = useConfirmDialog()
   const { data: services = [] } = useServices()
   const updateOrder = useUpdateOrder()
@@ -133,31 +135,6 @@ function OrderCard({ order, onPayment, onEdit, onHistory }: OrderCardProps) {
     }
   }
 
-  const getEmailTemplate = () => {
-    switch (order.status) {
-      case "quoted":
-        return order.price
-          ? emailTemplates.quote(clientName, order.serviceType, Number(order.price).toLocaleString("es-AR"))
-          : emailTemplates.thanks(clientName)
-      case "in_progress":
-        return emailTemplates.inProgress(clientName, order.serviceType)
-      case "ready":
-        return emailTemplates.orderReady(clientName, order.serviceType)
-      default:
-        return emailTemplates.thanks(clientName)
-    }
-  }
-
-  const handleSendEmail = async () => {
-    if (!order.client?.email) return
-    const template = getEmailTemplate()
-    const result = await sendEmail({ to: order.client.email, ...template })
-    if (result.success) {
-      toast.success("Email enviado")
-    } else {
-      toast.error(result.error || "Error al enviar email")
-    }
-  }
 
   return (
     <div className="rounded-lg border bg-background p-3 sm:p-4">
@@ -253,7 +230,7 @@ function OrderCard({ order, onPayment, onEdit, onHistory }: OrderCardProps) {
             )}
             {hasEmail && (
               <button
-                onClick={handleSendEmail}
+                onClick={() => onEmail(order)}
                 className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-blue-500 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-white hover:bg-blue-600 transition-colors"
               >
                 <Mail className="h-3.5 w-3.5" />
@@ -405,6 +382,23 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
   const [paymentOrder, setPaymentOrder] = useState<OrderWithClient | null>(null)
   const [editingOrder, setEditingOrder] = useState<OrderWithClient | null>(null)
   const [historyOrder, setHistoryOrder] = useState<OrderWithClient | null>(null)
+  const [emailOrder, setEmailOrder] = useState<OrderWithClient | null>(null)
+
+  const getEmailDefaults = (order: OrderWithClient) => {
+    const name = order.client?.name?.split(" ")[0] || "cliente"
+    switch (order.status) {
+      case "quoted":
+        return order.price
+          ? { subject: emailTemplates.quote(name, order.serviceType, Number(order.price).toLocaleString("es-AR")).subject, body: `La cotización para ${order.serviceType.toLowerCase()} es de $${Number(order.price).toLocaleString("es-AR")}.\n\nAvisame si querés que avancemos.` }
+          : { subject: "", body: "" }
+      case "in_progress":
+        return { subject: emailTemplates.inProgress(name, order.serviceType).subject, body: `Ya estamos trabajando en tu ${order.serviceType.toLowerCase()}.\n\nTe aviso cuando esté listo. ¡Gracias!` }
+      case "ready":
+        return { subject: emailTemplates.orderReady(name, order.serviceType).subject, body: `Tu ${order.serviceType.toLowerCase()} ya está listo para retirar.\n\n¡Te esperamos!` }
+      default:
+        return { subject: "", body: "" }
+    }
+  }
 
   const { data: orders = [], isLoading, error } = useOrders({
     status: statusFilter !== "all" ? statusFilter : undefined,
@@ -493,6 +487,7 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
             onPayment={setPaymentOrder}
             onEdit={setEditingOrder}
             onHistory={setHistoryOrder}
+            onEmail={setEmailOrder}
           />
         ))}
       </div>
@@ -515,6 +510,17 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
         open={!!historyOrder}
         onOpenChange={(open) => !open && setHistoryOrder(null)}
       />
+
+      {emailOrder?.client?.email && (
+        <EmailComposeModal
+          open={!!emailOrder}
+          onClose={() => setEmailOrder(null)}
+          to={emailOrder.client.email}
+          clientName={emailOrder.client.name || "Cliente"}
+          defaultSubject={getEmailDefaults(emailOrder).subject}
+          defaultBody={getEmailDefaults(emailOrder).body}
+        />
+      )}
     </>
   )
 }
