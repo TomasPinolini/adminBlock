@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic"
 import { useState } from "react"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
-import { Plus, Trash2, Copy, Check, FileText, ShoppingCart, Wrench, Package } from "lucide-react"
+import { Plus, Trash2, Copy, Check, FileText, ShoppingCart, Wrench, Package, Search, ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,7 +20,7 @@ import {
 import { useServices } from "@/hooks/use-services"
 import { useMaterials } from "@/hooks/use-materials"
 import { useSuppliers, useSupplierMaterials } from "@/hooks/use-suppliers"
-import { useQuotes, useCreateQuote, useDeleteQuote, useCreateOrderFromQuote } from "@/hooks/use-quotes"
+import { useQuotes, useQuote, useCreateQuote, useDeleteQuote, useCreateOrderFromQuote } from "@/hooks/use-quotes"
 import { useClients } from "@/hooks/use-clients"
 import { logApiError } from "@/lib/logger"
 
@@ -66,6 +66,8 @@ export default function QuotesPage() {
   const [serviceType, setServiceType] = useState("")
   const [description, setDescription] = useState("")
   const [copied, setCopied] = useState(false)
+  const [quoteSearch, setQuoteSearch] = useState("")
+  const [expandedQuoteId, setExpandedQuoteId] = useState<string | null>(null)
 
   // Get supplier materials for price suggestion
   const { data: supplierMaterials = [] } = useSupplierMaterials(
@@ -547,7 +549,18 @@ export default function QuotesPage() {
 
       {/* Quotes List */}
       <div className="space-y-4">
-        <h2 className="font-semibold">Cotizaciones Guardadas</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <h2 className="font-semibold">Cotizaciones Guardadas</h2>
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por cliente..."
+              value={quoteSearch}
+              onChange={(e) => setQuoteSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+        </div>
 
         {quotesLoading ? (
           <div className="space-y-2">
@@ -564,72 +577,140 @@ export default function QuotesPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {quotes.map((quote) => (
+            {quotes
+              .filter((q) => {
+                if (!quoteSearch) return true
+                const search = quoteSearch.toLowerCase()
+                return (
+                  q.clientName?.toLowerCase().includes(search) ||
+                  q.description?.toLowerCase().includes(search) ||
+                  q.supplierName?.toLowerCase().includes(search)
+                )
+              })
+              .map((quote) => (
               <div
                 key={quote.id}
-                className="flex items-center justify-between rounded-lg border bg-background p-4"
+                className="rounded-lg border bg-background p-4"
               >
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    {quote.clientName && (
-                      <span className="font-medium">{quote.clientName}</span>
-                    )}
-                    {quote.serviceType && (
-                      <span className="text-sm text-muted-foreground">
-                        {services.find((s) => s.name === quote.serviceType)?.displayName || quote.serviceType}
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {quote.clientName && (
+                        <span className="font-medium">{quote.clientName}</span>
+                      )}
+                      {quote.serviceType && (
+                        <span className="text-sm text-muted-foreground">
+                          {services.find((s) => s.name === quote.serviceType)?.displayName || quote.serviceType}
+                        </span>
+                      )}
+                      {!quote.clientName && !quote.serviceType && (
+                        <span className="text-muted-foreground">Sin cliente</span>
+                      )}
+                      {quote.isOutsourced && (
+                        <Badge variant="secondary" className="text-xs">Tercerizado</Badge>
+                      )}
+                      {quote.isOutsourced && quote.supplierName && (
+                        <span className="text-xs text-muted-foreground">→ {quote.supplierName}</span>
+                      )}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Costo: ${Number(quote.materialsCost || 0).toLocaleString("es-AR")} |
+                      Ganancia: ${Number(quote.profitMargin || 0).toLocaleString("es-AR")}
+                      {quote.profitType === "percentage" ? "%" : ""}
+                    </div>
+                    <p className="text-lg font-semibold text-primary">
+                      Total: ${Number(quote.totalPrice || 0).toLocaleString("es-AR")}
+                    </p>
+                    {quote.orderId && (
+                      <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 px-2 py-0.5 rounded">
+                        Pedido creado
                       </span>
                     )}
-                    {!quote.clientName && !quote.serviceType && (
-                      <span className="text-muted-foreground">Sin cliente</span>
-                    )}
-                    {quote.isOutsourced && (
-                      <Badge variant="secondary" className="text-xs">Tercerizado</Badge>
-                    )}
-                    {quote.isOutsourced && quote.supplierName && (
-                      <span className="text-xs text-muted-foreground">→ {quote.supplierName}</span>
-                    )}
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    Costo: ${Number(quote.materialsCost || 0).toLocaleString("es-AR")} |
-                    Ganancia: ${Number(quote.profitMargin || 0).toLocaleString("es-AR")}
-                    {quote.profitType === "percentage" ? "%" : ""}
-                  </div>
-                  <p className="text-lg font-semibold text-primary">
-                    Total: ${Number(quote.totalPrice || 0).toLocaleString("es-AR")}
-                  </p>
-                  {quote.orderId && (
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">
-                      Pedido creado
-                    </span>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  {!quote.orderId && quote.clientId && (
+                  <div className="flex items-center gap-2">
+                    {!quote.isOutsourced && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setExpandedQuoteId(expandedQuoteId === quote.id ? null : quote.id)}
+                        title="Ver detalle"
+                      >
+                        {expandedQuoteId === quote.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </Button>
+                    )}
+                    {!quote.orderId && quote.clientId && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCreateOrder(quote.id)}
+                        disabled={createOrderFromQuote.isPending}
+                      >
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        Crear Pedido
+                      </Button>
+                    )}
                     <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleCreateOrder(quote.id)}
-                      disabled={createOrderFromQuote.isPending}
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteQuote(quote.id)}
+                      className="text-destructive hover:text-destructive"
                     >
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      Crear Pedido
+                      <Trash2 className="h-4 w-4" />
                     </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteQuote(quote.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  </div>
                 </div>
+                {expandedQuoteId === quote.id && (
+                  <QuoteDetailPanel quoteId={quote.id} />
+                )}
               </div>
             ))}
           </div>
         )}
       </div>
       <ConfirmDialog />
+    </div>
+  )
+}
+
+function QuoteDetailPanel({ quoteId }: { quoteId: string }) {
+  const { data: detail, isLoading } = useQuote(quoteId)
+
+  if (isLoading) {
+    return <div className="mt-3 h-16 animate-pulse rounded bg-muted" />
+  }
+
+  if (!detail?.materials?.length) {
+    return (
+      <p className="mt-3 text-sm text-muted-foreground">Sin detalle de líneas</p>
+    )
+  }
+
+  return (
+    <div className="mt-3 border-t pt-3">
+      <p className="text-xs font-medium text-muted-foreground mb-2">Detalle de líneas</p>
+      <div className="rounded-lg border divide-y text-sm">
+        {detail.materials.map((m) => (
+          <div key={m.id} className="flex items-center justify-between px-3 py-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <Badge variant={m.lineType === "service" ? "secondary" : "outline"} className="text-xs">
+                  {m.lineType === "service" ? "Servicio" : "Material"}
+                </Badge>
+                <span className="font-medium">
+                  {m.lineType === "material" ? m.materialName : m.description}
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {m.supplierName && <span className="mr-2">Proveedor: {m.supplierName}</span>}
+                {m.quantity} {m.materialUnit || "u."} × ${parseFloat(m.unitPrice).toLocaleString("es-AR")}
+              </div>
+            </div>
+            <span className="font-semibold whitespace-nowrap">
+              ${parseFloat(m.subtotal).toLocaleString("es-AR")}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
