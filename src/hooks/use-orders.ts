@@ -3,7 +3,7 @@ import type { Order, NewOrder, Client } from "@/lib/db/schema"
 import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 
 export interface OrderWithClient extends Order {
-  client: Pick<Client, "id" | "name" | "phone" | "instagramHandle"> | null
+  client: Pick<Client, "id" | "name" | "phone" | "email"> | null
 }
 
 interface FetchOrdersParams {

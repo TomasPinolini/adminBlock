@@ -13,11 +13,6 @@ export function getWhatsAppLink(phone: string, message: string): string {
   return `https://wa.me/${cleanedPhone}?text=${encodedMessage}`
 }
 
-// Generate Instagram DM link
-export function getInstagramLink(handle: string): string {
-  const cleanHandle = handle.replace("@", "")
-  return `https://ig.me/m/${cleanHandle}`
-}
 
 // Message templates - now accepts dynamic service types
 export const messageTemplates = {

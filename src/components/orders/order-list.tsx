@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
-import { MoreVertical, Trash2, MessageCircle, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone, History } from "lucide-react"
+import { MoreVertical, Trash2, MessageCircle, Mail, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -23,7 +23,8 @@ import {
 import { useOrders, useUpdateOrder, useDeleteOrder, useDuplicateOrder, useArchiveOrder, useUnarchiveOrder, type OrderWithClient } from "@/hooks/use-orders"
 import { useUIStore } from "@/stores/ui-store"
 import { formatDate, formatRelative, isOverdue } from "@/lib/utils/dates"
-import { getWhatsAppLink, getInstagramLink, messageTemplates } from "@/lib/utils/messaging"
+import { getWhatsAppLink, messageTemplates } from "@/lib/utils/messaging"
+import { sendEmail, emailTemplates } from "@/lib/utils/email"
 import {
   orderStatusLabels,
   orderStatuses,
@@ -111,7 +112,7 @@ function OrderCard({ order, onPayment, onEdit, onHistory }: OrderCardProps) {
   const overdue = isOverdue(order.dueDate)
   const clientName = order.client?.name?.split(" ")[0] || "cliente"
   const hasPhone = !!order.client?.phone
-  const hasInstagram = !!order.client?.instagramHandle
+  const hasEmail = !!order.client?.email
   const hasPrice = !!order.price && Number(order.price) > 0
   const paymentStatus = (order.paymentStatus || "pending") as PaymentStatus
 
@@ -129,6 +130,32 @@ function OrderCard({ order, onPayment, onEdit, onHistory }: OrderCardProps) {
         return messageTemplates.orderReady(clientName, order.serviceType)
       default:
         return messageTemplates.thanks(clientName)
+    }
+  }
+
+  const getEmailTemplate = () => {
+    switch (order.status) {
+      case "quoted":
+        return order.price
+          ? emailTemplates.quote(clientName, order.serviceType, Number(order.price).toLocaleString("es-AR"))
+          : emailTemplates.thanks(clientName)
+      case "in_progress":
+        return emailTemplates.inProgress(clientName, order.serviceType)
+      case "ready":
+        return emailTemplates.orderReady(clientName, order.serviceType)
+      default:
+        return emailTemplates.thanks(clientName)
+    }
+  }
+
+  const handleSendEmail = async () => {
+    if (!order.client?.email) return
+    const template = getEmailTemplate()
+    const result = await sendEmail({ to: order.client.email, ...template })
+    if (result.success) {
+      toast.success("Email enviado")
+    } else {
+      toast.error(result.error || "Error al enviar email")
     }
   }
 
@@ -224,16 +251,14 @@ function OrderCard({ order, onPayment, onEdit, onHistory }: OrderCardProps) {
                 <span className="hidden sm:inline">WhatsApp</span>
               </a>
             )}
-            {hasInstagram && (
-              <a
-                href={getInstagramLink(order.client!.instagramHandle!)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-white hover:from-purple-600 hover:to-pink-600 transition-colors"
+            {hasEmail && (
+              <button
+                onClick={handleSendEmail}
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-blue-500 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-white hover:bg-blue-600 transition-colors"
               >
-                <Send className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Instagram</span>
-              </a>
+                <Mail className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Email</span>
+              </button>
             )}
             {hasPrice && paymentStatus !== "paid" && (
               <button

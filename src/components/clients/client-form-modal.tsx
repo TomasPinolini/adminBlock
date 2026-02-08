@@ -66,7 +66,7 @@ export function ClientFormModal() {
         clientType: type,
         name: editingClient.name,
         phone: editingClient.phone || "",
-        instagramHandle: editingClient.instagramHandle || "",
+        email: editingClient.email || "",
         cuit: editingClient.cuit || "",
         notes: editingClient.notes || "",
       })
@@ -109,7 +109,7 @@ export function ClientFormModal() {
   }
 
   const handleClose = () => {
-    reset({ clientType: "individual", name: "", phone: "", instagramHandle: "", cuit: "", notes: "" })
+    reset({ clientType: "individual", name: "", phone: "", email: "", cuit: "", notes: "" })
     setClientType("individual")
     setSelectedCompanyId(null)
     setRole("")
@@ -189,14 +189,15 @@ export function ClientFormModal() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="instagramHandle">
-              {clientType === "company" ? "Instagram de la empresa" : "Instagram"}
+            <Label htmlFor="email">
+              {clientType === "company" ? "Email de la empresa" : "Email"}
             </Label>
             <Input
-              id="instagramHandle"
-              placeholder={clientType === "company" ? "@empresa" : "@usuario"}
+              id="email"
+              type="email"
+              placeholder={clientType === "company" ? "empresa@ejemplo.com" : "cliente@ejemplo.com"}
               className="h-11 lg:h-9"
-              {...register("instagramHandle")}
+              {...register("email")}
             />
           </div>
 

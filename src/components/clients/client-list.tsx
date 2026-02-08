@@ -8,7 +8,7 @@ import {
   Trash2,
   Pencil,
   MessageCircle,
-  Send,
+  Mail,
   FileText,
   Building2,
   User,
@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useClients, useDeleteClient, type ClientWithStats } from "@/hooks/use-clients"
 import { useUIStore } from "@/stores/ui-store"
-import { getWhatsAppLink, getInstagramLink, messageTemplates } from "@/lib/utils/messaging"
+import { getWhatsAppLink, messageTemplates } from "@/lib/utils/messaging"
 import { cn } from "@/lib/utils"
 
 interface LinkedPerson {
@@ -35,7 +35,7 @@ interface LinkedPerson {
   personId: string
   companyId: string
   role: string | null
-  person: { id: string; name: string; phone: string | null; instagramHandle: string | null }
+  person: { id: string; name: string; phone: string | null; email: string | null }
 }
 
 function CompanyEmployees({ companyId }: { companyId: string }) {
@@ -101,7 +101,7 @@ function ClientCard({ client }: { client: ClientWithStats }) {
   }
 
   const hasPhone = !!client.phone
-  const hasInstagram = !!client.instagramHandle
+  const hasEmail = !!client.email
   const clientFirstName = client.name.split(" ")[0]
   const totalSpent = Number(client.totalSpent || 0)
   const isCompany = client.clientType === "company"
@@ -142,15 +142,13 @@ function ClientCard({ client }: { client: ClientWithStats }) {
               </Button>
             </a>
           )}
-          {hasInstagram && (
+          {hasEmail && (
             <a
-              href={getInstagramLink(client.instagramHandle!)}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Instagram"
+              href={`mailto:${client.email}`}
+              title="Email"
             >
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-pink-500 hover:text-pink-500">
-                <Send className="h-3.5 w-3.5" />
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-blue-500 hover:text-blue-500">
+                <Mail className="h-3.5 w-3.5" />
               </Button>
             </a>
           )}
@@ -263,7 +261,7 @@ export function ClientList({ searchQuery }: { searchQuery: string }) {
     return (
       client.name.toLowerCase().includes(query) ||
       client.phone?.toLowerCase().includes(query) ||
-      client.instagramHandle?.toLowerCase().includes(query)
+      client.email?.toLowerCase().includes(query)
     )
   })
 

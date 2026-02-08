@@ -3,11 +3,11 @@ import type { ClientRelationship, Client } from "@/lib/db/schema"
 import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 
 export interface RelationshipWithPerson extends ClientRelationship {
-  person: Pick<Client, "id" | "name" | "phone" | "instagramHandle"> | null
+  person: Pick<Client, "id" | "name" | "phone" | "email"> | null
 }
 
 export interface RelationshipWithCompany extends ClientRelationship {
-  company: Pick<Client, "id" | "name" | "phone" | "instagramHandle"> | null
+  company: Pick<Client, "id" | "name" | "phone" | "email"> | null
 }
 
 async function fetchCompanyEmployees(companyId: string): Promise<RelationshipWithPerson[]> {

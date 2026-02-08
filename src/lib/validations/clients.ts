@@ -7,7 +7,7 @@ export const createClientSchema = z.object({
   clientType: clientTypeEnum,
   name: z.string().min(1, "Nombre requerido").max(MAX_TEXT_SHORT).transform(sanitize),
   phone: z.string().max(30).optional(),
-  instagramHandle: z.string().max(50).optional(),
+  email: z.string().email("Email inválido").max(100).optional().or(z.literal("")),
   cuit: z.string().max(20).optional(),
   notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
   // Optional: link individual to a company on creation
@@ -19,7 +19,7 @@ export const updateClientSchema = z.object({
   clientType: clientTypeEnum.optional(),
   name: z.string().min(1, "Nombre requerido").max(MAX_TEXT_SHORT).transform(sanitize).optional(),
   phone: z.string().max(30).nullable().optional(),
-  instagramHandle: z.string().max(50).nullable().optional(),
+  email: z.string().email("Email inválido").max(100).nullable().optional().or(z.literal("")),
   cuit: z.string().max(20).nullable().optional(),
   notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).nullable().optional(),
 })

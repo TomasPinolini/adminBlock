@@ -31,7 +31,7 @@ export async function GET(
           id: clients.id,
           name: clients.name,
           phone: clients.phone,
-          instagramHandle: clients.instagramHandle,
+          email: clients.email,
         },
       })
       .from(orders)

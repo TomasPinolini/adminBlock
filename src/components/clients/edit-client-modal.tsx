@@ -33,7 +33,7 @@ export function EditClientModal({ client, open, onOpenChange }: EditClientModalP
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    instagramHandle: "",
+    email: "",
     cuit: "",
     notes: "",
     clientType: "individual" as "individual" | "company",
@@ -44,7 +44,7 @@ export function EditClientModal({ client, open, onOpenChange }: EditClientModalP
       setFormData({
         name: client.name || "",
         phone: client.phone || "",
-        instagramHandle: client.instagramHandle || "",
+        email: client.email || "",
         cuit: client.cuit || "",
         notes: client.notes || "",
         clientType: client.clientType || "individual",
@@ -62,7 +62,7 @@ export function EditClientModal({ client, open, onOpenChange }: EditClientModalP
         data: {
           name: formData.name,
           phone: formData.phone || null,
-          instagramHandle: formData.instagramHandle || null,
+          email: formData.email || null,
           cuit: formData.cuit || null,
           notes: formData.notes || null,
           clientType: formData.clientType,
@@ -130,12 +130,13 @@ export function EditClientModal({ client, open, onOpenChange }: EditClientModalP
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="instagram">Instagram</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
-              id="instagram"
-              value={formData.instagramHandle}
-              onChange={(e) => setFormData({ ...formData, instagramHandle: e.target.value })}
-              placeholder="@usuario"
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="cliente@ejemplo.com"
             />
           </div>
 

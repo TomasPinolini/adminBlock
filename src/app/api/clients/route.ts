@@ -14,7 +14,7 @@ export async function GET() {
         clientType: clients.clientType,
         name: clients.name,
         phone: clients.phone,
-        instagramHandle: clients.instagramHandle,
+        email: clients.email,
         cuit: clients.cuit,
         notes: clients.notes,
         createdAt: clients.createdAt,

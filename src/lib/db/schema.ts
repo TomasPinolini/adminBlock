@@ -58,7 +58,7 @@ export const clients = pgTable("clients", {
   clientType: clientTypeEnum("client_type").default("individual").notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
-  instagramHandle: text("instagram_handle"),
+  email: text("email"),
   cuit: text("cuit"), // CUIT for invoicing
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

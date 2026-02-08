@@ -112,23 +112,23 @@ ON CONFLICT DO NOTHING;
 -- =============================================
 -- 5. CLIENTES (personas + empresas)
 -- =============================================
-INSERT INTO clients (id, client_type, name, phone, instagram_handle, cuit, notes) VALUES
+INSERT INTO clients (id, client_type, name, phone, email, cuit, notes) VALUES
   -- Empresas
-  ('d0000000-0000-0000-0000-000000000001', 'company', 'Estudio Juridico Fernandez & Asoc.', '3424551100', null, '30-71234567-8', 'Cliente frecuente, facturas A'),
-  ('d0000000-0000-0000-0000-000000000002', 'company', 'Constructora Del Rio SRL', '3424889900', null, '30-70987654-3', 'Planos y documentacion'),
-  ('d0000000-0000-0000-0000-000000000003', 'company', 'Municipalidad de Santa Fe', '3424571000', null, '30-99999999-0', 'Licitaciones, piden factura A'),
-  ('d0000000-0000-0000-0000-000000000004', 'company', 'Clinica San Martin', '3424667788', null, '30-70111222-5', 'Formularios y folletos'),
-  ('d0000000-0000-0000-0000-000000000005', 'company', 'Inmobiliaria Costa', '3424998877', '@inmobiliariacosta', '20-28765432-1', 'Folleteria mensual'),
+  ('d0000000-0000-0000-0000-000000000001', 'company', 'Estudio Juridico Fernandez & Asoc.', '3424551100', 'estudio@fernandezasoc.com.ar', '30-71234567-8', 'Cliente frecuente, facturas A'),
+  ('d0000000-0000-0000-0000-000000000002', 'company', 'Constructora Del Rio SRL', '3424889900', 'admin@constructoradelrio.com', '30-70987654-3', 'Planos y documentacion'),
+  ('d0000000-0000-0000-0000-000000000003', 'company', 'Municipalidad de Santa Fe', '3424571000', 'compras@santafe.gob.ar', '30-99999999-0', 'Licitaciones, piden factura A'),
+  ('d0000000-0000-0000-0000-000000000004', 'company', 'Clinica San Martin', '3424667788', 'admin@clinicasanmartin.com.ar', '30-70111222-5', 'Formularios y folletos'),
+  ('d0000000-0000-0000-0000-000000000005', 'company', 'Inmobiliaria Costa', '3424998877', 'info@inmobiliariacosta.com.ar', '20-28765432-1', 'Folleteria mensual'),
   -- Personas
-  ('d0000000-0000-0000-0000-000000000006', 'individual', 'Maria Laura Gonzalez', '3424112233', '@mlaura.g', null, 'Estudiante de abogacia, tesis'),
-  ('d0000000-0000-0000-0000-000000000007', 'individual', 'Carlos Alberto Pereyra', '3424334455', null, '20-18234567-9', 'Contador, trae trabajo de sus clientes'),
-  ('d0000000-0000-0000-0000-000000000008', 'individual', 'Ana Lucia Martinez', '3424556677', '@analumartinez', null, 'Diseno grafico freelance'),
+  ('d0000000-0000-0000-0000-000000000006', 'individual', 'Maria Laura Gonzalez', '3424112233', 'mlaura.gonzalez@gmail.com', null, 'Estudiante de abogacia, tesis'),
+  ('d0000000-0000-0000-0000-000000000007', 'individual', 'Carlos Alberto Pereyra', '3424334455', 'cpereyra@estudiocontable.com', '20-18234567-9', 'Contador, trae trabajo de sus clientes'),
+  ('d0000000-0000-0000-0000-000000000008', 'individual', 'Ana Lucia Martinez', '3424556677', 'ana.martinez.diseno@gmail.com', null, 'Diseno grafico freelance'),
   ('d0000000-0000-0000-0000-000000000009', 'individual', 'Roberto Sanchez', '3424778899', null, null, 'Jubilado, fotocopias personales'),
-  ('d0000000-0000-0000-0000-000000000010', 'individual', 'Sofia Ramirez', '3424990011', '@sofi.ramirez', null, 'Profesora, muchas fotocopias'),
-  ('d0000000-0000-0000-0000-000000000011', 'individual', 'Pablo Gutierrez', '3424223344', null, '20-32456789-0', 'Arquitecto, planos'),
-  ('d0000000-0000-0000-0000-000000000012', 'individual', 'Valentina Romero', '3424445566', '@vale.romero', null, 'Estudiante de medicina'),
+  ('d0000000-0000-0000-0000-000000000010', 'individual', 'Sofia Ramirez', '3424990011', 'sofi.ramirez@hotmail.com', null, 'Profesora, muchas fotocopias'),
+  ('d0000000-0000-0000-0000-000000000011', 'individual', 'Pablo Gutierrez', '3424223344', 'pgutierrez.arq@gmail.com', '20-32456789-0', 'Arquitecto, planos'),
+  ('d0000000-0000-0000-0000-000000000012', 'individual', 'Valentina Romero', '3424445566', 'vale.romero@outlook.com', null, 'Estudiante de medicina'),
   ('d0000000-0000-0000-0000-000000000013', 'individual', 'Jorge Luis Acosta', '3424667788', null, '20-22334455-7', 'Agrimensor'),
-  ('d0000000-0000-0000-0000-000000000014', 'individual', 'Claudia Vega', '3424889911', '@claudiavega.sf', null, 'Emprendedora, stickers'),
+  ('d0000000-0000-0000-0000-000000000014', 'individual', 'Claudia Vega', '3424889911', 'claudia.vega@gmail.com', null, 'Emprendedora, stickers'),
   ('d0000000-0000-0000-0000-000000000015', 'individual', 'Martin Perez', '3424112244', null, null, 'Estudiante ingenieria')
 ON CONFLICT DO NOTHING;
 

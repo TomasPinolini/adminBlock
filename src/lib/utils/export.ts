@@ -46,7 +46,7 @@ export function exportOrdersToExcel(
     "Fecha": formatDate(order.createdAt),
     "Cliente": order.client?.name ?? "-",
     "Telefono": order.client?.phone ?? "-",
-    "Instagram": order.client?.instagramHandle ?? "-",
+    "Email": order.client?.email ?? "-",
     "Servicio": order.serviceType,
     "Descripcion": order.description ?? "-",
     "Estado": orderStatusLabels[order.status],
@@ -69,7 +69,7 @@ export function exportClientsToExcel(
   const data = clients.map((client) => ({
     "Nombre": client.name,
     "Telefono": client.phone ?? "-",
-    "Instagram": client.instagramHandle ?? "-",
+    "Email": client.email ?? "-",
     "Notas": client.notes ?? "-",
     "Pedidos": client.orderCount ?? 0,
     "Fecha registro": formatDate(client.createdAt),

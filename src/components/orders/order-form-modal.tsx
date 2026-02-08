@@ -114,7 +114,7 @@ export function OrderFormModal() {
                           <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
                         )}
                         {client.name}
-                        {client.instagramHandle && ` (${client.instagramHandle})`}
+                        {client.email && ` (${client.email})`}
                       </span>
                     </SelectItem>
                   ))

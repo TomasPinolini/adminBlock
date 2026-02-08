@@ -13,7 +13,7 @@ export async function GET() {
         name: clients.name,
         clientType: clients.clientType,
         phone: clients.phone,
-        instagramHandle: clients.instagramHandle,
+        email: clients.email,
         notes: clients.notes,
         createdAt: clients.createdAt,
         orderCount: sql<number>`count(${orders.id})::int`,
