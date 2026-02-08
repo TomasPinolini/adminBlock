@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     if (!to || !message) {
       return NextResponse.json(
-        { error: "Missing 'to' or 'message'" },
+        { error: "Faltan los campos 'to' o 'message'" },
         { status: 400 }
       )
     }
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("WhatsApp test error:", error)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error" },
+      { error: error instanceof Error ? error.message : "Error desconocido" },
       { status: 500 }
     )
   }

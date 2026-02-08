@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     if (!companyId && !personId) {
       return NextResponse.json(
-        { error: "companyId o personId requerido" },
+        { error: "ID de empresa o ID de persona requerido" },
         { status: 400 }
       )
     }

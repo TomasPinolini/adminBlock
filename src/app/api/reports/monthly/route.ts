@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     if (!year || !month) {
       return NextResponse.json(
-        { error: "year and month are required" },
+        { error: "Año y mes son requeridos" },
         { status: 400 }
       )
     }

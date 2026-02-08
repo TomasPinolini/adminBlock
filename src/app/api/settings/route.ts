@@ -39,7 +39,7 @@ export async function PATCH(request: NextRequest) {
 
     if (!key || value === undefined) {
       return NextResponse.json(
-        { error: "Key y value son requeridos" },
+        { error: "Clave y valor son requeridos" },
         { status: 400 }
       )
     }

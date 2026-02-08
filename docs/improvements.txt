@@ -4,7 +4,7 @@
 ================================================================================
 
 ================================================================================
-🔴 ALTA PRIORIDAD
+ ALTA PRIORIDAD
 ================================================================================
 
     1. Sistema de Roles y Permisos
@@ -19,105 +19,96 @@
        - Tabla audit_log con userId, action, entity, entityId, changes, timestamp
        - UI para ver historial de actividad por entidad
 
-    3. Validación y Sanitización de Inputs
-       - Validar números negativos/NaN en calculateIVA()
-       - Sanitizar inputs de texto (notes, description) contra XSS
-       - Frontend validation consistente en todos los forms
-
-    4. Estandarizar Mensajes de Error
-       - Mix de español/inglés en errores API
-       - Unificar todo a español con códigos de error consistentes
-
 ================================================================================
-🟡 MEDIA PRIORIDAD
+ MEDIA PRIORIDAD
 ================================================================================
 
-    5. Generación de PDFs
+    3. Generación de PDFs
        - Generar PDF de facturas (Factura A, C) desde pedidos
        - Generar PDF del reporte mensual (ventas + gastos + balance)
        - Librería sugerida: @react-pdf/renderer o jsPDF
 
-    6. Calendario de Entregas
+    4. Calendario de Entregas
        - Vista calendario de pedidos por fecha de entrega (dueDate)
        - Vista semanal y mensual
        - Drag & drop para reprogramar entregas
 
-    7. Dashboard Mejorado
+    5. Dashboard Mejorado
        - Gráficos de ventas vs gastos por mes (tendencia)
        - Top clientes por facturación
        - Servicios más vendidos
        - Comparación mes actual vs mes anterior
        - Librería sugerida: recharts
 
-    8. Operaciones en Lote (Bulk Actions)
+    6. Operaciones en Lote (Bulk Actions)
        - Seleccionar múltiples pedidos → archivar, cambiar estado
        - Seleccionar múltiples clientes → exportar, etiquetar
        - Checkbox en listas + barra de acciones flotante
 
-    9. Búsqueda Global
+    7. Búsqueda Global
        - Barra de búsqueda universal (Ctrl+K / Cmd+K)
        - Buscar en clientes, pedidos, cotizaciones, proveedores
        - Resultados agrupados por tipo con navegación rápida
        - Librería sugerida: cmdk
 
-    10. Gastos Recurrentes
-        - Marcar gastos como recurrentes (mensual: alquiler, EPE, etc.)
-        - Auto-generar gastos recurrentes al inicio de cada mes
-        - Editar/cancelar recurrencia
+    8. Gastos Recurrentes
+       - Marcar gastos como recurrentes (mensual: alquiler, EPE, etc.)
+       - Auto-generar gastos recurrentes al inicio de cada mes
+       - Editar/cancelar recurrencia
 
-    11. IVA Compras (Crédito Fiscal)
-        - Agregar campo taxAmount a order_materials / supplier_materials
-        - Calcular IVA compras mensual automáticamente
-        - Posición IVA mensual: IVA Ventas - IVA Compras = deuda AFIP
-        - Vista en reportes mensuales
+    9. IVA Compras (Crédito Fiscal)
+       - Agregar campo taxAmount a order_materials / supplier_materials
+       - Calcular IVA compras mensual automáticamente
+       - Posición IVA mensual: IVA Ventas - IVA Compras = deuda AFIP
+       - Vista en reportes mensuales
 
 ================================================================================
-🟢 BAJA PRIORIDAD / FUTURO
+ BAJA PRIORIDAD / FUTURO
 ================================================================================
 
-    12. PWA / App Instalable
+    10. PWA / App Instalable
         - Manifest + service worker para instalar en móvil
         - Notificaciones push para cambios de estado de pedidos
         - Offline básico: ver datos cacheados sin conexión
 
-    13. WhatsApp Avanzado
+    11. WhatsApp Avanzado
         - Recibir comprobantes de pago por WhatsApp
         - Asociar PDFs/imágenes a pedidos por teléfono
         - Enviar recordatorios automáticos a clientes que no retiran
         - Resumen diario automático al admin
 
-    14. Portal de Cliente (público)
+    12. Portal de Cliente (público)
         - Link público para que el cliente vea estado de su pedido
         - Sin login, token único por pedido
         - "Tu pedido está: En proceso / Listo para retirar"
 
-    15. Plantillas de Pedidos
+    13. Plantillas de Pedidos
         - Guardar pedidos tipo como templates
         - "Nuevo pedido desde plantilla" → pre-carga datos
         - Útil para pedidos que se repiten (ej: impresiones mensuales)
 
-    16. Historial de Comunicación por Cliente
+    14. Historial de Comunicación por Cliente
         - Log de mensajes enviados (WhatsApp, Instagram)
         - Timeline por cliente: pedidos + mensajes + pagos
         - Notas rápidas por interacción
 
-    17. Notificaciones In-App
+    15. Notificaciones In-App
         - Centro de notificaciones (campanita)
         - Pedidos vencidos, pagos pendientes, entregas hoy
         - Marcar como leída / ver todas
 
-    18. Atajos de Teclado
+    16. Atajos de Teclado
         - Ctrl+K: búsqueda global
         - N: nuevo pedido / cliente según contexto
         - Flechas: navegar entre pedidos
         - Esc: cerrar modales
 
-    19. Exportación Avanzada
+    17. Exportación Avanzada
         - Exportar reporte mensual como Excel (formato IVA AFIP)
         - Exportar libro de IVA ventas/compras
         - Backup completo de datos en JSON/CSV
 
-    20. Integración con AFIP
+    18. Integración con AFIP
         - Factura electrónica automática
         - Consulta de CUIT
         - Generación de CAE
