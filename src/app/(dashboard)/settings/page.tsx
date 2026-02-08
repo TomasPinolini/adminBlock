@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { MessageCircle, Bell, BellOff } from "lucide-react"
+import { MessageCircle, Mail, Bell, BellOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface NotificationSetting {
@@ -10,7 +10,7 @@ interface NotificationSetting {
   description: string
 }
 
-const notificationSettings: NotificationSetting[] = [
+const whatsappSettings: NotificationSetting[] = [
   {
     key: "whatsapp.auto.ready",
     label: "Pedido Listo",
@@ -30,6 +30,29 @@ const notificationSettings: NotificationSetting[] = [
     key: "whatsapp.auto.payment",
     label: "Pago registrado",
     description: "Enviar WhatsApp confirmando el pago recibido",
+  },
+]
+
+const emailSettings: NotificationSetting[] = [
+  {
+    key: "email.auto.ready",
+    label: "Pedido Listo",
+    description: "Enviar email cuando el pedido está listo para retirar",
+  },
+  {
+    key: "email.auto.quoted",
+    label: "Cotización enviada",
+    description: "Enviar email con el presupuesto cuando se cotiza",
+  },
+  {
+    key: "email.auto.in_progress",
+    label: "En proceso",
+    description: "Enviar email cuando el pedido entra en proceso",
+  },
+  {
+    key: "email.auto.payment",
+    label: "Pago registrado",
+    description: "Enviar email confirmando el pago recibido",
   },
 ]
 
@@ -111,7 +134,7 @@ export default function SettingsPage() {
         </p>
 
         <div className="space-y-3">
-          {notificationSettings.map((setting) => {
+          {whatsappSettings.map((setting) => {
             const isEnabled = settings[setting.key] === "true"
             const isSaving = saving === setting.key
 
@@ -148,16 +171,65 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Email Notifications Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Mail className="h-5 w-5 text-blue-500" />
+          <h2 className="text-lg font-semibold">Notificaciones por Email</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Cuando estas opciones están activadas, se envía un email automático
+          al cliente cada vez que ocurre el evento correspondiente.
+        </p>
+
+        <div className="space-y-3">
+          {emailSettings.map((setting) => {
+            const isEnabled = settings[setting.key] === "true"
+            const isSaving = saving === setting.key
+
+            return (
+              <div
+                key={setting.key}
+                className="flex items-center justify-between rounded-lg border bg-background p-4"
+              >
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    {isEnabled ? (
+                      <Bell className="h-4 w-4 text-blue-500" />
+                    ) : (
+                      <BellOff className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    <span className="font-medium">{setting.label}</span>
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {setting.description}
+                  </p>
+                </div>
+                <Button
+                  variant={isEnabled ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => toggleSetting(setting.key)}
+                  disabled={isSaving}
+                  className="ml-4 min-w-[80px]"
+                >
+                  {isSaving ? "..." : isEnabled ? "Activado" : "Desactivado"}
+                </Button>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
       {/* Info Box */}
       <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950">
         <h3 className="font-medium text-blue-900 dark:text-blue-100">
           ¿Cómo funciona?
         </h3>
         <ul className="mt-2 space-y-1 text-sm text-blue-800 dark:text-blue-200">
-          <li>• Los mensajes se envían automáticamente vía Twilio</li>
-          <li>• El cliente debe tener un número de teléfono cargado</li>
-          <li>• Los botones de WhatsApp en cada pedido siguen funcionando siempre</li>
-          <li>• Estas opciones solo controlan el envío automático</li>
+          <li>• Los mensajes se envían automáticamente vía Twilio (WhatsApp) o Resend (Email)</li>
+          <li>• El cliente debe tener teléfono cargado (WhatsApp) o email cargado (Email)</li>
+          <li>• Los botones manuales de WhatsApp y Email en cada pedido siguen funcionando siempre</li>
+          <li>• Estas opciones solo controlan el envío automático al cambiar el estado</li>
         </ul>
       </div>
     </div>

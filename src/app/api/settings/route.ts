@@ -10,6 +10,10 @@ const DEFAULT_SETTINGS = {
   "whatsapp.auto.quoted": "true",
   "whatsapp.auto.in_progress": "false",
   "whatsapp.auto.payment": "true",
+  "email.auto.ready": "false",
+  "email.auto.quoted": "false",
+  "email.auto.in_progress": "false",
+  "email.auto.payment": "false",
 }
 
 export async function GET() {
