@@ -153,6 +153,18 @@ export const activityLogs = pgTable("activity_logs", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
+// Monthly expenses (gastos mensuales)
+export const monthlyExpenses = pgTable("monthly_expenses", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  year: integer("year").notNull(),
+  month: integer("month").notNull(), // 1-12
+  category: text("category").notNull(), // e.g., "IMPUESTOS", "ALQUILER", "EPE", "VISA", etc.
+  description: text("description"),
+  amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
 // App settings (key-value store)
 export const appSettings = pgTable("app_settings", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -454,6 +466,9 @@ export type NewQuote = typeof quotes.$inferInsert
 
 export type QuoteMaterial = typeof quoteMaterials.$inferSelect
 export type NewQuoteMaterial = typeof quoteMaterials.$inferInsert
+
+export type MonthlyExpense = typeof monthlyExpenses.$inferSelect
+export type NewMonthlyExpense = typeof monthlyExpenses.$inferInsert
 
 export type ServiceType = string // Dynamic - loaded from services table
 export type OrderStatus = (typeof orderStatusEnum.enumValues)[number]
