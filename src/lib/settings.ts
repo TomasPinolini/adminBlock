@@ -8,10 +8,8 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   "whatsapp.auto.quoted": "true",
   "whatsapp.auto.in_progress": "false",
   "whatsapp.auto.payment": "true",
-  "email.auto.ready": "false",
   "email.auto.quoted": "false",
-  "email.auto.in_progress": "false",
-  "email.auto.payment": "false",
+  "email.auto.ready": "false",
 }
 
 export async function getSetting(key: string): Promise<string> {
@@ -46,7 +44,3 @@ export async function isEmailAutoEnabled(status: string): Promise<boolean> {
   return value === "true"
 }
 
-export async function isEmailPaymentNotificationEnabled(): Promise<boolean> {
-  const value = await getSetting("email.auto.payment")
-  return value === "true"
-}

@@ -19,6 +19,8 @@ export async function POST(
 
     const paymentAmount = formData.get("paymentAmount") as string
     const receipt = formData.get("receipt") as File | null
+    const invoiceType = (formData.get("invoiceType") as string) || "none"
+    const invoiceNumber = formData.get("invoiceNumber") as string | null
 
     if (!paymentAmount) {
       return NextResponse.json(
@@ -93,13 +95,28 @@ export async function POST(
       receiptUrl = urlData.publicUrl
     }
 
-    // Update order with payment info
+    // Calculate IVA breakdown based on invoice type
+    const IVA_RATE = 0.21
+    let subtotal: string | null = null
+    let taxAmount: string | null = null
+
+    if (invoiceType === "A" && orderPrice > 0) {
+      const sub = orderPrice / (1 + IVA_RATE)
+      subtotal = sub.toFixed(2)
+      taxAmount = (orderPrice - sub).toFixed(2)
+    }
+
+    // Update order with payment + invoice info
     const [updatedOrder] = await db
       .update(orders)
       .set({
         paymentStatus,
         paymentAmount: totalPaid.toString(),
         receiptUrl,
+        invoiceType: invoiceType as "A" | "B" | "none",
+        invoiceNumber: invoiceNumber || null,
+        subtotal,
+        taxAmount,
         paidAt: new Date(),
         updatedAt: new Date(),
       })
@@ -115,8 +132,8 @@ export async function POST(
       userEmail: user?.email,
       entityType: "order",
       entityId: id,
-      description: `Pago registrado: $${paidAmount.toLocaleString("es-AR")} (${paymentStatus === "paid" ? "pagado" : "parcial"})`,
-      metadata: { amount: paidAmount, totalPaid, paymentStatus },
+      description: `Pago registrado: $${paidAmount.toLocaleString("es-AR")} (${paymentStatus === "paid" ? "pagado" : "parcial"})${invoiceType !== "none" ? ` - Factura ${invoiceType}${invoiceNumber ? ` #${invoiceNumber}` : ""}` : ""}`,
+      metadata: { amount: paidAmount, totalPaid, paymentStatus, invoiceType, invoiceNumber },
     })
 
     // Return validation info

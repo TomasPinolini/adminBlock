@@ -161,10 +161,14 @@ async function registerPayment({
   orderId,
   paymentAmount,
   receipt,
+  invoiceType,
+  invoiceNumber,
 }: {
   orderId: string
   paymentAmount: number
   receipt?: File
+  invoiceType?: string
+  invoiceNumber?: string
 }): Promise<{
   order: Order
   validation: {
@@ -179,6 +183,12 @@ async function registerPayment({
   formData.append("paymentAmount", paymentAmount.toString())
   if (receipt) {
     formData.append("receipt", receipt)
+  }
+  if (invoiceType) {
+    formData.append("invoiceType", invoiceType)
+  }
+  if (invoiceNumber) {
+    formData.append("invoiceNumber", invoiceNumber)
   }
 
   const res = await fetchWithTimeout(`/api/orders/${orderId}/payment`, {

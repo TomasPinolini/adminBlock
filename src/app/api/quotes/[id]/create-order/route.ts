@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { quotes, quoteMaterials, orders, orderMaterials } from "@/lib/db/schema"
+import { quotes, quoteMaterials, orders, orderMaterials, clients, services } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { logApiError } from "@/lib/logger"
+import { isEmailAutoEnabled } from "@/lib/settings"
 
 export async function POST(
   request: NextRequest,
@@ -81,6 +82,45 @@ export async function POST(
         updatedAt: new Date(),
       })
       .where(eq(quotes.id, id))
+
+    // Send quote email if auto email for quoted is enabled
+    if (quote.clientId && quote.totalPrice) {
+      try {
+        const [client] = await db.select({ name: clients.name, email: clients.email }).from(clients).where(eq(clients.id, quote.clientId)).limit(1)
+        if (client?.email) {
+          const isEnabled = await isEmailAutoEnabled("quoted")
+          if (isEnabled) {
+            const [svc] = await db.select({ displayName: services.displayName }).from(services).where(eq(services.name, newOrder.serviceType)).limit(1)
+            const serviceLabel = svc?.displayName || newOrder.serviceType
+            const clientName = client.name || "Cliente"
+            const priceStr = Number(quote.totalPrice).toLocaleString("es-AR")
+
+            const edgeFnUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-email`
+            fetch(edgeFnUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+              },
+              body: JSON.stringify({
+                to: client.email,
+                subject: `Cotización ${serviceLabel} - AdminBlock`,
+                html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>¡Hola ${clientName}!</h2><p>La cotización para <strong>${serviceLabel.toLowerCase()}</strong> es de:</p><p style="font-size:28px;font-weight:bold;text-align:center;margin:20px 0">$${priceStr}</p><p>Avisame si querés que avancemos.</p><hr style="border:none;border-top:1px solid #eee;margin:20px 0"/><p style="font-size:12px;color:#999">AdminBlock</p></div>`,
+              }),
+            }).then(async (res) => {
+              if (!res.ok) {
+                const body = await res.json().catch(() => null)
+                console.error("[EMAIL] Quote email error:", res.status, body)
+              } else {
+                console.log("[EMAIL] Quote email sent to", client.email)
+              }
+            }).catch((err) => console.error("[EMAIL] Quote email exception:", err))
+          }
+        }
+      } catch (emailErr) {
+        console.error("[EMAIL] Failed to send quote email:", emailErr)
+      }
+    }
 
     return NextResponse.json({
       success: true,

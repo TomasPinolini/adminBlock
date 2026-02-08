@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Upload, Receipt, CheckCircle, AlertTriangle, X } from "lucide-react"
+import { Upload, Receipt, CheckCircle, AlertTriangle, X, FileText } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -11,8 +11,17 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useRegisterPayment, type OrderWithClient } from "@/hooks/use-orders"
 import { cn } from "@/lib/utils"
+
+const IVA_RATE = 0.21
 
 interface PaymentModalProps {
   order: OrderWithClient | null
@@ -24,6 +33,8 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
   const [paymentAmount, setPaymentAmount] = useState("")
   const [receipt, setReceipt] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [invoiceType, setInvoiceType] = useState<"A" | "B" | "none">("none")
+  const [invoiceNumber, setInvoiceNumber] = useState("")
   const [error, setError] = useState("")
   const [validationResult, setValidationResult] = useState<{
     amountMatch: boolean
@@ -78,6 +89,8 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
         orderId: order.id,
         paymentAmount: Number(paymentAmount),
         receipt: receipt || undefined,
+        invoiceType: invoiceType !== "none" ? invoiceType : undefined,
+        invoiceNumber: invoiceNumber || undefined,
       })
 
       setValidationResult(result.validation)
@@ -97,6 +110,8 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
     setPaymentAmount("")
     setReceipt(null)
     setPreviewUrl(null)
+    setInvoiceType("none")
+    setInvoiceNumber("")
     setError("")
     setValidationResult(null)
     onClose()
@@ -169,6 +184,66 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
               </p>
             )}
           </div>
+
+          {/* Invoice Type */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1.5">
+              <FileText className="h-4 w-4" />
+              Tipo de factura
+            </Label>
+            <Select
+              value={invoiceType}
+              onValueChange={(v) => setInvoiceType(v as "A" | "B" | "none")}
+            >
+              <SelectTrigger className="h-11">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Sin factura</SelectItem>
+                <SelectItem value="A">Factura A (discrimina IVA)</SelectItem>
+                <SelectItem value="B">Factura B (consumidor final)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Invoice Number (only if factura selected) */}
+          {invoiceType !== "none" && (
+            <div className="space-y-2">
+              <Label htmlFor="invoiceNumber">Número de factura</Label>
+              <Input
+                id="invoiceNumber"
+                type="text"
+                placeholder="Ej: 0001-00001234"
+                className="h-11"
+                value={invoiceNumber}
+                onChange={(e) => setInvoiceNumber(e.target.value)}
+              />
+            </div>
+          )}
+
+          {/* IVA Breakdown (only for Factura A) */}
+          {invoiceType === "A" && orderPrice > 0 && (
+            <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 p-3 text-sm space-y-1">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Subtotal (sin IVA):</span>
+                <span className="font-medium">
+                  ${(orderPrice / (1 + IVA_RATE)).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">IVA (21%):</span>
+                <span className="font-medium">
+                  ${(orderPrice - orderPrice / (1 + IVA_RATE)).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between border-t pt-1">
+                <span className="text-muted-foreground">Total:</span>
+                <span className="font-bold">
+                  ${orderPrice.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Receipt Upload */}
           <div className="space-y-2">

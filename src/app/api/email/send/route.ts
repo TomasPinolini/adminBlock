@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
 import { logApiError } from "@/lib/logger"
 
 export async function POST(request: NextRequest) {
@@ -13,17 +12,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
-
-    const { data, error } = await supabase.functions.invoke("send-email", {
-      body: { to, subject, html },
+    const edgeFnUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-email`
+    const res = await fetch(edgeFnUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({ to, subject, html }),
     })
 
-    if (error) {
-      console.error("Edge function error:", error)
+    const data = await res.json().catch(() => null)
+
+    if (!res.ok) {
+      console.error("Edge function error:", res.status, data)
       return NextResponse.json(
-        { error: error.message || "Error al enviar email" },
-        { status: 500 }
+        { error: data?.error || "Error al enviar email" },
+        { status: res.status }
       )
     }
 

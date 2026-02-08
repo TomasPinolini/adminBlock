@@ -35,24 +35,14 @@ const whatsappSettings: NotificationSetting[] = [
 
 const emailSettings: NotificationSetting[] = [
   {
+    key: "email.auto.quoted",
+    label: "Cotización enviada",
+    description: "Enviar email con el presupuesto al crear pedido desde cotización",
+  },
+  {
     key: "email.auto.ready",
     label: "Pedido Listo",
     description: "Enviar email cuando el pedido está listo para retirar",
-  },
-  {
-    key: "email.auto.quoted",
-    label: "Cotización enviada",
-    description: "Enviar email con el presupuesto cuando se cotiza",
-  },
-  {
-    key: "email.auto.in_progress",
-    label: "En proceso",
-    description: "Enviar email cuando el pedido entra en proceso",
-  },
-  {
-    key: "email.auto.payment",
-    label: "Pago registrado",
-    description: "Enviar email confirmando el pago recibido",
   },
 ]
 

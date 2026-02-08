@@ -162,51 +162,34 @@ export async function PATCH(
       }
     }
 
-    // Send Email notification for specific status changes
-    if (isStatusChange && currentOrderWithClient?.clientEmail) {
-      const clientName = currentOrderWithClient.clientName || "Cliente"
-      const [svcEmail] = await db.select({ displayName: services.displayName }).from(services).where(eq(services.name, updatedOrder.serviceType)).limit(1)
-      const serviceLabelEmail = svcEmail?.displayName || updatedOrder.serviceType
-      const emailNotifyStatuses = ["ready", "quoted", "in_progress"]
+    // Send Email notification when status changes to "ready"
+    if (isStatusChange && validated.status === "ready" && currentOrderWithClient?.clientEmail) {
+      const isEmailEnabled = await isEmailAutoEnabled("ready")
+      if (isEmailEnabled) {
+        const clientName = currentOrderWithClient.clientName || "Cliente"
+        const [svcEmail] = await db.select({ displayName: services.displayName }).from(services).where(eq(services.name, updatedOrder.serviceType)).limit(1)
+        const serviceLabelEmail = svcEmail?.displayName || updatedOrder.serviceType
 
-      if (emailNotifyStatuses.includes(validated.status!)) {
-        const isEmailEnabled = await isEmailAutoEnabled(validated.status!)
-
-        if (isEmailEnabled) {
-          let emailPayload: { subject: string; html: string } | null = null
-
-          switch (validated.status) {
-            case "ready":
-              emailPayload = {
-                subject: `Tu ${serviceLabelEmail} esta listo - AdminBlock`,
-                html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>¡Hola ${clientName}!</h2><p>Tu <strong>${serviceLabelEmail.toLowerCase()}</strong> ya está listo para retirar.</p><p>¡Te esperamos!</p></div>`,
-              }
-              break
-            case "quoted":
-              if (updatedOrder.price) {
-                const priceStr = Number(updatedOrder.price).toLocaleString("es-AR")
-                emailPayload = {
-                  subject: `Cotizacion ${serviceLabelEmail} - AdminBlock`,
-                  html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>¡Hola ${clientName}!</h2><p>La cotización para <strong>${serviceLabelEmail.toLowerCase()}</strong> es de:</p><p style="font-size:28px;font-weight:bold;text-align:center;margin:20px 0">$${priceStr}</p><p>Avisame si querés que avancemos.</p></div>`,
-                }
-              }
-              break
-            case "in_progress":
-              emailPayload = {
-                subject: `Tu ${serviceLabelEmail} esta en proceso - AdminBlock`,
-                html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>¡Hola ${clientName}!</h2><p>Ya estamos trabajando en tu <strong>${serviceLabelEmail.toLowerCase()}</strong>.</p><p>Te aviso cuando esté listo. ¡Gracias!</p></div>`,
-              }
-              break
+        const edgeFnUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-email`
+        fetch(edgeFnUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            to: currentOrderWithClient.clientEmail,
+            subject: `Tu ${serviceLabelEmail} está listo - AdminBlock`,
+            html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>¡Hola ${clientName}!</h2><p>Tu <strong>${serviceLabelEmail.toLowerCase()}</strong> ya está listo para retirar.</p><p>¡Te esperamos!</p><hr style="border:none;border-top:1px solid #eee;margin:20px 0"/><p style="font-size:12px;color:#999">AdminBlock</p></div>`,
+          }),
+        }).then(async (res) => {
+          if (!res.ok) {
+            const body = await res.json().catch(() => null)
+            console.error("[EMAIL] Ready email error:", res.status, body)
+          } else {
+            console.log("[EMAIL] Ready email sent to", currentOrderWithClient.clientEmail)
           }
-
-          if (emailPayload) {
-            // Send in background, don't block response
-            const supabaseForEmail = await createClient()
-            supabaseForEmail.functions.invoke("send-email", {
-              body: { to: currentOrderWithClient.clientEmail, ...emailPayload },
-            }).catch((err) => console.error("Auto email error:", err))
-          }
-        }
+        }).catch((err) => console.error("[EMAIL] Ready email exception:", err))
       }
     }
 
