@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   "whatsapp.auto.payment": "true",
   "email.auto.quoted": "false",
   "email.auto.ready": "false",
+  "admin.email": "",
 }
 
 export async function getSetting(key: string): Promise<string> {

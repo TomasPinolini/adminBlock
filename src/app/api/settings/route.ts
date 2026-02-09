@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
   "whatsapp.auto.payment": "true",
   "email.auto.quoted": "false",
   "email.auto.ready": "false",
+  "admin.email": "",
 }
 
 export async function GET() {

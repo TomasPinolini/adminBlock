@@ -1,0 +1,146 @@
+===============================================================================
+                ADMINBLOCK - AUTOMATIZACIONES (Edge Functions)
+                Ultima actualizacion: Feb 2026
+===============================================================================
+
+¿QUÉ SON LAS EDGE FUNCTIONS?
+  Son funciones que corren en los servidores de Supabase, separadas de la app.
+  Se ejecutan automáticamente (por horario o por evento) sin necesidad de que
+  nadie esté usando la aplicación. Están escritas en TypeScript/Deno.
+
+¿QUÉ ES pg_cron?
+  Es una extensión de PostgreSQL que permite programar tareas recurrentes,
+  como un "despertador" para la base de datos. Se configura con expresiones
+  cron (ej: "0 3 * * *" = todos los días a las 3am UTC).
+
+¿CÓMO SE CONECTAN?
+  pg_cron (dentro de Postgres) → llama a la Edge Function via HTTP →
+  la función consulta la BD, hace su trabajo, y responde.
+
+===============================================================================
+ AUTOMATIZACIONES ACTIVAS
+===============================================================================
+
+1. AUTO-ARCHIVE (Archivado Automático)
+   ─────────────────────────────────────
+   Archivo: supabase/functions/auto-archive/index.ts
+   Cron:    Todos los días a las 00:00 ART (03:00 UTC)
+
+   ¿Qué hace?
+     Busca pedidos que estén ENTREGADOS + PAGADOS hace más de 30 días
+     y los marca como archivados automáticamente.
+
+   ¿Por qué?
+     Para mantener limpia la lista de pedidos activos sin que nadie
+     tenga que archivar manualmente. Los pedidos archivados siguen
+     existiendo en la BD, solo se ocultan de la vista principal.
+
+   ¿Cómo funciona?
+     1. pg_cron dispara la función a medianoche
+     2. La función busca: status='delivered' AND payment_status='paid'
+        AND is_archived=false AND paid_at < hace 30 días
+     3. Actualiza esos pedidos: is_archived=true, archived_at=ahora
+     4. Responde con la cantidad de pedidos archivados
+
+   SQL del cron: docs/sql/auto-archive-cron.sql
+
+───────────────────────────────────────────────────────────────────────
+
+2. DAILY DIGEST (Resumen Diario por Email)
+   ─────────────────────────────────────────
+   Archivo: supabase/functions/daily-digest/index.ts
+   Cron:    Todos los días a las 08:00 ART (11:00 UTC)
+
+   ¿Qué hace?
+     Envía un email al administrador con el resumen del día:
+     - Pedidos que vencen HOY
+     - Pedidos VENCIDOS (fecha pasada, no entregados)
+     - Pagos PENDIENTES (pedidos con precio pero sin pagar)
+     - Pedidos completados AYER
+
+   ¿Por qué?
+     Para que el admin empiece el día informado sin necesidad de
+     abrir la app. Sabe qué es urgente y qué se completó.
+
+   ¿Cómo funciona?
+     1. pg_cron dispara la función a las 8am ART
+     2. La función consulta la BD para cada categoría
+     3. Arma un email HTML con el resumen
+     4. Lee el email del admin desde app_settings (clave: admin.email)
+     5. Envía el email via Resend (misma API que los emails manuales)
+
+   SQL del cron: docs/sql/daily-digest-cron.sql
+   Configuración: Ajustes → Email del administrador
+
+───────────────────────────────────────────────────────────────────────
+
+3. OVERDUE REMINDERS (Recordatorios de Pedidos Vencidos)
+   ──────────────────────────────────────────────────────
+   Archivo: supabase/functions/overdue-reminders/index.ts
+   Cron:    Todos los días a las 09:00 ART (12:00 UTC)
+
+   ¿Qué hace?
+     Envía un email recordatorio a cada cliente que tenga un pedido
+     vencido (fecha de entrega pasada y no entregado/cancelado).
+
+   ¿Por qué?
+     Para que los clientes no se olviden de retirar sus pedidos,
+     sin que el admin tenga que llamar uno por uno.
+
+   ¿Cómo funciona?
+     1. pg_cron dispara la función a las 9am ART
+     2. La función busca pedidos donde due_date < hoy y no estén
+        entregados, cancelados, ni archivados
+     3. Filtra: solo clientes que tengan email Y que no hayan
+        recibido un recordatorio HOY (campo last_reminder_sent)
+     4. Envía un email personalizado a cada cliente via Resend
+     5. Marca el pedido con last_reminder_sent = hoy para no repetir
+
+   Anti-spam: Solo envía UN recordatorio por día por pedido.
+   SQL del cron: docs/sql/overdue-reminders-cron.sql
+   Columna nueva: orders.last_reminder_sent (date)
+
+===============================================================================
+ EMAILS (Edge Function existente)
+===============================================================================
+
+4. SEND-EMAIL (Envío de Emails)
+   ─────────────────────────────
+   Archivo: supabase/functions/send-email/index.ts
+
+   ¿Qué hace?
+     Envía emails a clientes usando la API de Resend.
+     Se usa para: cotizaciones, avisos de pedido listo, y emails
+     personalizados desde el botón "Email" en cada pedido/cliente.
+
+   ¿Cómo funciona?
+     1. La app (Next.js) llama a esta función con: destinatario,
+        asunto y cuerpo HTML
+     2. La función reenvía a la API de Resend
+     3. Resend entrega el email al destinatario
+
+   Secretos necesarios:
+     - RESEND_API_KEY: clave de la API de Resend
+     - FROM_EMAIL: dirección de envío (requiere dominio verificado)
+
+===============================================================================
+ CÓMO ADMINISTRAR
+===============================================================================
+
+  Ver trabajos programados:
+    SELECT * FROM cron.job;
+
+  Ver historial de ejecuciones:
+    SELECT * FROM cron.job_run_details ORDER BY start_time DESC LIMIT 20;
+
+  Desactivar un trabajo:
+    SELECT cron.unschedule('nombre-del-job');
+
+  Reactivar / crear:
+    Ejecutar el SQL correspondiente en docs/sql/
+
+  Desplegar una función actualizada:
+    Desde el Dashboard de Supabase → Edge Functions → seleccionar función
+    → pegar código actualizado → Deploy
+
+===============================================================================

@@ -1,8 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { MessageCircle, Mail, Bell, BellOff } from "lucide-react"
+import { MessageCircle, Mail, Bell, BellOff, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
 
 interface NotificationSetting {
   key: string
@@ -66,6 +68,26 @@ export default function SettingsPage() {
       console.error("Error fetching settings:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function saveSetting(key: string, value: string) {
+    setSaving(key)
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value }),
+      })
+      if (res.ok) {
+        setSettings((prev) => ({ ...prev, [key]: value }))
+        toast.success("Guardado")
+      }
+    } catch (error) {
+      console.error("Error updating setting:", error)
+      toast.error("Error al guardar")
+    } finally {
+      setSaving(null)
     }
   }
 
@@ -207,6 +229,40 @@ export default function SettingsPage() {
               </div>
             )
           })}
+        </div>
+      </div>
+
+      {/* Admin Email Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <User className="h-5 w-5 text-purple-500" />
+          <h2 className="text-lg font-semibold">Administrador</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Email del administrador para recibir el resumen diario automático.
+        </p>
+
+        <div className="rounded-lg border bg-background p-4">
+          <label className="text-sm font-medium">Email del administrador</label>
+          <p className="text-xs text-muted-foreground mt-1 mb-2">
+            Se usa para enviar el resumen diario (pedidos del día, vencidos, pagos pendientes)
+          </p>
+          <div className="flex gap-2">
+            <Input
+              type="email"
+              placeholder="admin@ejemplo.com"
+              value={settings["admin.email"] || ""}
+              onChange={(e) => setSettings((prev) => ({ ...prev, "admin.email": e.target.value }))}
+              className="max-w-sm"
+            />
+            <Button
+              size="sm"
+              onClick={() => saveSetting("admin.email", settings["admin.email"] || "")}
+              disabled={saving === "admin.email"}
+            >
+              {saving === "admin.email" ? "..." : "Guardar"}
+            </Button>
+          </div>
         </div>
       </div>
 
