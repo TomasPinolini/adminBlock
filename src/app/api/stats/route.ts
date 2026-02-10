@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { orders } from "@/lib/db/schema"
-import { sql, eq, and, gte, lt, notInArray } from "drizzle-orm"
+import { sql, eq, and, gte, lt, notInArray, inArray } from "drizzle-orm"
 import { logApiError } from "@/lib/logger"
 
 export async function GET() {
@@ -82,30 +82,30 @@ export async function GET() {
           )
         ),
 
-      // Revenue this week (delivered orders)
+      // Revenue this week (paid orders)
       db
         .select({ 
-          revenue: sql<number>`coalesce(sum(${orders.price}), 0)::numeric`
+          revenue: sql<number>`coalesce(sum(coalesce(${orders.paymentAmount}, ${orders.price})), 0)::numeric`
         })
         .from(orders)
         .where(
           and(
-            eq(orders.status, "delivered"),
-            gte(orders.updatedAt, weekStart),
+            inArray(orders.paymentStatus, ["paid", "partial"]),
+            gte(sql`coalesce(${orders.paidAt}, ${orders.createdAt})`, weekStart.toISOString()),
             sql`${orders.price} IS NOT NULL`
           )
         ),
 
-      // Revenue this month (delivered orders)
+      // Revenue this month (paid orders)
       db
         .select({
-          revenue: sql<number>`coalesce(sum(${orders.price}), 0)::numeric`
+          revenue: sql<number>`coalesce(sum(coalesce(${orders.paymentAmount}, ${orders.price})), 0)::numeric`
         })
         .from(orders)
         .where(
           and(
-            eq(orders.status, "delivered"),
-            gte(orders.updatedAt, monthStart),
+            inArray(orders.paymentStatus, ["paid", "partial"]),
+            gte(sql`coalesce(${orders.paidAt}, ${orders.createdAt})`, monthStart.toISOString()),
             sql`${orders.price} IS NOT NULL`
           )
         ),

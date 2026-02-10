@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AdminBlock — Manual de Usuario</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #1a1a2e;
+      line-height: 1.6;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    @media print {
+      body { font-size: 12px; }
+      .page-break { page-break-before: always; }
+      .no-print { display: none; }
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 32px;
+    }
+
+    /* Cover */
+    .cover {
+      text-align: center;
+      padding: 80px 20px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: white;
+      border-radius: 16px;
+      margin-bottom: 48px;
+    }
+    .cover h1 {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+    .cover .subtitle {
+      font-size: 20px;
+      font-weight: 400;
+      opacity: 0.85;
+      margin-bottom: 24px;
+    }
+    .cover .version {
+      font-size: 13px;
+      opacity: 0.5;
+    }
+
+    /* TOC */
+    .toc {
+      background: #f8f9fc;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 48px;
+    }
+    .toc h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #1a1a2e;
+    }
+    .toc ol {
+      list-style: none;
+      counter-reset: toc;
+    }
+    .toc li {
+      counter-increment: toc;
+      padding: 6px 0;
+      border-bottom: 1px solid #e8eaf0;
+      font-size: 14px;
+    }
+    .toc li:last-child { border-bottom: none; }
+    .toc li::before {
+      content: counter(toc) ".";
+      font-weight: 700;
+      color: #4361ee;
+      margin-right: 8px;
+      display: inline-block;
+      width: 24px;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 48px;
+    }
+    .section-number {
+      display: inline-block;
+      background: #4361ee;
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      border-radius: 8px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    .section h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid #4361ee;
+    }
+    .section h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin: 20px 0 8px;
+    }
+    .section p, .section li {
+      color: #444;
+      margin-bottom: 6px;
+    }
+    .section ul, .section ol {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    /* Info boxes */
+    .box {
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    .box-blue {
+      background: #eef2ff;
+      border-left: 4px solid #4361ee;
+    }
+    .box-green {
+      background: #ecfdf5;
+      border-left: 4px solid #10b981;
+    }
+    .box-yellow {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+    }
+    .box-red {
+      background: #fef2f2;
+      border-left: 4px solid #ef4444;
+    }
+    .box-purple {
+      background: #faf5ff;
+      border-left: 4px solid #8b5cf6;
+    }
+    .box strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #1a1a2e;
+    }
+
+    /* Steps */
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      padding-left: 0;
+    }
+    .steps li {
+      counter-increment: step;
+      padding: 10px 0 10px 44px;
+      position: relative;
+      border-left: 2px solid #e0e0e0;
+      margin-left: 14px;
+    }
+    .steps li:last-child { border-left-color: transparent; }
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: -15px;
+      top: 8px;
+      background: #4361ee;
+      color: white;
+      font-weight: 700;
+      font-size: 12px;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      border-radius: 50%;
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 2px 4px 2px 0;
+    }
+    .badge-gray { background: #f3f4f6; color: #374151; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-cyan { background: #cffafe; color: #0e7490; }
+    .badge-yellow { background: #fef3c7; color: #92400e; }
+    .badge-green { background: #d1fae5; color: #065f46; }
+    .badge-emerald { background: #ecfdf5; color: #047857; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+
+    /* Mockup card */
+    .mockup {
+      background: #f8f9fc;
+      border: 1px solid #e2e5ea;
+      border-radius: 10px;
+      padding: 16px;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    .mockup-header {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .mockup-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+    }
+    .mockup-label { color: #666; }
+    .mockup-value { font-weight: 600; }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e8eaf0;
+    }
+    th {
+      background: #f8f9fc;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    /* Keyboard shortcut */
+    kbd {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 12px;
+      font-family: inherit;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 32px;
+      color: #999;
+      font-size: 12px;
+      border-top: 1px solid #eee;
+      margin-top: 48px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- COVER -->
+    <div class="cover">
+      <h1>AdminBlock</h1>
+      <div class="subtitle">Manual de Usuario</div>
+      <div class="version">Febrero 2026 — Guia paso a paso</div>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+      <h2>Indice</h2>
+      <ol>
+        <li>Como entrar a la aplicacion</li>
+        <li>La pantalla principal (Pedidos)</li>
+        <li>Crear un pedido nuevo</li>
+        <li>Cambiar el estado de un pedido</li>
+        <li>Registrar un pago (con Factura)</li>
+        <li>Contactar al cliente (WhatsApp + Email)</li>
+        <li>Gestion de clientes</li>
+        <li>Cotizaciones / Presupuestos</li>
+        <li>Filtros y busqueda</li>
+        <li>Reportes y exportacion</li>
+        <li>Ajustes del sistema</li>
+        <li>Tips y consejos</li>
+      </ol>
+    </div>
+
+    <!-- 1. LOGIN -->
+    <div class="section">
+      <h2><span class="section-number">1</span> Como entrar a la aplicacion</h2>
+
+      <ol class="steps">
+        <li><strong>Abrir el navegador</strong> — Chrome, Safari, Firefox, etc. (celular o computadora)</li>
+        <li><strong>Escribir la direccion</strong> — La URL de AdminBlock en la barra de arriba (te la pasa Tomas)</li>
+        <li><strong>Iniciar sesion</strong> — Escribi tu email y contrasena, toca "Iniciar Sesion"</li>
+      </ol>
+
+      <div class="box box-green">
+        <strong>Consejo: Instalalo como app</strong>
+        Si usas mucho la app desde el celular, podes "Agregar a pantalla de inicio" para que aparezca como una app mas, con su icono propio.
+      </div>
+    </div>
+
+    <!-- 2. MAIN SCREEN -->
+    <div class="section page-break">
+      <h2><span class="section-number">2</span> La pantalla principal (Pedidos)</h2>
+
+      <p>Cuando entras, ves la pantalla de <strong>Pedidos</strong>. Tiene tres partes:</p>
+
+      <h3>Parte 1: Estadisticas (arriba)</h3>
+      <p>Rectangulos con numeros que muestran de un vistazo cuantos pedidos hay en cada situacion. <strong>Tocando cualquier numero se filtran automaticamente!</strong></p>
+
+      <h3>Parte 2: Filtros rapidos</h3>
+      <p>Botones para ver solo ciertos pedidos: Vencidos, Hoy, Sin cotizar, En proceso, Listos.</p>
+
+      <h3>Parte 3: Lista de pedidos</h3>
+      <p>Cada pedido es una tarjeta que muestra:</p>
+
+      <div class="mockup">
+        <div class="mockup-header">JUAN PEREZ</div>
+        <div class="mockup-row">
+          <span><span class="badge badge-cyan">Tesis</span> <span class="badge badge-yellow">En proceso</span></span>
+          <span style="font-size:16px">WhatsApp | Email | Llamar</span>
+        </div>
+        <div style="color:#666; font-size:12px; margin:4px 0">"Tesis de arquitectura, 150 paginas..."</div>
+        <div class="mockup-row">
+          <span class="mockup-value">$15.000</span>
+          <span class="mockup-label">Entrega: 15/02</span>
+        </div>
+        <div class="mockup-row">
+          <span class="badge badge-red">Sin pagar</span>
+          <span><kbd>Registrar Pago</kbd> &nbsp; <kbd>...</kbd></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CREATE ORDER -->
+    <div class="section">
+      <h2><span class="section-number">3</span> Crear un pedido nuevo</h2>
+
+      <ol class="steps">
+        <li><strong>Tocar "+ Nuevo Pedido"</strong> — Boton azul arriba a la derecha</li>
+        <li>
+          <strong>Completar el formulario:</strong>
+          <table>
+            <tr><th>Campo</th><th>Que poner</th></tr>
+            <tr><td><strong>Cliente *</strong></td><td>Elegi de la lista. Las empresas aparecen con icono de empresa</td></tr>
+            <tr><td><strong>Persona</strong></td><td>Solo si elegiste una empresa — quien hizo el pedido</td></tr>
+            <tr><td><strong>Tipo de servicio *</strong></td><td>Que trabajo es (copiado, tesis, etc.)</td></tr>
+            <tr><td><strong>Descripcion</strong></td><td>Detalles: "150 copias doble faz, papel comun"</td></tr>
+            <tr><td><strong>Precio</strong></td><td>Monto a cobrar (vacio si no cotizaste aun)</td></tr>
+            <tr><td><strong>Fecha de entrega</strong></td><td>Cuando tiene que estar listo</td></tr>
+          </table>
+        </li>
+        <li><strong>Tocar "Crear Pedido"</strong> — Listo! Aparece en la lista</li>
+      </ol>
+    </div>
+
+    <!-- 4. STATUS -->
+    <div class="section page-break">
+      <h2><span class="section-number">4</span> Cambiar el estado de un pedido</h2>
+
+      <p>Cada pedido pasa por diferentes estados:</p>
+
+      <table>
+        <tr><th>Estado</th><th>Significa</th></tr>
+        <tr><td><span class="badge badge-gray">Pend. Cotizacion</span></td><td>Llego el pedido, falta darle precio</td></tr>
+        <tr><td><span class="badge badge-blue">Cotizado</span></td><td>Ya le pasamos el precio al cliente</td></tr>
+        <tr><td><span class="badge badge-cyan">Aprobado</span></td><td>El cliente acepto, hay que hacerlo</td></tr>
+        <tr><td><span class="badge badge-yellow">En proceso</span></td><td>Estamos trabajando en el pedido</td></tr>
+        <tr><td><span class="badge badge-green">Listo</span></td><td>Terminado, hay que avisar al cliente</td></tr>
+        <tr><td><span class="badge badge-emerald">Entregado</span></td><td>El cliente ya lo retiro</td></tr>
+        <tr><td><span class="badge badge-red">Cancelado</span></td><td>Se cancelo el trabajo</td></tr>
+      </table>
+
+      <h3>Como cambio el estado?</h3>
+      <ol class="steps">
+        <li>Busca el pedido en la lista</li>
+        <li>Donde dice "Estado:" hay un menu desplegable — tocalo</li>
+        <li>Elegi el nuevo estado — cambia automaticamente!</li>
+      </ol>
+
+      <div class="box box-blue">
+        <strong>Notificaciones automaticas</strong>
+        Cuando cambias el estado a "Listo", el sistema puede enviar un WhatsApp y/o Email automatico al cliente (segun la configuracion en Ajustes).
+      </div>
+    </div>
+
+    <!-- 5. PAYMENT -->
+    <div class="section">
+      <h2><span class="section-number">5</span> Registrar un pago (con Factura)</h2>
+
+      <ol class="steps">
+        <li><strong>Buscar el pedido</strong> del cliente que pago</li>
+        <li><strong>Tocar "Registrar Pago"</strong> — el boton azul en la tarjeta</li>
+        <li>
+          <strong>Completar los datos:</strong>
+          <table>
+            <tr><th>Campo</th><th>Que poner</th></tr>
+            <tr><td><strong>Monto *</strong></td><td>Cuanto pago el cliente</td></tr>
+            <tr><td><strong>Comprobante</strong></td><td>Foto del transfer o recibo (opcional, JPG/PNG/PDF)</td></tr>
+            <tr><td><strong>Tipo de factura</strong></td><td>Sin factura / Factura A / Factura B</td></tr>
+            <tr><td><strong>Nro. de factura</strong></td><td>Numero de la factura (si aplica)</td></tr>
+          </table>
+        </li>
+        <li><strong>Tocar "Registrar"</strong></li>
+      </ol>
+
+      <div class="box box-purple">
+        <strong>Factura A (discrimina IVA)</strong>
+        Si elegis Factura A, el sistema calcula automaticamente:
+        <br>- <strong>Subtotal sin IVA</strong> = Precio / 1.21
+        <br>- <strong>IVA 21%</strong> = Subtotal x 0.21
+        <br>- <strong>Total</strong> = Subtotal + IVA
+        <br>Estos datos quedan guardados en el pedido.
+      </div>
+
+      <h3>Estados de pago</h3>
+      <table>
+        <tr><td><span class="badge badge-red">Sin pagar</span></td><td>No se registro ningun pago</td></tr>
+        <tr><td><span class="badge badge-yellow">Pago parcial</span></td><td>Pago una parte</td></tr>
+        <tr><td><span class="badge badge-green">Pagado</span></td><td>Pago todo</td></tr>
+      </table>
+
+      <div class="box box-green">
+        <strong>Pagos en cuotas</strong>
+        Si el cliente paga en partes, registra cada pago por separado. El sistema suma todo automaticamente.
+      </div>
+    </div>
+
+    <!-- 6. CONTACT -->
+    <div class="section page-break">
+      <h2><span class="section-number">6</span> Contactar al cliente (WhatsApp + Email)</h2>
+
+      <h3>WhatsApp (boton verde)</h3>
+      <p>Al tocarlo se abre WhatsApp con un mensaje listo para enviar segun el estado del pedido. Solo tenes que tocar "Enviar".</p>
+
+      <h3>Email (boton azul)</h3>
+      <p>Abre un formulario donde podes escribir:</p>
+      <ul>
+        <li><strong>Asunto</strong> — Se pre-llena segun el estado del pedido (podes editarlo)</li>
+        <li><strong>Mensaje</strong> — Escribi lo que quieras, el sistema agrega un saludo automatico con el nombre del cliente</li>
+      </ul>
+      <p>Toca <strong>"Enviar"</strong> y el email sale directamente desde la app.</p>
+
+      <h3>Llamar (icono de telefono)</h3>
+      <p>Llama directo al cliente.</p>
+
+      <h3>Menu "Mas opciones" (los tres puntitos)</h3>
+      <p>Toca los tres puntitos de un pedido para ver:</p>
+      <ul>
+        <li>Editar pedido</li>
+        <li>Duplicar pedido</li>
+        <li>Archivar (si esta entregado y pagado)</li>
+        <li>Ver historial de actividad</li>
+        <li>Eliminar pedido</li>
+      </ul>
+
+      <div class="box box-blue">
+        <strong>Notificaciones automaticas</strong>
+        Segun la configuracion en Ajustes, al cambiar el estado se pueden enviar WhatsApp y/o Email automaticos. Los botones manuales siempre funcionan independientemente.
+      </div>
+    </div>
+
+    <!-- 7. CLIENTS -->
+    <div class="section">
+      <h2><span class="section-number">7</span> Gestion de clientes</h2>
+
+      <p>Ir a <strong>"Clientes"</strong> en el menu lateral (PC) o en la barra inferior (celular).</p>
+
+      <h3>Tipos de clientes</h3>
+      <table>
+        <tr><td><strong>Persona</strong></td><td>Un cliente particular: "Juan Perez"</td></tr>
+        <tr><td><strong>Empresa</strong></td><td>Una organizacion: "Imprenta Norte S.A." — puede tener personas vinculadas</td></tr>
+      </table>
+
+      <h3>Crear un cliente</h3>
+      <ol class="steps">
+        <li><strong>Tocar "+ Nuevo Cliente"</strong></li>
+        <li><strong>Elegir tipo</strong> — Persona o Empresa</li>
+        <li>
+          <strong>Completar datos:</strong>
+          <table>
+            <tr><th>Campo</th><th>Detalle</th></tr>
+            <tr><td><strong>Nombre *</strong></td><td>Nombre completo o razon social</td></tr>
+            <tr><td><strong>Telefono</strong></td><td>Con codigo de area (ej: 1155667788)</td></tr>
+            <tr><td><strong>Email</strong></td><td>Para enviarle emails desde la app</td></tr>
+            <tr><td><strong>CUIT</strong></td><td>Para facturacion (si corresponde)</td></tr>
+            <tr><td><strong>Notas</strong></td><td>"Siempre paga con transfer", "Cliente frecuente"</td></tr>
+          </table>
+        </li>
+        <li><strong>Guardar</strong></li>
+      </ol>
+
+      <h3>Empresas con personas</h3>
+      <p>Las empresas pueden tener varias personas vinculadas. En la tarjeta de la empresa, podes expandir para ver las personas asociadas con sus roles (Secretaria, Gerente, etc.).</p>
+
+      <div class="box box-green">
+        <strong>Ver pedidos de un cliente</strong>
+        Toca el icono azul de "Ver pedidos" para ver el historial completo. Para empresas, muestra pedidos de la empresa y de todas sus personas vinculadas.
+      </div>
+    </div>
+
+    <!-- 8. QUOTES -->
+    <div class="section page-break">
+      <h2><span class="section-number">8</span> Cotizaciones / Presupuestos</h2>
+
+      <p>Ir a <strong>"Cotizaciones"</strong> en el menu. Aca se arman presupuestos detallados con materiales y costos.</p>
+
+      <h3>Crear una cotizacion</h3>
+      <ol class="steps">
+        <li><strong>Tocar "+ Nueva Cotizacion"</strong></li>
+        <li><strong>Elegir cliente y servicio</strong></li>
+        <li><strong>Agregar materiales/servicios</strong> con cantidades y precios unitarios</li>
+        <li><strong>Definir ganancia</strong> — Monto fijo o porcentaje sobre el costo</li>
+        <li><strong>Guardar</strong> — Se muestra el desglose: costo de materiales + ganancia = precio final</li>
+      </ol>
+
+      <h3>Crear pedido desde cotizacion</h3>
+      <p>Cuando el cliente acepta, toca <strong>"Crear Pedido"</strong> en la cotizacion. Se genera un pedido automaticamente con todos los datos y materiales ya cargados.</p>
+
+      <div class="box box-blue">
+        <strong>Email automatico al crear pedido</strong>
+        Si esta habilitado en Ajustes, al crear un pedido desde una cotizacion se envia automaticamente un email al cliente con el presupuesto.
+      </div>
+    </div>
+
+    <!-- 9. FILTERS -->
+    <div class="section">
+      <h2><span class="section-number">9</span> Filtros y busqueda</h2>
+
+      <h3>Filtros rapidos</h3>
+      <table>
+        <tr><th>Filtro</th><th>Muestra</th></tr>
+        <tr><td><strong>Vencidos</strong></td><td>Pedidos con fecha de entrega pasada (urgentes!)</td></tr>
+        <tr><td><strong>Hoy</strong></td><td>Pedidos que hay que entregar hoy</td></tr>
+        <tr><td><strong>Sin cotizar</strong></td><td>Pedidos que todavia no tienen precio</td></tr>
+        <tr><td><strong>En proceso</strong></td><td>Pedidos que se estan trabajando</td></tr>
+        <tr><td><strong>Listos</strong></td><td>Pedidos terminados esperando retiro</td></tr>
+      </table>
+
+      <h3>Filtro por servicio</h3>
+      <p>Desplegable "Tipo de servicio" para filtrar por tipo de trabajo.</p>
+
+      <h3>Busqueda</h3>
+      <p>La barra de busqueda busca por <strong>nombre de cliente</strong> y <strong>descripcion del pedido</strong>.</p>
+
+      <h3>Pedidos archivados</h3>
+      <p>Los pedidos entregados y pagados se pueden archivar (manual o automaticamente despues de 30 dias). Para verlos, activa "Mostrar archivados" en los filtros.</p>
+
+      <div class="box box-green">
+        <strong>Filtros combinados</strong>
+        Podes combinar filtros. Ejemplo: "En proceso" + "Tesis" = solo las tesis en proceso.
+      </div>
+    </div>
+
+    <!-- 10. REPORTS -->
+    <div class="section page-break">
+      <h2><span class="section-number">10</span> Reportes y exportacion</h2>
+
+      <p>Ir a <strong>"Reportes"</strong> en el menu.</p>
+
+      <h3>Exportar a Excel</h3>
+      <ul>
+        <li><strong>Pedidos de este mes</strong> — Todos los pedidos del mes actual</li>
+        <li><strong>Pedidos por fecha</strong> — Elegi un rango de fechas</li>
+        <li><strong>Lista de clientes</strong> — Todos los clientes con sus datos</li>
+      </ul>
+
+      <h3>Gastos mensuales</h3>
+      <p>En Reportes podes cargar los <strong>gastos del mes</strong> (alquiler, servicios, impuestos, etc.) para ver el balance: ingresos vs gastos.</p>
+    </div>
+
+    <!-- 11. SETTINGS -->
+    <div class="section">
+      <h2><span class="section-number">11</span> Ajustes del sistema</h2>
+
+      <p>Ir a <strong>"Ajustes"</strong> en el menu. Desde aca se configura:</p>
+
+      <h3>Notificaciones de WhatsApp</h3>
+      <p>Activar/desactivar el envio automatico de WhatsApp para cada evento:</p>
+      <ul>
+        <li>Pedido listo</li>
+        <li>Cotizacion enviada</li>
+        <li>En proceso</li>
+        <li>Pago registrado</li>
+      </ul>
+
+      <h3>Notificaciones por Email</h3>
+      <p>Activar/desactivar emails automaticos:</p>
+      <ul>
+        <li>Cotizacion enviada (al crear pedido desde cotizacion)</li>
+        <li>Pedido listo</li>
+      </ul>
+
+      <h3>Email del administrador</h3>
+      <p>Aca se pone el email donde llega el <strong>resumen diario automatico</strong> todas las mananas a las 8am con:</p>
+      <ul>
+        <li>Pedidos que vencen hoy</li>
+        <li>Pedidos vencidos</li>
+        <li>Pagos pendientes</li>
+        <li>Pedidos completados ayer</li>
+      </ul>
+    </div>
+
+    <!-- 12. TIPS -->
+    <div class="section page-break">
+      <h2><span class="section-number">12</span> Tips y consejos</h2>
+
+      <div class="box box-green">
+        <strong>Revisa todos los dias</strong>
+        Entra a la app y mira: hay pedidos vencidos? Hay listos para avisar? Cotizaciones pendientes?
+        <br><em>O mejor: configura el email del admin y recibi el resumen automatico cada manana.</em>
+      </div>
+
+      <div class="box box-blue">
+        <strong>Avisa siempre que este listo</strong>
+        Cuando termines un trabajo, cambia el estado a "Listo". El sistema avisa automaticamente al cliente.
+      </div>
+
+      <div class="box box-yellow">
+        <strong>Registra los pagos al momento</strong>
+        Cuando te paguen, registralo enseguida asi no te olvidas. Podes subir foto del comprobante.
+      </div>
+
+      <div class="box box-purple">
+        <strong>Usa las notas del cliente</strong>
+        Si un cliente tiene preferencias ("siempre quiere papel de 120g"), ponelo en las notas.
+      </div>
+
+      <div class="box box-green">
+        <strong>No tengas miedo de tocar</strong>
+        No podes "romper" nada. Si te equivocas, siempre se puede corregir. Y si no sabes como hacer algo, preguntale a Tomas!
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <p><strong>Dudas o problemas?</strong> — Contactar a Tomas</p>
+      <p style="margin-top:8px">AdminBlock — Manual de Usuario — Febrero 2026</p>
+    </div>
+
+  </div>
+</body>
+</html>

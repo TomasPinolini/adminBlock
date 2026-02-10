@@ -144,3 +144,135 @@
     → pegar código actualizado → Deploy
 
 ===============================================================================
+ ROADMAP — PLAN DE AUTOMATIZACIONES FUTURAS
+===============================================================================
+
+Estado: ✅ = Implementado | ⏳ = Pendiente
+
+───────────────────────────────────────────────────────────────────────
+ FASE 1 — Quick Wins (pg_cron + infraestructura existente)
+───────────────────────────────────────────────────────────────────────
+
+  ✅ 1.1 Auto-Archive (Archivado Automático)
+     Edge Function que archiva pedidos entregados+pagados hace 30+ días.
+     Cron diario a medianoche.
+
+  ✅ 1.2 Daily Digest (Resumen Diario por Email)
+     Edge Function que envía un resumen diario al admin por email.
+     Cron diario a las 8am ART.
+
+  ✅ 1.3 Overdue Reminders (Recordatorios de Vencidos)
+     Edge Function que envía un email recordatorio a clientes con
+     pedidos vencidos. Máximo 1 por día por pedido.
+     Cron diario a las 9am ART.
+
+───────────────────────────────────────────────────────────────────────
+ FASE 2 — Database Webhooks (event-driven)
+───────────────────────────────────────────────────────────────────────
+
+  ⏳ 2.1 Auto-Notificaciones por Cambio de Estado
+     Webhook en tabla `orders` cuando cambia `status`.
+     Edge Function: revisa estado viejo vs nuevo, busca email/tel
+     del cliente, chequea configuración de notificaciones, y envía
+     email/WhatsApp automáticamente.
+     Beneficio: saca la lógica de envío de las API routes de Next.js.
+
+  ⏳ 2.2 Cascade de Precios de Proveedores
+     Webhook en `supplier_materials` cuando cambia `current_price`.
+     Edge Function: busca cotizaciones abiertas que usen ese
+     material+proveedor y recalcula costos y precio total.
+
+───────────────────────────────────────────────────────────────────────
+ FASE 3 — Automatización de Negocio
+───────────────────────────────────────────────────────────────────────
+
+  ⏳ 3.1 Gastos Recurrentes
+     Tabla nueva: `recurring_expenses` (categoría, monto, frecuencia).
+     Edge Function: el 1ro de cada mes, crea los gastos recurrentes
+     en `monthly_expenses` automáticamente.
+     UI: sección en Ajustes para gestionar plantillas de gastos.
+
+  ⏳ 3.2 Generación de Factura PDF
+     Edge Function que recibe un orderId, arma un PDF con los datos
+     del pedido + cliente + materiales, lo guarda en Storage y
+     devuelve la URL.
+     UI: botón "Descargar Factura" en pedidos con factura A o B.
+
+  ⏳ 3.3 Reporte Mensual PDF
+     Edge Function que el 1ro de cada mes genera un PDF resumen:
+     ingresos, gastos, balance, top clientes, top servicios, IVA.
+     Se guarda en Storage y se envía por email al admin.
+
+───────────────────────────────────────────────────────────────────────
+ FASE 4 — Features para Clientes
+───────────────────────────────────────────────────────────────────────
+
+  ⏳ 4.1 Portal de Seguimiento (Client Portal)
+     Edge Function que genera un token único por pedido y sirve una
+     página HTML pública mostrando el estado del pedido.
+     URL: .../functions/v1/client-portal?token=<TOKEN>
+     Se incluye el link de seguimiento en todos los emails al cliente.
+     DB: columna `tracking_token` en `orders`.
+
+  ⏳ 4.2 Pagos Online (MercadoPago)
+     Edge Functions: `create-payment-link` + `payment-webhook`.
+     Genera un link de pago de MercadoPago, lo incluye en el email
+     de cotización, y el webhook actualiza el pago automáticamente.
+     DB: columnas `payment_link_id` y `payment_provider` en `orders`.
+
+───────────────────────────────────────────────────────────────────────
+ FASE 5 — Avanzado / Futuro
+───────────────────────────────────────────────────────────────────────
+
+  ⏳ 5.1 AFIP (Factura Electrónica)
+     Edge Function como proxy del WSFE de AFIP.
+     Requiere: certificado digital, registro AFIP, validación CUIT.
+     Genera CAE al registrar pago.
+     Complejidad: ALTA — planificar como proyecto propio.
+
+  ⏳ 5.2 Estimación de Precio con IA
+     Edge Function que recibe tipo de servicio + descripción,
+     consulta datos históricos y sugiere un precio.
+     Opcionalmente llama a OpenAI/Claude para estimación inteligente.
+
+  ⏳ 5.3 OCR de Comprobantes
+     Al subir un comprobante de pago, una Edge Function llama a un
+     servicio OCR, extrae el monto y pre-llena el campo de pago.
+
+  ⏳ 5.4 Sync en Tiempo Real (Supabase Realtime)
+     Suscripción a cambios en tabla `orders` → muestra notificaciones
+     en la app. Útil para coordinación multi-usuario.
+
+  ⏳ 5.5 Backup Automático a Storage
+     Cron semanal → Edge Function exporta todas las tablas a JSON →
+     las guarda en un bucket de Storage.
+
+===============================================================================
+ ORDEN RECOMENDADO DE IMPLEMENTACIÓN
+===============================================================================
+
+  Paso  │ Item                                │ Tiempo est.
+  ──────┼─────────────────────────────────────┼────────────
+  1     │ ✅ Auto-archive (1.1)               │ 30 min
+  2     │ ✅ Daily digest (1.2)               │ 1 hora
+  3     │ ✅ Overdue reminders (1.3)          │ 1 hora
+  4     │ ⏳ DB webhook notificaciones (2.1)  │ 2 horas
+  5     │ ⏳ Gastos recurrentes (3.1)         │ 2 horas
+  6     │ ⏳ PDF facturas (3.2)               │ 3 horas
+  7     │ ⏳ Reporte mensual PDF (3.3)        │ 3 horas
+  8     │ ⏳ Cascade de precios (2.2)         │ 1.5 horas
+  9     │ ⏳ Portal de clientes (4.1)         │ 3 horas
+  10    │ ⏳ Pagos online (4.2)               │ 4 horas
+  11+   │ ⏳ Items de Fase 5                  │ Planificar
+
+===============================================================================
+ PATRÓN DE IMPLEMENTACIÓN (igual para cada Edge Function)
+===============================================================================
+
+  1. Crear función:   supabase/functions/<nombre>/index.ts
+  2. Agregar secretos: supabase secrets set KEY=VALUE (si necesario)
+  3. Deploy:          Supabase Dashboard → Edge Functions → Deploy
+  4. Configurar trigger: pg_cron o DB webhook (SQL en SQL Editor)
+  5. Testear:         Invocar manualmente primero, después verificar trigger
+
+===============================================================================

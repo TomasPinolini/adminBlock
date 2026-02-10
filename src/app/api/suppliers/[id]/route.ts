@@ -9,6 +9,7 @@ import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validatio
 const updateSupplierSchema = z.object({
   name: z.string().min(1).max(MAX_TEXT_SHORT).transform(sanitize).optional(),
   phone: z.string().max(30).optional().nullable(),
+  email: z.string().email().max(MAX_TEXT_SHORT).optional().nullable().or(z.literal("")),
   address: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional().nullable(),
   notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional().nullable(),
   isActive: z.boolean().optional(),

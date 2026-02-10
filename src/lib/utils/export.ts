@@ -111,6 +111,13 @@ export interface ReportMaterialCost {
   subtotal: string
 }
 
+export interface ReportOutsourcedCost {
+  orderId: string
+  supplierName: string | null
+  materialsCost: string | null
+  clientName: string | null
+}
+
 export interface ReportExpense {
   id: string
   category: string
@@ -130,6 +137,7 @@ export function exportMonthlyReport(
   materialCosts: ReportMaterialCost[],
   expenses: ReportExpense[],
   getServiceLabel: (name: string) => string,
+  outsourcedCosts: ReportOutsourcedCost[] = [],
 ) {
   const wb = XLSX.utils.book_new()
   const label = `${monthNames[month - 1]} ${year}`
@@ -230,6 +238,26 @@ export function exportMonthlyReport(
       "Subtotal": materialCosts.reduce((s, m) => s + num(m.subtotal), 0),
     })
   }
+  if (outsourcedCosts.length > 0) {
+    outsourcedCosts.forEach((o) => {
+      gastosData.push({
+        "Tipo": "Tercerizado",
+        "Descripcion": o.clientName ? `Pedido de ${o.clientName}` : "Pedido tercerizado",
+        "Proveedor": o.supplierName || "-",
+        "Cantidad": "",
+        "Precio Unit.": "",
+        "Subtotal": num(o.materialsCost),
+      })
+    })
+    gastosData.push({
+      "Tipo": "",
+      "Descripcion": "SUBTOTAL TERCERIZADOS",
+      "Proveedor": "",
+      "Cantidad": "",
+      "Precio Unit.": "",
+      "Subtotal": outsourcedCosts.reduce((s, o) => s + num(o.materialsCost), 0),
+    })
+  }
   if (expenses.length > 0) {
     expenses.forEach((e) => {
       gastosData.push({
@@ -251,7 +279,9 @@ export function exportMonthlyReport(
     })
   }
   if (gastosData.length > 0) {
+    const totalOutsourced = outsourcedCosts.reduce((s, o) => s + num(o.materialsCost), 0)
     const totalGastos = materialCosts.reduce((s, m) => s + num(m.subtotal), 0)
+      + totalOutsourced
       + expenses.reduce((s, e) => s + num(e.amount), 0)
     gastosData.push({
       "Tipo": "",
@@ -270,8 +300,9 @@ export function exportMonthlyReport(
   const totalVentas = orders.reduce((s, o) => s + num(o.price), 0)
   const totalIVA = orders.reduce((s, o) => s + num(o.taxAmount), 0)
   const totalMat = materialCosts.reduce((s, m) => s + num(m.subtotal), 0)
+  const totalOut = outsourcedCosts.reduce((s, o) => s + num(o.materialsCost), 0)
   const totalExp = expenses.reduce((s, e) => s + num(e.amount), 0)
-  const totalGastos = totalMat + totalExp
+  const totalGastos = totalMat + totalOut + totalExp
   const balance = totalVentas - totalGastos
 
   const resumen = [
@@ -286,6 +317,7 @@ export function exportMonthlyReport(
     { "Concepto": "", "Monto": "" },
     { "Concepto": "Total Gastos", "Monto": currency(totalGastos) },
     { "Concepto": `  Materiales (${materialCosts.length})`, "Monto": currency(totalMat) },
+    { "Concepto": `  Tercerizados (${outsourcedCosts.length})`, "Monto": currency(totalOut) },
     { "Concepto": `  Gastos manuales (${expenses.length})`, "Monto": currency(totalExp) },
     { "Concepto": "", "Monto": "" },
     { "Concepto": "BALANCE", "Monto": currency(balance) },

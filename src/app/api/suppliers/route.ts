@@ -9,6 +9,7 @@ import { sanitize, MAX_TEXT_SHORT, MAX_TEXT_MEDIUM } from "@/lib/utils/validatio
 const createSupplierSchema = z.object({
   name: z.string().min(1, "Nombre requerido").max(MAX_TEXT_SHORT).transform(sanitize),
   phone: z.string().max(30).optional(),
+  email: z.string().email().max(MAX_TEXT_SHORT).optional().or(z.literal("")),
   address: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
   notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
 })
@@ -41,6 +42,7 @@ export async function POST(request: NextRequest) {
       .values({
         name: validated.name,
         phone: validated.phone,
+        email: validated.email || null,
         address: validated.address,
         notes: validated.notes,
       })

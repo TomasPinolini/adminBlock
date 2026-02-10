@@ -32,9 +32,17 @@ export interface MaterialCost {
   subtotal: string
 }
 
+export interface OutsourcedCost {
+  orderId: string
+  supplierName: string | null
+  materialsCost: string | null
+  clientName: string | null
+}
+
 interface MonthlyReportResponse {
   orders: MonthlyOrder[]
   materialCosts: MaterialCost[]
+  outsourcedCosts: OutsourcedCost[]
 }
 
 interface MonthlyExpense {

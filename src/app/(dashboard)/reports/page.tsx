@@ -21,6 +21,7 @@ import {
   Download,
   FileSpreadsheet,
   Database,
+  Truck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,7 +34,7 @@ import {
   useUpdateExpense,
   useDeleteExpense,
 } from "@/hooks/use-monthly-report"
-import type { MaterialCost } from "@/hooks/use-monthly-report"
+import type { MaterialCost, OutsourcedCost } from "@/hooks/use-monthly-report"
 import { cn } from "@/lib/utils"
 import { exportMonthlyReport, exportLibroIVA, exportBackupJSON } from "@/lib/utils/export"
 
@@ -67,6 +68,7 @@ export default function ReportsPage() {
   const { data: reportData, isLoading: reportLoading } = useMonthlyReport(year, month)
   const orders = reportData?.orders ?? []
   const materialCosts = reportData?.materialCosts ?? []
+  const outsourcedCosts = reportData?.outsourcedCosts ?? []
   const { data: expenses = [], isLoading: expensesLoading } = useMonthlyExpenses(year, month)
   const createExpense = useCreateExpense()
   const updateExpense = useUpdateExpense()
@@ -111,8 +113,9 @@ export default function ReportsPage() {
   const totalSubtotal = orders.reduce((sum, o) => sum + (parseFloat(o.subtotal || "0") || 0), 0)
   const totalIVA = orders.reduce((sum, o) => sum + (parseFloat(o.taxAmount || "0") || 0), 0)
   const totalMaterialCosts = materialCosts.reduce((sum, m) => sum + (parseFloat(m.subtotal) || 0), 0)
+  const totalOutsourcedCosts = outsourcedCosts.reduce((sum, o) => sum + (parseFloat(o.materialsCost || "0") || 0), 0)
   const totalManualExpenses = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0)
-  const totalGastos = totalManualExpenses + totalMaterialCosts
+  const totalGastos = totalManualExpenses + totalMaterialCosts + totalOutsourcedCosts
   const balance = totalVentas - totalGastos
 
   // Group material costs by order for display
@@ -196,7 +199,7 @@ export default function ReportsPage() {
       toast.error("No hay datos para exportar")
       return
     }
-    exportMonthlyReport(year, month, orders, materialCosts, expenses, getServiceLabel)
+    exportMonthlyReport(year, month, orders, materialCosts, expenses, getServiceLabel, outsourcedCosts)
     toast.success("Reporte exportado")
   }
 
@@ -284,7 +287,9 @@ export default function ReportsPage() {
           <p className="mt-1 text-lg font-bold text-red-600">{formatCurrency(totalGastos)}</p>
           <p className="text-xs text-muted-foreground">
             {totalMaterialCosts > 0 && <span className="text-orange-600">Mat: {formatCurrency(totalMaterialCosts)}</span>}
-            {totalMaterialCosts > 0 && totalManualExpenses > 0 && " + "}
+            {totalMaterialCosts > 0 && totalOutsourcedCosts > 0 && " + "}
+            {totalOutsourcedCosts > 0 && <span className="text-purple-600">Terc: {formatCurrency(totalOutsourcedCosts)}</span>}
+            {(totalMaterialCosts > 0 || totalOutsourcedCosts > 0) && totalManualExpenses > 0 && " + "}
             {totalManualExpenses > 0 && <span>Otros: {formatCurrency(totalManualExpenses)}</span>}
             {totalGastos === 0 && "Sin gastos"}
           </p>
@@ -526,6 +531,44 @@ export default function ReportsPage() {
           </div>
         )}
 
+        {/* Outsourced supplier costs */}
+        {outsourcedCosts.length > 0 && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium flex items-center gap-2">
+              <Truck className="h-4 w-4 text-purple-600" />
+              Costos de tercerizados (proveedores)
+            </h3>
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="w-full text-sm">
+                <thead className="border-b bg-muted/50">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium">Proveedor</th>
+                    <th className="px-3 py-2 text-left font-medium hidden sm:table-cell">Cliente</th>
+                    <th className="px-3 py-2 text-right font-medium">Costo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {outsourcedCosts.map((o, i) => (
+                    <tr key={`${o.orderId}-${i}`} className="border-b last:border-0 hover:bg-muted/30">
+                      <td className="px-3 py-2 font-medium">{o.supplierName || "Proveedor"}</td>
+                      <td className="px-3 py-2 text-muted-foreground hidden sm:table-cell">{o.clientName || "-"}</td>
+                      <td className="px-3 py-2 text-right font-semibold text-purple-600">
+                        {formatCurrency(o.materialsCost)}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="bg-muted/50 font-semibold">
+                    <td colSpan={2} className="px-3 py-2">Subtotal tercerizados</td>
+                    <td className="px-3 py-2 text-right text-purple-600">
+                      {formatCurrency(totalOutsourcedCosts)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* Manual expenses list */}
         {expenses.length > 0 && (
           <div className="space-y-2">
@@ -633,7 +676,7 @@ export default function ReportsPage() {
         )}
 
         {/* Total gastos combined */}
-        {(expenses.length > 0 || materialCosts.length > 0) && (
+        {(expenses.length > 0 || materialCosts.length > 0 || outsourcedCosts.length > 0) && (
           <div className="rounded-lg border bg-red-50 dark:bg-red-950/20 p-3 flex justify-between items-center">
             <span className="font-semibold">Total gastos del mes</span>
             <span className="text-lg font-bold text-red-600">{formatCurrency(totalGastos)}</span>

@@ -179,6 +179,7 @@ export const suppliers = pgTable("suppliers", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   phone: text("phone"),
+  email: text("email"),
   address: text("address"),
   notes: text("notes"),
   isActive: boolean("is_active").default(true).notNull(), // soft delete

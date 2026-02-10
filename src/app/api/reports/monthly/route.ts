@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { orders, clients, orderMaterials, materials, suppliers } from "@/lib/db/schema"
+import { orders, clients, orderMaterials, materials, suppliers, quotes } from "@/lib/db/schema"
 import { eq, and, gte, lt, desc, sql } from "drizzle-orm"
 import { logApiError } from "@/lib/logger"
 
@@ -86,7 +86,36 @@ export async function GET(request: NextRequest) {
         )
     }
 
-    return NextResponse.json({ orders: monthOrders, materialCosts })
+    // Get outsourced supplier costs from quotes linked to these orders
+    let outsourcedCosts: Array<{
+      orderId: string
+      supplierName: string | null
+      materialsCost: string | null
+      clientName: string | null
+    }> = []
+
+    if (orderIds.length > 0) {
+      outsourcedCosts = await db
+        .select({
+          orderId: quotes.orderId,
+          supplierName: suppliers.name,
+          materialsCost: quotes.materialsCost,
+          clientName: clients.name,
+        })
+        .from(quotes)
+        .leftJoin(suppliers, eq(quotes.outsourcedSupplierId, suppliers.id))
+        .leftJoin(orders, eq(quotes.orderId, orders.id))
+        .leftJoin(clients, eq(orders.clientId, clients.id))
+        .where(
+          and(
+            sql`${quotes.orderId} IN (${sql.join(orderIds.map(id => sql`${id}`), sql`, `)})`,
+            eq(quotes.isOutsourced, true),
+            sql`${quotes.materialsCost} IS NOT NULL`
+          )
+        )
+    }
+
+    return NextResponse.json({ orders: monthOrders, materialCosts, outsourcedCosts })
   } catch (error) {
     logApiError("/api/reports/monthly", "GET", error)
     return NextResponse.json(

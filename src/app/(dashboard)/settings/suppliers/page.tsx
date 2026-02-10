@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
-import { Plus, Pencil, Trash2, Truck, ArrowLeft, Package } from "lucide-react"
+import { Plus, Pencil, Trash2, Truck, ArrowLeft, Package, MessageCircle, Phone, Mail } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,6 +33,8 @@ import {
 } from "@/hooks/use-suppliers"
 import { useMaterials } from "@/hooks/use-materials"
 import type { Supplier } from "@/lib/db/schema"
+import { getWhatsAppLink } from "@/lib/utils/messaging"
+import { EmailComposeModal } from "@/components/email-compose-modal"
 
 export default function SuppliersPage() {
   const { confirm, ConfirmDialog } = useConfirmDialog()
@@ -45,9 +47,11 @@ export default function SuppliersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
+  const [emailSupplier, setEmailSupplier] = useState<Supplier | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
+    email: "",
     address: "",
     notes: "",
   })
@@ -69,7 +73,7 @@ export default function SuppliersPage() {
   )
 
   const resetForm = () => {
-    setFormData({ name: "", phone: "", address: "", notes: "" })
+    setFormData({ name: "", phone: "", email: "", address: "", notes: "" })
     setEditingSupplier(null)
   }
 
@@ -83,6 +87,7 @@ export default function SuppliersPage() {
     setFormData({
       name: supplier.name,
       phone: supplier.phone || "",
+      email: supplier.email || "",
       address: supplier.address || "",
       notes: supplier.notes || "",
     })
@@ -238,27 +243,66 @@ export default function SuppliersPage() {
                       </p>
                     )}
                   </div>
-                  <div className="flex gap-1 ml-2">
+                  <div className="flex gap-0.5 ml-2">
+                    {supplier.phone && (
+                      <a
+                        href={getWhatsAppLink(supplier.phone, `Hola, te contacto de la imprenta.`)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        title="WhatsApp"
+                      >
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-600">
+                          <MessageCircle className="h-3.5 w-3.5" />
+                        </Button>
+                      </a>
+                    )}
+                    {supplier.phone && (
+                      <a
+                        href={`tel:${supplier.phone}`}
+                        onClick={(e) => e.stopPropagation()}
+                        title="Llamar"
+                      >
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-blue-500 hover:text-blue-500">
+                          <Phone className="h-3.5 w-3.5" />
+                        </Button>
+                      </a>
+                    )}
+                    {supplier.email && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-blue-500 hover:text-blue-500"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setEmailSupplier(supplier)
+                        }}
+                        title="Email"
+                      >
+                        <Mail className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="h-7 w-7"
                       onClick={(e) => {
                         e.stopPropagation()
                         openEditModal(supplier)
                       }}
                     >
-                      <Pencil className="h-4 w-4" />
+                      <Pencil className="h-3.5 w-3.5" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="h-7 w-7 text-destructive hover:text-destructive"
                       onClick={(e) => {
                         e.stopPropagation()
                         handleDelete(supplier)
                       }}
-                      className="text-destructive hover:text-destructive"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
                 </div>
@@ -414,6 +458,19 @@ export default function SuppliersPage() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="email@proveedor.com"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="address">Dirección</Label>
               <Input
                 id="address"
@@ -459,6 +516,14 @@ export default function SuppliersPage() {
           </form>
         </DialogContent>
       </Dialog>
+      {emailSupplier?.email && (
+        <EmailComposeModal
+          open={!!emailSupplier}
+          onClose={() => setEmailSupplier(null)}
+          to={emailSupplier.email}
+          clientName={emailSupplier.name}
+        />
+      )}
       <ConfirmDialog />
     </div>
   )
