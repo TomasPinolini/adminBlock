@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
+  LayoutDashboard,
   ClipboardList,
   Users,
   Calculator,
@@ -12,6 +13,11 @@ import {
 import { cn } from "@/lib/utils"
 
 const navItems = [
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+  },
   {
     href: "/orders",
     label: "Pedidos",
@@ -47,7 +53,7 @@ export function Sidebar() {
     <aside className="hidden lg:flex h-full w-64 flex-col border-r bg-background">
       {/* Header */}
       <div className="flex h-16 items-center border-b px-4">
-        <Link href="/orders" className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2">
           <img src="/logo.png" alt="Block" className="h-8" />
         </Link>
       </div>

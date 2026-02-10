@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
 
     // Get outsourced supplier costs from quotes linked to these orders
     let outsourcedCosts: Array<{
-      orderId: string
+      orderId: string | null
       supplierName: string | null
       materialsCost: string | null
       clientName: string | null

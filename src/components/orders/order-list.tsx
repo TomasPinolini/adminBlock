@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
-import { MoreVertical, Trash2, MessageCircle, Mail, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone, History } from "lucide-react"
+import { MoreVertical, Trash2, MessageCircle, Mail, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone, History, FileDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -36,6 +36,7 @@ import { PaymentModal } from "./payment-modal"
 import { EditOrderModal } from "./edit-order-modal"
 import { ActivityModal } from "./activity-modal"
 import { cn } from "@/lib/utils"
+import { generateInvoicePDF, type InvoicePDFData } from "@/lib/utils/pdf"
 
 const statusVariants: Record<OrderStatus, "pending" | "info" | "warning" | "success" | "secondary" | "destructive"> = {
   pending_quote: "pending",
@@ -117,6 +118,26 @@ function OrderCard({ order, onPayment, onEdit, onHistory, onEmail }: OrderCardPr
   const hasEmail = !!order.client?.email
   const hasPrice = !!order.price && Number(order.price) > 0
   const paymentStatus = (order.paymentStatus || "pending") as PaymentStatus
+  const canDownloadInvoice = order.invoiceType === "A" || order.invoiceType === "B"
+
+  const handleDownloadInvoice = () => {
+    const serviceLabel = services.find((s) => s.name === order.serviceType)?.displayName || order.serviceType
+    generateInvoicePDF({
+      invoiceType: order.invoiceType as "A" | "B",
+      invoiceNumber: order.invoiceNumber,
+      createdAt: order.createdAt,
+      clientName: order.client?.name || "Cliente",
+      clientCuit: order.client?.cuit,
+      serviceDisplayName: serviceLabel,
+      description: order.description,
+      quantity: order.quantity,
+      price: order.price,
+      subtotal: order.subtotal,
+      taxAmount: order.taxAmount,
+      paymentStatus: order.paymentStatus,
+      paymentAmount: order.paymentAmount,
+    })
+  }
 
   // Get appropriate message based on status
   const getQuickMessage = () => {
@@ -255,6 +276,15 @@ function OrderCard({ order, onPayment, onEdit, onHistory, onEmail }: OrderCardPr
                 <span className="hidden sm:inline">Llamar</span>
               </a>
             )}
+            {canDownloadInvoice && (
+              <button
+                onClick={handleDownloadInvoice}
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md bg-purple-600 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-white hover:bg-purple-700 transition-colors"
+              >
+                <FileDown className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Factura</span>
+              </button>
+            )}
           </div>
 
           {/* Receipt link if exists */}
@@ -298,6 +328,15 @@ function OrderCard({ order, onPayment, onEdit, onHistory, onEmail }: OrderCardPr
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {canDownloadInvoice && (
+                <>
+                  <DropdownMenuItem onClick={handleDownloadInvoice}>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    Descargar Factura
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               {hasPrice && (
                 <>
                   <DropdownMenuItem onClick={() => onPayment(order)}>

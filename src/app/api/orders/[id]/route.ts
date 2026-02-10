@@ -32,6 +32,7 @@ export async function GET(
           name: clients.name,
           phone: clients.phone,
           email: clients.email,
+          cuit: clients.cuit,
         },
       })
       .from(orders)

@@ -22,6 +22,7 @@ import {
   FileSpreadsheet,
   Database,
   Truck,
+  FileText,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,6 +38,7 @@ import {
 import type { MaterialCost, OutsourcedCost } from "@/hooks/use-monthly-report"
 import { cn } from "@/lib/utils"
 import { exportMonthlyReport, exportLibroIVA, exportBackupJSON } from "@/lib/utils/export"
+import { generateMonthlyReportPDF } from "@/lib/utils/pdf"
 
 const monthNames = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -203,6 +205,50 @@ export default function ReportsPage() {
     toast.success("Reporte exportado")
   }
 
+  const handleExportPDF = () => {
+    if (!orders.length && !expenses.length && !materialCosts.length) {
+      toast.error("No hay datos para exportar")
+      return
+    }
+    generateMonthlyReportPDF({
+      year,
+      month,
+      orders: orders.map((o) => ({
+        id: o.id,
+        clientName: o.clientName,
+        serviceType: o.serviceType,
+        description: o.description,
+        price: o.price,
+        invoiceNumber: o.invoiceNumber,
+        invoiceType: o.invoiceType,
+        subtotal: o.subtotal,
+        taxAmount: o.taxAmount,
+        createdAt: o.createdAt,
+        clientCuit: o.clientCuit,
+      })),
+      materialCosts: materialCosts.map((m) => ({
+        materialName: m.materialName,
+        supplierName: m.supplierName,
+        description: m.description,
+        quantity: m.quantity,
+        unitPrice: m.unitPrice,
+        subtotal: m.subtotal,
+      })),
+      outsourcedCosts: outsourcedCosts.map((o) => ({
+        supplierName: o.supplierName,
+        materialsCost: o.materialsCost,
+        clientName: o.clientName,
+      })),
+      expenses: expenses.map((e) => ({
+        category: e.category,
+        description: e.description,
+        amount: e.amount,
+      })),
+      getServiceLabel,
+    })
+    toast.success("PDF exportado")
+  }
+
   const handleExportIVA = () => {
     const invoiced = orders.filter((o) => o.invoiceType && o.invoiceType !== "none")
     if (!invoiced.length) {
@@ -253,9 +299,13 @@ export default function ReportsPage() {
             </Button>
           </div>
           <div className="flex gap-1.5">
-            <Button variant="outline" size="sm" onClick={handleExportReport} title="Exportar reporte mensual">
+            <Button variant="outline" size="sm" onClick={handleExportPDF} title="Exportar reporte mensual en PDF">
+              <FileText className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">PDF</span>
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportReport} title="Exportar reporte mensual en Excel">
               <Download className="h-4 w-4 sm:mr-1" />
-              <span className="hidden sm:inline">Reporte</span>
+              <span className="hidden sm:inline">Excel</span>
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportIVA} title="Exportar libro IVA ventas">
               <FileSpreadsheet className="h-4 w-4 sm:mr-1" />

@@ -58,6 +58,7 @@ export async function GET(request: NextRequest) {
           name: clients.name,
           phone: clients.phone,
           email: clients.email,
+          cuit: clients.cuit,
         },
       })
       .from(orders)
