@@ -30,7 +30,6 @@ interface PaymentModalProps {
 }
 
 export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
-  const [paymentAmount, setPaymentAmount] = useState("")
   const [receipt, setReceipt] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [invoiceType, setInvoiceType] = useState<"A" | "B" | "none">("none")
@@ -53,6 +52,11 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      if (file.type !== "application/pdf") {
+        setError("Solo se permiten archivos PDF.")
+        if (fileInputRef.current) fileInputRef.current.value = ""
+        return
+      }
       if (file.size > MAX_FILE_SIZE) {
         setError("El archivo es muy grande. Máximo 5MB.")
         if (fileInputRef.current) fileInputRef.current.value = ""
@@ -79,7 +83,7 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!order || !paymentAmount) return
+    if (!order) return
 
     setError("")
     setValidationResult(null)
@@ -87,7 +91,7 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
     try {
       const result = await registerPayment.mutateAsync({
         orderId: order.id,
-        paymentAmount: Number(paymentAmount),
+        paymentAmount: remaining > 0 ? remaining : orderPrice,
         receipt: receipt || undefined,
         invoiceType: invoiceType !== "none" ? invoiceType : undefined,
         invoiceNumber: invoiceNumber || undefined,
@@ -107,7 +111,6 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
   }
 
   const handleClose = () => {
-    setPaymentAmount("")
     setReceipt(null)
     setPreviewUrl(null)
     setInvoiceType("none")
@@ -149,39 +152,6 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
                   <span className="font-bold">${remaining.toLocaleString("es-AR")}</span>
                 </div>
               </>
-            )}
-          </div>
-
-          {/* Payment Amount */}
-          <div className="space-y-2">
-            <Label htmlFor="paymentAmount">Monto del pago *</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                $
-              </span>
-              <Input
-                id="paymentAmount"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder={remaining > 0 ? remaining.toString() : "0"}
-                className="pl-7 h-11"
-                value={paymentAmount}
-                onChange={(e) => setPaymentAmount(e.target.value)}
-                required
-              />
-            </div>
-            {paymentAmount && Number(paymentAmount) !== remaining && remaining > 0 && (
-              <p className={cn(
-                "text-xs",
-                Number(paymentAmount) < remaining ? "text-orange-600" : "text-green-600"
-              )}>
-                {Number(paymentAmount) < remaining
-                  ? `Faltarían $${(remaining - Number(paymentAmount)).toLocaleString("es-AR")}`
-                  : Number(paymentAmount) > remaining
-                  ? `Excede por $${(Number(paymentAmount) - remaining).toLocaleString("es-AR")}`
-                  : null}
-              </p>
             )}
           </div>
 
@@ -258,7 +228,7 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
                   Click para subir comprobante
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  JPG, PNG o PDF (máx. 5MB)
+                  Solo PDF (máx. 5MB)
                 </p>
               </div>
             ) : (
@@ -270,24 +240,16 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
                 >
                   <X className="h-3 w-3" />
                 </button>
-                {previewUrl && receipt.type.startsWith("image/") ? (
-                  <img
-                    src={previewUrl}
-                    alt="Comprobante"
-                    className="max-h-40 mx-auto rounded"
-                  />
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Receipt className="h-8 w-8 text-muted-foreground" />
-                    <span className="text-sm truncate">{receipt.name}</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2">
+                  <FileText className="h-8 w-8 text-red-500" />
+                  <span className="text-sm truncate">{receipt.name}</span>
+                </div>
               </div>
             )}
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*,.pdf"
+              accept=".pdf,application/pdf"
               onChange={handleFileChange}
               className="hidden"
             />
@@ -335,7 +297,7 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
             </Button>
             <Button
               type="submit"
-              disabled={registerPayment.isPending || !paymentAmount}
+              disabled={registerPayment.isPending}
               className="flex-1 h-11"
             >
               {registerPayment.isPending ? "Registrando..." : "Registrar Pago"}

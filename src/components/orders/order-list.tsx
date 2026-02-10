@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
-import { MoreVertical, Trash2, MessageCircle, Mail, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone, History, FileDown } from "lucide-react"
+import { MoreVertical, Trash2, MessageCircle, Mail, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone, History, FileDown, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -35,6 +35,7 @@ import type { OrderStatus, PaymentStatus, Service } from "@/lib/db/schema"
 import { PaymentModal } from "./payment-modal"
 import { EditOrderModal } from "./edit-order-modal"
 import { ActivityModal } from "./activity-modal"
+import { ComprobantesModal } from "./comprobantes-modal"
 import { cn } from "@/lib/utils"
 import { generateInvoicePDF, type InvoicePDFData } from "@/lib/utils/pdf"
 
@@ -66,9 +67,10 @@ interface OrderCardProps {
   onEdit: (order: OrderWithClient) => void
   onHistory: (order: OrderWithClient) => void
   onEmail: (order: OrderWithClient) => void
+  onComprobantes: (order: OrderWithClient) => void
 }
 
-function OrderCard({ order, onPayment, onEdit, onHistory, onEmail }: OrderCardProps) {
+function OrderCard({ order, onPayment, onEdit, onHistory, onEmail, onComprobantes }: OrderCardProps) {
   const { confirm, ConfirmDialog } = useConfirmDialog()
   const { data: services = [] } = useServices()
   const updateOrder = useUpdateOrder()
@@ -337,11 +339,11 @@ function OrderCard({ order, onPayment, onEdit, onHistory, onEmail }: OrderCardPr
                   <DropdownMenuSeparator />
                 </>
               )}
-              {hasPrice && (
+              {hasPrice && paymentStatus !== "paid" && (
                 <>
                   <DropdownMenuItem onClick={() => onPayment(order)}>
                     <Receipt className="mr-2 h-4 w-4" />
-                    {paymentStatus === "paid" ? "Ver pago" : "Registrar pago"}
+                    Registrar pago
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
@@ -378,6 +380,10 @@ function OrderCard({ order, onPayment, onEdit, onHistory, onEmail }: OrderCardPr
               <DropdownMenuItem onClick={() => onHistory(order)}>
                 <History className="mr-2 h-4 w-4" />
                 Historial
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onComprobantes(order)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Comprobantes
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDuplicate} disabled={duplicateOrder.isPending}>
                 <Copy className="mr-2 h-4 w-4" />
@@ -422,6 +428,7 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
   const [editingOrder, setEditingOrder] = useState<OrderWithClient | null>(null)
   const [historyOrder, setHistoryOrder] = useState<OrderWithClient | null>(null)
   const [emailOrder, setEmailOrder] = useState<OrderWithClient | null>(null)
+  const [comprobantesOrder, setComprobantesOrder] = useState<OrderWithClient | null>(null)
 
   const getEmailDefaults = (order: OrderWithClient) => {
     const name = order.client?.name?.split(" ")[0] || "cliente"
@@ -527,6 +534,7 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
             onEdit={setEditingOrder}
             onHistory={setHistoryOrder}
             onEmail={setEmailOrder}
+            onComprobantes={setComprobantesOrder}
           />
         ))}
       </div>
@@ -560,6 +568,13 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
           defaultBody={getEmailDefaults(emailOrder).body}
         />
       )}
+
+      <ComprobantesModal
+        orderId={comprobantesOrder?.id ?? null}
+        orderLabel={comprobantesOrder?.client?.name}
+        open={!!comprobantesOrder}
+        onOpenChange={(open) => !open && setComprobantesOrder(null)}
+      />
     </>
   )
 }
