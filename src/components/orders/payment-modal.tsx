@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/select"
 import { useRegisterPayment, type OrderWithClient } from "@/hooks/use-orders"
 import { cn } from "@/lib/utils"
+import { invoiceTypes, invoiceTypeLabels } from "@/lib/validations/orders"
+import { parseInvoiceType, type InvoiceType } from "@/lib/utils/validation"
 
 const IVA_RATE = 0.21
 
@@ -32,7 +34,7 @@ interface PaymentModalProps {
 export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
   const [receipt, setReceipt] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [invoiceType, setInvoiceType] = useState<"A" | "B" | "none">("none")
+  const [invoiceType, setInvoiceType] = useState<InvoiceType>("none")
   const [invoiceNumber, setInvoiceNumber] = useState("")
   const [error, setError] = useState("")
   const [validationResult, setValidationResult] = useState<{
@@ -163,15 +165,17 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
             </Label>
             <Select
               value={invoiceType}
-              onValueChange={(v) => setInvoiceType(v as "A" | "B" | "none")}
+              onValueChange={(v) => setInvoiceType(parseInvoiceType(v))}
             >
               <SelectTrigger className="h-11">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Sin factura</SelectItem>
-                <SelectItem value="A">Factura A (discrimina IVA)</SelectItem>
-                <SelectItem value="B">Factura B (consumidor final)</SelectItem>
+                {invoiceTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {invoiceTypeLabels[type]}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

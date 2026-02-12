@@ -31,11 +31,18 @@ export const orderStatuses = [
   "cancelled",
 ] as const
 
-export const invoiceTypes = ["A", "B", "none"] as const
+export const invoiceTypes = ["A", "B", "C", "NC_C", "ND_C", "R_C", "C_E", "NC_C_E", "ND_C_E", "none"] as const
 
 export const invoiceTypeLabels: Record<(typeof invoiceTypes)[number], string> = {
   A: "Factura A",
   B: "Factura B",
+  C: "Factura C",
+  NC_C: "Nota de Crédito C",
+  ND_C: "Nota de Débito C",
+  R_C: "Recibo C",
+  C_E: "Factura C Electrónica",
+  NC_C_E: "Nota de Crédito C Electrónica",
+  ND_C_E: "Nota de Débito C Electrónica",
   none: "Sin factura",
 }
 

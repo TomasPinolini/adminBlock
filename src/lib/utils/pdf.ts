@@ -2,6 +2,7 @@ import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"
 import { formatCurrency, calculateInvoiceBreakdown, formatCUIT } from "./invoice"
 import { formatDate } from "./dates"
+import { invoiceTypeLabels } from "@/lib/validations/orders"
 
 // Business constants
 const BUSINESS_NAME = "BLOCK Imprenta"
@@ -25,7 +26,7 @@ const paymentLabels: Record<string, string> = {
 // ============================================================
 
 export interface InvoicePDFData {
-  invoiceType: "A" | "B"
+  invoiceType: "A" | "B" | "C" | "C_E"
   invoiceNumber: string | null
   createdAt: string | Date
   clientName: string
@@ -53,7 +54,7 @@ export function generateInvoicePDF(data: InvoicePDFData) {
   doc.text(BUSINESS_NAME, margin, y)
 
   doc.setFontSize(14)
-  const facturaLabel = `FACTURA ${data.invoiceType}`
+  const facturaLabel = (invoiceTypeLabels[data.invoiceType] || `Factura ${data.invoiceType}`).toUpperCase()
   doc.text(facturaLabel, pageWidth - margin, y, { align: "right" })
   y += 8
 
@@ -162,7 +163,8 @@ export function generateInvoicePDF(data: InvoicePDFData) {
   }
 
   // -- Save --
-  const fileName = `factura_${data.invoiceType}_${data.invoiceNumber || "sin-numero"}.pdf`
+  const typeSlug = data.invoiceType.replace(/_/g, "-").toLowerCase()
+  const fileName = `factura_${typeSlug}_${data.invoiceNumber || "sin-numero"}.pdf`
   doc.save(fileName)
 }
 
@@ -238,7 +240,7 @@ export function generateMonthlyReportPDF(data: MonthlyReportPDFData) {
 
   // -- Summary calculations --
   const facturaAOrders = data.orders.filter((o) => o.invoiceType === "A")
-  const facturaCOrders = data.orders.filter((o) => o.invoiceType === "C")
+  const otherInvoicedOrders = data.orders.filter((o) => o.invoiceType && o.invoiceType !== "A" && o.invoiceType !== "none")
   const noInvoiceOrders = data.orders.filter((o) => !o.invoiceType || o.invoiceType === "none")
 
   const totalVentas = data.orders.reduce((s, o) => s + num(o.price), 0)
@@ -257,7 +259,7 @@ export function generateMonthlyReportPDF(data: MonthlyReportPDFData) {
     body: [
       ["Ventas totales", formatCurrency(totalVentas)],
       [`  Factura A (${facturaAOrders.length})`, formatCurrency(facturaAOrders.reduce((s, o) => s + num(o.price), 0))],
-      [`  Factura C (${facturaCOrders.length})`, formatCurrency(facturaCOrders.reduce((s, o) => s + num(o.price), 0))],
+      [`  Otros comprobantes (${otherInvoicedOrders.length})`, formatCurrency(otherInvoicedOrders.reduce((s, o) => s + num(o.price), 0))],
       [`  Sin factura (${noInvoiceOrders.length})`, formatCurrency(noInvoiceOrders.reduce((s, o) => s + num(o.price), 0))],
       ["Subtotal neto", formatCurrency(totalSubtotal)],
       ["IVA 21%", formatCurrency(totalIVA)],
@@ -323,20 +325,21 @@ export function generateMonthlyReportPDF(data: MonthlyReportPDFData) {
     })
   }
 
-  // -- Factura C detail --
-  if (facturaCOrders.length > 0) {
+  // -- Other invoiced types detail --
+  if (otherInvoicedOrders.length > 0) {
     doc.addPage()
     y = margin
 
     doc.setFontSize(12)
     doc.setFont("helvetica", "bold")
-    doc.text("Detalle Factura C", margin, y)
+    doc.text("Detalle Otros Comprobantes", margin, y)
     y += 6
 
     autoTable(doc, {
       startY: y,
-      head: [["Fecha", "Fact#", "Cliente", "Detalle", "Total"]],
-      body: facturaCOrders.map((o) => [
+      head: [["Tipo", "Fecha", "N\u00B0", "Cliente", "Detalle", "Total"]],
+      body: otherInvoicedOrders.map((o) => [
+        invoiceTypeLabels[o.invoiceType as keyof typeof invoiceTypeLabels] || o.invoiceType || "-",
         new Date(o.createdAt).toLocaleDateString("es-AR"),
         o.invoiceNumber || "-",
         o.clientName || "-",
@@ -344,8 +347,8 @@ export function generateMonthlyReportPDF(data: MonthlyReportPDFData) {
         formatCurrency(num(o.price)),
       ]),
       foot: [[
-        "", "", "", "Total",
-        formatCurrency(facturaCOrders.reduce((s, o) => s + num(o.price), 0)),
+        "", "", "", "", "Total",
+        formatCurrency(otherInvoicedOrders.reduce((s, o) => s + num(o.price), 0)),
       ]],
       theme: "grid",
       headStyles: { fillColor: [50, 50, 50], fontSize: 8 },

@@ -181,8 +181,8 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
               <Label htmlFor="invoiceType">Tipo de Factura</Label>
               <Select
                 value={formData.invoiceType}
-                onValueChange={(value: "A" | "B" | "none") => 
-                  setFormData({ ...formData, invoiceType: value })
+                onValueChange={(value: string) =>
+                  setFormData({ ...formData, invoiceType: parseInvoiceType(value) })
                 }
               >
                 <SelectTrigger id="invoiceType">

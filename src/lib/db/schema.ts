@@ -48,7 +48,14 @@ export const clientTypeEnum = pgEnum("client_type", [
 
 export const invoiceTypeEnum = pgEnum("invoice_type", [
   "A",
-  "B", 
+  "B",
+  "C",
+  "NC_C",
+  "ND_C",
+  "R_C",
+  "C_E",
+  "NC_C_E",
+  "ND_C_E",
   "none",
 ])
 
@@ -250,6 +257,7 @@ export const quotes = pgTable("quotes", {
   isOutsourced: boolean("is_outsourced").default(false).notNull(), // tercerizado
   outsourcedSupplierId: uuid("outsourced_supplier_id").references(() => suppliers.id), // proveedor que hace el trabajo
   orderId: uuid("order_id").references(() => orders.id, { onDelete: "set null" }), // if converted to order
+  deliveryDate: date("delivery_date"), // fecha de entrega estimada
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })

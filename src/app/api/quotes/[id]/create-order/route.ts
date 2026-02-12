@@ -55,6 +55,7 @@ export async function POST(
         status: "quoted" as const,
         description: quote.description,
         price: quote.totalPrice,
+        dueDate: quote.deliveryDate || null,
       })
       .returning()
 
@@ -63,7 +64,7 @@ export async function POST(
       await db.insert(orderMaterials).values(
         qMaterials.map((m) => ({
           orderId: newOrder.id,
-          lineType: m.lineType || "material",
+          lineType: "material",
           materialId: m.materialId,
           description: m.description,
           supplierId: m.supplierId,

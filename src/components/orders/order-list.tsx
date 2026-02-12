@@ -29,6 +29,7 @@ import { EmailComposeModal } from "@/components/email-compose-modal"
 import {
   orderStatusLabels,
   orderStatuses,
+  invoiceTypeLabels,
 } from "@/lib/validations/orders"
 import { useServices } from "@/hooks/use-services"
 import type { OrderStatus, PaymentStatus, Service } from "@/lib/db/schema"
@@ -120,12 +121,12 @@ function OrderCard({ order, onPayment, onEdit, onHistory, onEmail, onComprobante
   const hasEmail = !!order.client?.email
   const hasPrice = !!order.price && Number(order.price) > 0
   const paymentStatus = (order.paymentStatus || "pending") as PaymentStatus
-  const canDownloadInvoice = order.invoiceType === "A" || order.invoiceType === "B"
+  const canDownloadInvoice = order.invoiceType === "A" || order.invoiceType === "B" || order.invoiceType === "C" || order.invoiceType === "C_E"
 
   const handleDownloadInvoice = () => {
     const serviceLabel = services.find((s) => s.name === order.serviceType)?.displayName || order.serviceType
     generateInvoicePDF({
-      invoiceType: order.invoiceType as "A" | "B",
+      invoiceType: order.invoiceType as InvoicePDFData["invoiceType"],
       invoiceNumber: order.invoiceNumber,
       createdAt: order.createdAt,
       clientName: order.client?.name || "Cliente",
@@ -223,7 +224,10 @@ function OrderCard({ order, onPayment, onEdit, onHistory, onEmail, onComprobante
               {order.invoiceNumber && (
                 <span className="inline-flex items-center gap-1">
                   <Receipt className="h-3 w-3" />
-                  Factura {order.invoiceType !== "none" ? order.invoiceType : ""} N° {order.invoiceNumber}
+                  {order.invoiceType && order.invoiceType !== "none"
+                    ? invoiceTypeLabels[order.invoiceType as keyof typeof invoiceTypeLabels] || order.invoiceType
+                    : "Comprobante"}{" "}
+                  N° {order.invoiceNumber}
                 </span>
               )}
               {order.quantity && (
