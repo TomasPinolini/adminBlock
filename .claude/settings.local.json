@@ -26,7 +26,9 @@
       "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: remove dead serviceTypeEnum, fix stats double-cast, add missing updatedAt to clients API\n\n- Remove phantom serviceTypeEnum pgEnum \\(DB already migrated to TEXT\\)\n- Simplify revenue SQL from double-cast to direct sum\n- Add missing updatedAt field to clients GET response\n- Remove unused ServiceType import and cast in orders route\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git mv:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nperf: move orders filtering to SQL, fix sortOrder type, clean up migrations\n\n- Move orders GET filtering from JS to SQL WHERE clauses \\(uses existing indexes\\)\n- Change sortOrder from numeric\\(10,0\\) to integer, remove string conversions\n- Archive ad-hoc FIX_* migration scripts to _archive/\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nchore: unify migration system, archive outdated Drizzle migrations\n\n- Move Drizzle auto-generated migrations \\(0000-0002\\) to _archive/drizzle_legacy\n- Update drizzle.config.ts to point to ./migrations as single source of truth\n- Manual migrations \\(003-010\\) are now the authoritative migration history\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nchore: unify migration system, archive outdated Drizzle migrations\n\n- Move Drizzle auto-generated migrations \\(0000-0002\\) to _archive/drizzle_legacy\n- Update drizzle.config.ts to point to ./migrations as single source of truth\n- Manual migrations \\(003-010\\) are now the authoritative migration history\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "WebSearch",
+      "Bash(npx next build)"
     ]
   }
 }
