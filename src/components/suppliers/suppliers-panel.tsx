@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Combobox } from "@/components/ui/combobox"
 import {
   useSuppliers,
   useCreateSupplier,
@@ -362,21 +363,15 @@ export function SuppliersPanel() {
               {/* Add material */}
               {availableMaterials.length > 0 ? (
                 <div className="flex gap-2 pt-2">
-                  <Select
+                  <Combobox
+                    options={availableMaterials.map((m) => ({ value: m.id, label: `${m.name} (${m.unit})` }))}
                     value={selectedMaterialId}
                     onValueChange={setSelectedMaterialId}
-                  >
-                    <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="Seleccionar material..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableMaterials.map((material) => (
-                        <SelectItem key={material.id} value={material.id}>
-                          {material.name} ({material.unit})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Seleccionar material..."
+                    searchPlaceholder="Buscar material..."
+                    emptyText="Sin resultados."
+                    className="flex-1"
+                  />
                   <Input
                     type="number"
                     step="0.01"

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { orders, clients, orderComments, services } from "@/lib/db/schema"
+import { orders, clients, orderComments, services, quotes } from "@/lib/db/schema"
 import { updateOrderSchema } from "@/lib/validations/orders"
 import { eq, desc } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
@@ -214,6 +214,12 @@ export async function DELETE(
     // Get current user
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+
+    // Unlink any quotes referencing this order to avoid FK constraint
+    await db
+      .update(quotes)
+      .set({ orderId: null })
+      .where(eq(quotes.orderId, id))
 
     const [deletedOrder] = await db
       .delete(orders)

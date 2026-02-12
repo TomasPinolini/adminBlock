@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 interface QuoteLineItem {
-  lineType: "material" | "service"
   materialId?: string
   description?: string
   supplierId?: string
@@ -13,6 +12,7 @@ interface CreateQuoteData {
   clientId?: string
   serviceType?: string
   description?: string
+  deliveryDate?: string
   profitMargin?: string
   profitType?: "fixed" | "percentage"
   isOutsourced?: boolean
@@ -26,6 +26,7 @@ interface QuoteListItem {
   clientId: string | null
   serviceType: string | null
   description: string | null
+  deliveryDate: string | null
   materialsCost: string | null
   profitMargin: string | null
   profitType: string | null

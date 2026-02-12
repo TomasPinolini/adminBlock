@@ -39,18 +39,12 @@ import type { MaterialCost, OutsourcedCost } from "@/hooks/use-monthly-report"
 import { cn } from "@/lib/utils"
 import { exportMonthlyReport, exportLibroIVA, exportBackupJSON } from "@/lib/utils/export"
 import { generateMonthlyReportPDF } from "@/lib/utils/pdf"
+import { invoiceTypeLabels } from "@/lib/validations/orders"
 
 const monthNames = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ]
-
-const invoiceTypeLabels: Record<string, string> = {
-  A: "Factura A",
-  B: "Factura B",
-  C: "Factura C",
-  none: "Sin factura",
-}
 
 function formatCurrency(value: string | number | null | undefined): string {
   if (!value) return "-"
@@ -108,7 +102,7 @@ export default function ReportsPage() {
   // Calculations
   const invoicedOrders = orders.filter((o) => o.invoiceType && o.invoiceType !== "none")
   const facturaAOrders = orders.filter((o) => o.invoiceType === "A")
-  const facturaCOrders = orders.filter((o) => o.invoiceType === "C")
+  const otherInvoicedOrders = orders.filter((o) => o.invoiceType && o.invoiceType !== "A" && o.invoiceType !== "none")
   const noInvoiceOrders = orders.filter((o) => !o.invoiceType || o.invoiceType === "none")
 
   const totalVentas = orders.reduce((sum, o) => sum + (parseFloat(o.price || "0") || 0), 0)
@@ -420,46 +414,48 @@ export default function ReportsPage() {
         </div>
       )}
 
-      {/* VENTAS Section - Factura C */}
-      {facturaCOrders.length > 0 && (
+      {/* VENTAS Section - Other invoiced types (B, C, NC_C, etc.) */}
+      {otherInvoicedOrders.length > 0 && (
         <div className="space-y-2">
           <h2 className="font-semibold flex items-center gap-2">
-            <Badge variant="outline">Factura C</Badge>
-            <span className="text-sm text-muted-foreground">({facturaCOrders.length})</span>
+            <Badge variant="outline">Otros comprobantes</Badge>
+            <span className="text-sm text-muted-foreground">({otherInvoicedOrders.length})</span>
           </h2>
           <div className="overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
               <thead className="border-b bg-muted/50">
                 <tr>
-                  <th className="px-3 py-2 text-left font-medium">Fact#</th>
+                  <th className="px-3 py-2 text-left font-medium">Tipo</th>
+                  <th className="px-3 py-2 text-left font-medium">N°</th>
                   <th className="px-3 py-2 text-left font-medium">Fecha</th>
                   <th className="px-3 py-2 text-left font-medium">Cliente</th>
                   <th className="px-3 py-2 text-right font-medium">Total</th>
-                  <th className="px-3 py-2 text-left font-medium hidden lg:table-cell">CUIT</th>
                   <th className="px-3 py-2 text-left font-medium hidden lg:table-cell">Detalle</th>
                 </tr>
               </thead>
               <tbody>
-                {facturaCOrders.map((o) => (
+                {otherInvoicedOrders.map((o) => (
                   <tr key={o.id} className="border-b last:border-0 hover:bg-muted/30">
+                    <td className="px-3 py-2 text-xs">
+                      {invoiceTypeLabels[o.invoiceType as keyof typeof invoiceTypeLabels] || o.invoiceType}
+                    </td>
                     <td className="px-3 py-2 font-mono text-xs">{o.invoiceNumber || "-"}</td>
                     <td className="px-3 py-2 whitespace-nowrap">
                       {new Date(o.createdAt).toLocaleDateString("es-AR")}
                     </td>
                     <td className="px-3 py-2 font-medium">{o.clientName || "-"}</td>
                     <td className="px-3 py-2 text-right font-semibold">{formatCurrency(o.price)}</td>
-                    <td className="px-3 py-2 font-mono text-xs hidden lg:table-cell">{o.clientCuit || "-"}</td>
                     <td className="px-3 py-2 text-muted-foreground hidden lg:table-cell truncate max-w-[200px]">
                       {o.description || getServiceLabel(o.serviceType)}
                     </td>
                   </tr>
                 ))}
                 <tr className="bg-muted/50 font-semibold">
-                  <td colSpan={3} className="px-3 py-2">Total Factura C</td>
+                  <td colSpan={4} className="px-3 py-2">Total otros comprobantes</td>
                   <td className="px-3 py-2 text-right">
-                    {formatCurrency(facturaCOrders.reduce((s, o) => s + (parseFloat(o.price || "0") || 0), 0))}
+                    {formatCurrency(otherInvoicedOrders.reduce((s, o) => s + (parseFloat(o.price || "0") || 0), 0))}
                   </td>
-                  <td colSpan={2} className="hidden lg:table-cell" />
+                  <td className="hidden lg:table-cell" />
                 </tr>
               </tbody>
             </table>

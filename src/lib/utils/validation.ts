@@ -66,7 +66,7 @@ export const MAX_TEXT_LONG = 2000  // comments, long notes
 /**
  * Valid invoice types
  */
-export const INVOICE_TYPES = ["A", "B", "none"] as const
+export const INVOICE_TYPES = ["A", "B", "C", "NC_C", "ND_C", "R_C", "C_E", "NC_C_E", "ND_C_E", "none"] as const
 export type InvoiceType = typeof INVOICE_TYPES[number]
 
 /**

@@ -12,7 +12,6 @@ const positiveNumStr = z.string().or(z.number()).transform(String).refine(
 )
 
 const quoteLineItemSchema = z.object({
-  lineType: z.enum(["material", "service"]).default("material"),
   materialId: z.string().uuid().optional(),
   description: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
   supplierId: z.string().uuid().optional(),
@@ -24,6 +23,7 @@ const createQuoteSchema = z.object({
   clientId: z.string().uuid().optional(),
   serviceType: z.string().max(MAX_TEXT_SHORT).optional(),
   description: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
+  deliveryDate: z.string().optional(),
   profitMargin: positiveNumStr.optional(),
   profitType: z.enum(["fixed", "percentage"]).optional(),
   isOutsourced: z.boolean().optional(),
@@ -40,6 +40,7 @@ export async function GET() {
         clientId: quotes.clientId,
         serviceType: quotes.serviceType,
         description: quotes.description,
+        deliveryDate: quotes.deliveryDate,
         materialsCost: quotes.materialsCost,
         profitMargin: quotes.profitMargin,
         profitType: quotes.profitType,
@@ -74,7 +75,6 @@ export async function POST(request: NextRequest) {
 
     let materialsCost = 0
     let materialsToInsert: Array<{
-      lineType: string
       materialId?: string
       description?: string
       supplierId?: string
@@ -100,7 +100,6 @@ export async function POST(request: NextRequest) {
         const subtotal = quantity * unitPrice
         materialsCost += subtotal
         return {
-          lineType: m.lineType || "material",
           materialId: m.materialId,
           description: m.description,
           supplierId: m.supplierId,
@@ -128,6 +127,7 @@ export async function POST(request: NextRequest) {
         clientId: validated.clientId,
         serviceType: validated.serviceType as any,
         description: validated.description,
+        deliveryDate: validated.deliveryDate || null,
         materialsCost: materialsCost.toFixed(2),
         profitMargin: validated.profitMargin,
         profitType: validated.profitType || "fixed",
@@ -142,6 +142,7 @@ export async function POST(request: NextRequest) {
       await db.insert(quoteMaterials).values(
         materialsToInsert.map((m) => ({
           ...m,
+          lineType: "material",
           quoteId: newQuote.id,
         }))
       )

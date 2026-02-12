@@ -4,7 +4,7 @@
 
 export const IVA_RATE = 0.21 // 21% IVA in Argentina
 
-export type InvoiceType = "A" | "B" | "none"
+export type InvoiceType = "A" | "B" | "C" | "NC_C" | "ND_C" | "R_C" | "C_E" | "NC_C_E" | "ND_C_E" | "none"
 
 /**
  * Ensure a value is a finite non-negative number. Returns 0 for invalid input.
