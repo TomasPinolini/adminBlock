@@ -53,7 +53,9 @@
       "WebFetch(domain:admin-block-nine.vercel.app)",
       "WebFetch(domain:admin-block.vercel.app)",
       "WebFetch(domain:adminblock.vercel.app)",
-      "WebFetch(domain:admin-block-six.vercel.app)"
+      "WebFetch(domain:admin-block-six.vercel.app)",
+      "Bash(git stash pop:*)",
+      "Bash(git stash:*)"
     ]
   }
 }

@@ -8,6 +8,7 @@ import {
   integer,
   date,
   boolean,
+  jsonb,
 } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
 
@@ -67,6 +68,7 @@ export const clients = pgTable("clients", {
   phone: text("phone"),
   email: text("email"),
   cuit: text("cuit"), // CUIT for invoicing
+  address: text("address"), // DIRECCION - used for termocopiados
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -112,6 +114,7 @@ export const orders = pgTable("orders", {
   receiptUrl: text("receipt_url"),
   paidAt: timestamp("paid_at"),
   lastReminderSent: date("last_reminder_sent"), // tracks last overdue reminder date to avoid spamming
+  metadata: jsonb("metadata"), // structured service-specific data (e.g. termocopiado: { libros, copias })
   isArchived: boolean("is_archived").default(false).notNull(), // soft delete for delivered+paid
   archivedAt: timestamp("archived_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -485,3 +488,9 @@ export type OrderStatus = (typeof orderStatusEnum.enumValues)[number]
 export type ActivityType = (typeof activityTypeEnum.enumValues)[number]
 export type PaymentStatus = (typeof paymentStatusEnum.enumValues)[number]
 export type ClientType = (typeof clientTypeEnum.enumValues)[number]
+
+// Service-specific metadata types
+export interface TermocopiadoMetadata {
+  libros: number
+  copias: number
+}

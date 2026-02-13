@@ -517,7 +517,7 @@ export default function QuotesPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {quotes
               .filter((q) => {
                 if (!quoteSearch) return true
@@ -531,13 +531,14 @@ export default function QuotesPage() {
               .map((quote) => (
               <div
                 key={quote.id}
-                className="rounded-lg border bg-background p-4"
+                className="rounded-lg border bg-background p-4 space-y-3"
               >
-                <div className="flex items-center justify-between">
+                {/* Header: name + badges + delete */}
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       {quote.clientName && (
-                        <span className="font-medium">{quote.clientName}</span>
+                        <span className="font-medium text-base">{quote.clientName}</span>
                       )}
                       {quote.serviceType && (
                         <span className="text-sm text-muted-foreground">
@@ -555,34 +556,34 @@ export default function QuotesPage() {
                       )}
                     </div>
                     {quote.deliveryDate && (
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-muted-foreground mt-0.5">
                         Entrega: {new Date(quote.deliveryDate + "T00:00:00").toLocaleDateString("es-AR")}
                       </div>
                     )}
-                    <div className="text-sm text-muted-foreground">
-                      Costo: ${Number(quote.materialsCost || 0).toLocaleString("es-AR")} |
-                      Ganancia: ${Number(quote.profitMargin || 0).toLocaleString("es-AR")}
-                      {quote.profitType === "percentage" ? "%" : ""}
+                    <div className="text-sm text-muted-foreground mt-0.5">
+                      Costo: ${Number(quote.materialsCost || 0).toLocaleString("es-AR")} | Ganancia: ${Number(quote.profitMargin || 0).toLocaleString("es-AR")}{quote.profitType === "percentage" ? "%" : ""}
                     </div>
-                    <p className="text-xl font-bold text-primary">
-                      Costo cotizado total: ${Number(quote.totalPrice || 0).toLocaleString("es-AR")}
-                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteQuote(quote.id)}
+                    className="text-destructive hover:text-destructive shrink-0 h-9 w-9"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Footer: total price + actions */}
+                <div className="flex items-center justify-between gap-3 pt-2 border-t border-border/50">
+                  <p className="text-lg font-bold text-primary whitespace-nowrap">
+                    Total: ${Number(quote.totalPrice || 0).toLocaleString("es-AR")}
+                  </p>
+                  <div className="flex items-center gap-2">
                     {quote.orderId && (
-                      <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 px-2 py-0.5 rounded">
+                      <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 px-2 py-1 rounded-md whitespace-nowrap">
                         Pedido creado
                       </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {!quote.isOutsourced && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setExpandedQuoteId(expandedQuoteId === quote.id ? null : quote.id)}
-                        title="Ver detalle"
-                      >
-                        {expandedQuoteId === quote.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                      </Button>
                     )}
                     {!quote.orderId && quote.clientId && (
                       <Button
@@ -590,19 +591,23 @@ export default function QuotesPage() {
                         size="sm"
                         onClick={() => handleCreateOrder(quote.id)}
                         disabled={createOrderFromQuote.isPending}
+                        className="h-9"
                       >
-                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        <ShoppingCart className="mr-1.5 h-4 w-4" />
                         Crear Pedido
                       </Button>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeleteQuote(quote.id)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {!quote.isOutsourced && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setExpandedQuoteId(expandedQuoteId === quote.id ? null : quote.id)}
+                        title="Ver detalle"
+                        className="h-9 w-9 shrink-0"
+                      >
+                        {expandedQuoteId === quote.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </Button>
+                    )}
                   </div>
                 </div>
                 {expandedQuoteId === quote.id && (
