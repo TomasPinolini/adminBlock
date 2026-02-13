@@ -68,6 +68,7 @@ export function ClientFormModal() {
         phone: editingClient.phone || "",
         email: editingClient.email || "",
         cuit: editingClient.cuit || "",
+        address: editingClient.address || "",
         notes: editingClient.notes || "",
       })
     }
@@ -109,7 +110,7 @@ export function ClientFormModal() {
   }
 
   const handleClose = () => {
-    reset({ clientType: "individual", name: "", phone: "", email: "", cuit: "", notes: "" })
+    reset({ clientType: "individual", name: "", phone: "", email: "", cuit: "", address: "", notes: "" })
     setClientType("individual")
     setSelectedCompanyId(null)
     setRole("")
@@ -208,6 +209,16 @@ export function ClientFormModal() {
               placeholder="20-12345678-9"
               className="h-11 lg:h-9"
               {...register("cuit")}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="address">Dirección</Label>
+            <Input
+              id="address"
+              placeholder="Calle 123, Ciudad"
+              className="h-11 lg:h-9"
+              {...register("address")}
             />
           </div>
 

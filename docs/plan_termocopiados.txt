@@ -1,0 +1,137 @@
+# Termocopiados - Dedicated Fast-Entry Page
+
+## Context
+60% of dad's work is termocopiados. He currently tracks them on paper strips
+(EMPRESA, DIRECCION, CONTACTO, CUIT/CUIL, LIBROS, COPIAS, TELEFONO, PRECIO).
+This plan creates a dedicated /termocopiados page with a fast inline form that
+mimics the paper workflow but digitally — integrated with the existing orders
+system so everything stays in one place.
+
+---
+
+## Data Model Changes
+
+### Migration 016_add_termocopiado_support.sql
+1. Add `address` (TEXT) to `clients` table — dad tracks DIRECCION on paper, currently missing
+2. Add `metadata` (JSONB) to `orders` table — stores structured service-specific data
+   For termocopiados: {"libros": 5, "copias": 200}. Flexible for future service types too.
+3. Ensure "termocopiado" service exists in services table
+4. Add index on orders.service_type for fast filtering
+
+### Schema update (src/lib/db/schema.ts)
+- Import `jsonb` from drizzle-orm/pg-core
+- Add `address: text("address")` to clients table
+- Add `metadata: jsonb("metadata")` to orders table
+- Add TermocopiadoMetadata interface: { libros: number; copias: number }
+
+### Default status: delivered
+Termocopiados are "log and done" — no status tracking needed. Created with
+status: 'delivered', paymentStatus: 'pending'.
+
+---
+
+## Files to Create
+
+| File                                                    | Purpose                              |
+|---------------------------------------------------------|--------------------------------------|
+| migrations/016_add_termocopiado_support.sql             | DB migration                         |
+| src/app/(dashboard)/termocopiados/page.tsx              | Main page                            |
+| src/components/termocopiados/termocopiado-form.tsx      | Inline fast-entry form (NOT modal)   |
+| src/components/termocopiados/termocopiado-list.tsx      | Recent entries list grouped by date  |
+| src/components/termocopiados/termocopiado-card.tsx      | Individual entry card                |
+| src/components/termocopiados/termocopiado-edit-modal.tsx| Edit dialog                          |
+| src/components/termocopiados/quick-client-form.tsx      | Inline mini-form to create client    |
+| src/hooks/use-termocopiados.ts                          | TanStack Query hooks                 |
+| src/lib/validations/termocopiados.ts                    | Zod schemas                          |
+| src/app/api/termocopiados/route.ts                      | GET (list) + POST (create)           |
+| src/app/api/termocopiados/[id]/route.ts                 | PATCH + DELETE                       |
+
+## Files to Modify
+
+| File                                            | Change                                        |
+|-------------------------------------------------|-----------------------------------------------|
+| src/lib/db/schema.ts                            | Add address, metadata, TermocopiadoMetadata   |
+| src/lib/validations/clients.ts                  | Add optional address field                    |
+| src/components/clients/client-form-modal.tsx     | Add address input                             |
+| src/app/api/clients/route.ts                    | Include address in queries                    |
+| src/components/layout/sidebar.tsx               | Add "Termocopiados" nav item (after Pedidos)  |
+
+---
+
+## UI Design
+
+### Page Layout
+```
+/termocopiados
+├── Header: "Termocopiados" + daily summary (count, total $)
+├── TermocopiadoForm (inline, always visible)
+│   ├── Client combobox (search existing clients)
+│   ├── [If no match] "Crear nuevo cliente" → QuickClientForm (inline expand)
+│   ├── [If selected] Read-only info card: empresa, direccion, telefono, cuit
+│   ├── Number inputs row: LIBROS | COPIAS | PRECIO
+│   └── Big green "GUARDAR" button
+└── TermocopiadoList (below form)
+    ├── Date group headers ("Hoy", "Ayer", date)
+    └── TermocopiadoCard[] (client name, libros x copias, precio, time, edit/delete)
+```
+
+### UX Flow
+1. Type client name → autocomplete shows matches
+2. Select client → auto-fills info card (empresa, direccion, telefono, cuit)
+3. Enter libros, copias, precio
+4. Click GUARDAR → saves, clears numbers (keeps client for batch entry)
+5. Toast confirms success
+6. Entry appears at top of list
+
+### Elderly-Friendly
+- h-12 text-lg inputs, h-14 text-lg font-bold submit button
+- inputMode="numeric" for number fields (mobile numeric keyboard)
+- High contrast, simple Spanish labels
+- Minimal fields — just what's on the paper
+
+---
+
+## API Design
+
+### POST /api/termocopiados
+Accepts: { clientId, libros, copias, precio }
+Creates order with: serviceType="termocopiado", status="delivered",
+description="X libros, Y copias", metadata={libros, copias}, paymentStatus="pending"
+
+### GET /api/termocopiados?limit=50&offset=0
+Returns termocopiado orders with client info (name, phone, address, cuit),
+ordered by createdAt DESC
+
+### PATCH /api/termocopiados/[id] / DELETE /api/termocopiados/[id]
+Standard update/delete
+
+---
+
+## Hooks (use-termocopiados.ts)
+Follow use-orders.ts pattern. On mutations, invalidate BOTH ["termocopiados"]
+and ["orders"] query keys so the main orders page stays in sync.
+
+---
+
+## Implementation Order
+
+ 1. Migration — add address to clients, metadata JSONB to orders, seed termocopiado service
+ 2. Schema — update Drizzle schema + client validation
+ 3. Client updates — add address field to client form modal + API
+ 4. Validation — create termocopiados.ts Zod schemas
+ 5. API routes — create /api/termocopiados endpoints
+ 6. Hooks — create use-termocopiados.ts
+ 7. Components — build form, list, card, edit modal, quick-client-form
+ 8. Page — assemble /termocopiados/page.tsx
+ 9. Sidebar — add nav item
+10. Polish — daily summary stats, test full flow
+
+---
+
+## Verification
+1. Create a new client with address from the termocopiados page
+2. Create a termocopiado entry → verify it appears in the list
+3. Verify the same entry appears in /orders filtered by "termocopiado" service
+4. Edit and delete entries
+5. Test on mobile for elderly-friendly sizing
+6. Batch entry: create multiple entries for the same client in a row

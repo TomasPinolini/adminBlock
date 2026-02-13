@@ -9,6 +9,7 @@ export const createClientSchema = z.object({
   phone: z.string().max(30).optional(),
   email: z.string().email("Email inválido").max(100).optional().or(z.literal("")),
   cuit: z.string().max(20).optional(),
+  address: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
   notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).optional(),
   // Optional: link individual to a company on creation
   companyId: z.string().uuid().optional().nullable(),
@@ -21,6 +22,7 @@ export const updateClientSchema = z.object({
   phone: z.string().max(30).nullable().optional(),
   email: z.string().email("Email inválido").max(100).nullable().optional().or(z.literal("")),
   cuit: z.string().max(20).nullable().optional(),
+  address: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).nullable().optional(),
   notes: z.string().max(MAX_TEXT_MEDIUM).transform(sanitize).nullable().optional(),
 })
 
