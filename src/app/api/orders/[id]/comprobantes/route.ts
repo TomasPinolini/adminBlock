@@ -84,17 +84,23 @@ export async function POST(
       .from("comprobantes")
       .getPublicUrl(path)
 
-    // Insert into DB
-    const [attachment] = await db
-      .insert(orderAttachments)
-      .values({
-        orderId: id,
-        fileUrl: urlData.publicUrl,
-        fileName: file.name,
-      })
-      .returning()
+    // Insert into DB — if this fails, clean up the uploaded file
+    try {
+      const [attachment] = await db
+        .insert(orderAttachments)
+        .values({
+          orderId: id,
+          fileUrl: urlData.publicUrl,
+          fileName: file.name,
+        })
+        .returning()
 
-    return NextResponse.json(attachment)
+      return NextResponse.json(attachment)
+    } catch (dbError) {
+      // Compensating transaction: remove orphaned file
+      await supabase.storage.from("comprobantes").remove([path]).catch(() => {})
+      throw dbError
+    }
   } catch (error) {
     logApiError("/api/orders/[id]/comprobantes", "POST", error)
     return NextResponse.json(

@@ -91,13 +91,17 @@ function ClientCard({ client, onEmail }: { client: ClientWithStats; onEmail: (cl
   const handleDelete = async () => {
     const confirmed = await confirm({
       title: "Eliminar cliente",
-      description: `¿Estás seguro de que deseas eliminar a ${client.name}? Esta acción eliminará todos sus pedidos y no se puede deshacer.`,
+      description: `¿Estás seguro de que deseas eliminar a ${client.name}? Esta acción no se puede deshacer.`,
       confirmText: "Eliminar",
       variant: "destructive",
     })
     if (confirmed) {
-      await deleteClient.mutateAsync(client.id)
-      toast.success("Cliente eliminado")
+      try {
+        await deleteClient.mutateAsync(client.id)
+        toast.success("Cliente eliminado")
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Error al eliminar cliente")
+      }
     }
   }
 
@@ -129,7 +133,7 @@ function ClientCard({ client, onEmail }: { client: ClientWithStats; onEmail: (cl
         </div>
 
         {/* Right: action buttons */}
-        <div className="flex items-center gap-0.5 shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-0.5 shrink-0">
           {/* Quick contact */}
           {hasPhone && (
             <a
@@ -138,7 +142,7 @@ function ClientCard({ client, onEmail }: { client: ClientWithStats; onEmail: (cl
               rel="noopener noreferrer"
               title="WhatsApp"
             >
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-600">
+              <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-7 sm:w-7 text-green-600 hover:text-green-600">
                 <MessageCircle className="h-3.5 w-3.5" />
               </Button>
             </a>
@@ -147,7 +151,7 @@ function ClientCard({ client, onEmail }: { client: ClientWithStats; onEmail: (cl
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-blue-500 hover:text-blue-500"
+              className="h-9 w-9 sm:h-7 sm:w-7 text-blue-500 hover:text-blue-500"
               onClick={() => onEmail(client)}
               title="Email"
             >
@@ -157,7 +161,7 @@ function ClientCard({ client, onEmail }: { client: ClientWithStats; onEmail: (cl
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-blue-600 hover:text-blue-600"
+            className="h-9 w-9 sm:h-7 sm:w-7 text-blue-600 hover:text-blue-600"
             onClick={() => setViewingClientOrders(client)}
             title="Ver pedidos"
           >
@@ -169,7 +173,7 @@ function ClientCard({ client, onEmail }: { client: ClientWithStats; onEmail: (cl
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7"
+              className="h-9 w-9 sm:h-7 sm:w-7"
               onClick={() => setExpanded(!expanded)}
               title="Personas vinculadas"
             >
@@ -180,7 +184,7 @@ function ClientCard({ client, onEmail }: { client: ClientWithStats; onEmail: (cl
           {/* Actions dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7">
+              <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-7 sm:w-7">
                 <MoreVertical className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { clients, orders } from "@/lib/db/schema"
 import { createClientSchema } from "@/lib/validations/clients"
+import { z } from "zod"
 import { desc, eq, sql } from "drizzle-orm"
 import { logApiError } from "@/lib/logger"
 
@@ -51,6 +52,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newClient, { status: 201 })
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: error.errors[0].message },
+        { status: 400 }
+      )
+    }
     logApiError("/api/clients", "POST", error)
     return NextResponse.json(
       { error: "Error al crear cliente" },

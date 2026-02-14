@@ -120,33 +120,37 @@ export async function POST(request: NextRequest) {
       totalPrice = materialsCost + profitMargin
     }
 
-    // Create quote
-    const [newQuote] = await db
-      .insert(quotes)
-      .values({
-        clientId: validated.clientId,
-        serviceType: validated.serviceType as any,
-        description: validated.description,
-        deliveryDate: validated.deliveryDate || null,
-        materialsCost: materialsCost.toFixed(2),
-        profitMargin: validated.profitMargin,
-        profitType: validated.profitType || "fixed",
-        totalPrice: totalPrice.toFixed(2),
-        isOutsourced: validated.isOutsourced || false,
-        outsourcedSupplierId: validated.outsourcedSupplierId,
-      })
-      .returning()
+    // Create quote + line items in a single transaction.
+    // If the line items insert fails, the quote is rolled back too — no orphans.
+    const newQuote = await db.transaction(async (tx) => {
+      const [quote] = await tx
+        .insert(quotes)
+        .values({
+          clientId: validated.clientId,
+          serviceType: validated.serviceType as any,
+          description: validated.description,
+          deliveryDate: validated.deliveryDate ?? null,
+          materialsCost: materialsCost.toFixed(2),
+          profitMargin: validated.profitMargin,
+          profitType: validated.profitType || "fixed",
+          totalPrice: totalPrice.toFixed(2),
+          isOutsourced: validated.isOutsourced || false,
+          outsourcedSupplierId: validated.outsourcedSupplierId,
+        })
+        .returning()
 
-    // Insert line items (only for non-outsourced quotes)
-    if (materialsToInsert.length > 0) {
-      await db.insert(quoteMaterials).values(
-        materialsToInsert.map((m) => ({
-          ...m,
-          lineType: "material",
-          quoteId: newQuote.id,
-        }))
-      )
-    }
+      if (materialsToInsert.length > 0) {
+        await tx.insert(quoteMaterials).values(
+          materialsToInsert.map((m) => ({
+            ...m,
+            lineType: "material",
+            quoteId: quote.id,
+          }))
+        )
+      }
+
+      return quote
+    })
 
     return NextResponse.json(newQuote, { status: 201 })
   } catch (error) {

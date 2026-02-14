@@ -31,7 +31,7 @@ export function QuickClientForm({ onCreated, onCancel, initialName = "" }: Quick
     setError("")
     try {
       const client = await createClient.mutateAsync({
-        clientType: "company",
+        clientType: "individual",
         name: name.trim(),
         phone: phone.trim() || undefined,
         cuit: cuit.trim() || undefined,
@@ -54,11 +54,11 @@ export function QuickClientForm({ onCreated, onCancel, initialName = "" }: Quick
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-1">
-          <Label className="text-sm">Empresa *</Label>
+          <Label className="text-sm">Nombre *</Label>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nombre de empresa"
+            placeholder="Nombre del cliente"
             className="h-12 text-lg"
             autoFocus
           />

@@ -4,9 +4,11 @@ import { formatCurrency, calculateInvoiceBreakdown, formatCUIT } from "./invoice
 import { formatDate } from "./dates"
 import { invoiceTypeLabels } from "@/lib/validations/orders"
 
-// Business constants
-const BUSINESS_NAME = "BLOCK Imprenta"
-const BUSINESS_ADDRESS = "Rosario, Santa Fe"
+// Business constants — override via env vars in .env.local:
+// NEXT_PUBLIC_BUSINESS_NAME="Mi Imprenta"
+// NEXT_PUBLIC_BUSINESS_ADDRESS="Ciudad, Provincia"
+const BUSINESS_NAME = process.env.NEXT_PUBLIC_BUSINESS_NAME || "BLOCK Imprenta"
+const BUSINESS_ADDRESS = process.env.NEXT_PUBLIC_BUSINESS_ADDRESS || "Rosario, Santa Fe"
 
 // Helpers
 function num(v: string | number | null | undefined): number {

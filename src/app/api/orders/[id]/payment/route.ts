@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { orders, clients } from "@/lib/db/schema"
-import { eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 import { sendWhatsAppBackground, whatsappTemplates } from "@/lib/whatsapp"
 import { isPaymentNotificationEnabled } from "@/lib/settings"
@@ -29,6 +29,14 @@ export async function POST(
       )
     }
 
+    const paidAmount = Number(paymentAmount)
+    if (!Number.isFinite(paidAmount) || paidAmount <= 0) {
+      return NextResponse.json(
+        { error: "El monto debe ser un número positivo" },
+        { status: 400 }
+      )
+    }
+
     // Get the order with client info
     const [orderWithClient] = await db
       .select({
@@ -49,19 +57,6 @@ export async function POST(
 
     const order = orderWithClient.order
 
-    const orderPrice = Number(order.price || 0)
-    const paidAmount = Number(paymentAmount)
-    const previousPaid = Number(order.paymentAmount || 0)
-    const totalPaid = previousPaid + paidAmount
-
-    // Determine payment status
-    let paymentStatus: PaymentStatus = "pending"
-    if (totalPaid >= orderPrice && orderPrice > 0) {
-      paymentStatus = "paid"
-    } else if (totalPaid > 0) {
-      paymentStatus = "partial"
-    }
-
     let receiptUrl = order.receiptUrl
 
     // Upload receipt if provided
@@ -72,7 +67,7 @@ export async function POST(
       const fileExt = receipt.name.split(".").pop()
       const fileName = `${id}-${Date.now()}.${fileExt}`
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("receipts")
         .upload(fileName, receipt, {
           cacheControl: "3600",
@@ -96,36 +91,59 @@ export async function POST(
     }
 
     // Calculate IVA breakdown based on invoice type
+    const orderPrice = Number(order.price || 0)
     const IVA_RATE = 0.21
     let subtotal: string | null = null
     let taxAmount: string | null = null
 
     if (invoiceType === "A" && orderPrice > 0) {
-      const sub = orderPrice / (1 + IVA_RATE)
+      const sub = Math.round((orderPrice / (1 + IVA_RATE)) * 100) / 100
       subtotal = sub.toFixed(2)
-      taxAmount = (orderPrice - sub).toFixed(2)
+      taxAmount = (Math.round((orderPrice - sub) * 100) / 100).toFixed(2)
     }
 
-    // Update order with payment + invoice info
+    // ATOMIC payment update — uses SQL to add the amount in a single operation.
+    // This prevents race conditions: two concurrent payments can't overwrite each other
+    // because Postgres adds to the current value, not a stale snapshot.
     const [updatedOrder] = await db
       .update(orders)
       .set({
-        paymentStatus,
-        paymentAmount: totalPaid.toString(),
+        paymentAmount: sql`COALESCE(${orders.paymentAmount}, '0')::numeric + ${paidAmount.toFixed(2)}::numeric`,
+        paymentStatus: sql`
+          CASE
+            WHEN (COALESCE(${orders.paymentAmount}, '0')::numeric + ${paidAmount.toFixed(2)}::numeric) >= COALESCE(${orders.price}, '0')::numeric
+              AND COALESCE(${orders.price}, '0')::numeric > 0
+            THEN 'paid'
+            WHEN (COALESCE(${orders.paymentAmount}, '0')::numeric + ${paidAmount.toFixed(2)}::numeric) > 0
+            THEN 'partial'
+            ELSE 'pending'
+          END::payment_status
+        `,
         receiptUrl,
-        invoiceType: invoiceType as "A" | "B" | "none",
-        invoiceNumber: invoiceNumber || null,
+        invoiceType: invoiceType as "A" | "B" | "C" | "NC_C" | "ND_C" | "R_C" | "C_E" | "NC_C_E" | "ND_C_E" | "none",
+        invoiceNumber: invoiceNumber ?? null,
         subtotal,
         taxAmount,
-        paidAt: new Date(),
+        paidAt: sql`
+          CASE
+            WHEN (COALESCE(${orders.paymentAmount}, '0')::numeric + ${paidAmount.toFixed(2)}::numeric) >= COALESCE(${orders.price}, '0')::numeric
+              AND COALESCE(${orders.price}, '0')::numeric > 0
+            THEN NOW()
+            ELSE ${orders.paidAt}
+          END
+        `,
         updatedAt: new Date(),
       })
       .where(eq(orders.id, id))
       .returning()
 
+    // Compute final values from the updated row (source of truth)
+    const totalPaid = Number(updatedOrder.paymentAmount || 0)
+    const paymentStatus = updatedOrder.paymentStatus as PaymentStatus
+
     // Log activity
-    const supabaseAuth = await createClient()
-    const { data: { user } } = await supabaseAuth.auth.getUser()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
     await logActivity({
       type: "payment_registered",
       userId: user?.id,
@@ -138,21 +156,20 @@ export async function POST(
 
     // Return validation info
     const amountMatch = totalPaid >= orderPrice
-    const difference = orderPrice - totalPaid
+    const difference = Math.round((orderPrice - totalPaid) * 100) / 100
 
     // Send WhatsApp payment confirmation (if enabled)
     if (orderWithClient.clientPhone) {
       const isEnabled = await isPaymentNotificationEnabled()
-      
+
       if (isEnabled) {
         const clientName = orderWithClient.clientName || "Cliente"
         const message = whatsappTemplates.paymentConfirmed(
           clientName,
           paidAmount.toLocaleString("es-AR"),
-          amountMatch ? undefined : difference.toLocaleString("es-AR")
+          amountMatch ? undefined : Math.abs(difference).toLocaleString("es-AR")
         )
 
-        // Send in background, don't block response
         sendWhatsAppBackground({
           to: orderWithClient.clientPhone,
           message,

@@ -4,6 +4,8 @@ import { orders, clients } from "@/lib/db/schema"
 import { eq, and, gte, lte } from "drizzle-orm"
 import { logApiError } from "@/lib/logger"
 
+const MAX_EXPORT_ROWS = 5000
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
@@ -24,8 +26,16 @@ export async function GET(request: NextRequest) {
       toDate.setHours(23, 59, 59, 999)
     }
 
+    // Require a date filter to prevent full-table dumps
+    if (!fromDate || !toDate) {
+      return NextResponse.json(
+        { error: "Se requiere un rango de fechas (from/to o period=month)" },
+        { status: 400 }
+      )
+    }
+
     // Build query
-    let query = db
+    const result = await db
       .select({
         id: orders.id,
         clientId: orders.clientId,
@@ -48,18 +58,14 @@ export async function GET(request: NextRequest) {
       })
       .from(orders)
       .leftJoin(clients, eq(orders.clientId, clients.id))
-
-    // Apply date filters if provided
-    if (fromDate && toDate) {
-      query = query.where(
+      .where(
         and(
           gte(orders.createdAt, fromDate),
           lte(orders.createdAt, toDate)
         )
-      ) as typeof query
-    }
-
-    const result = await query.orderBy(orders.createdAt)
+      )
+      .orderBy(orders.createdAt)
+      .limit(MAX_EXPORT_ROWS)
 
     return NextResponse.json(result)
   } catch (error) {

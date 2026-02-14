@@ -17,37 +17,48 @@ const navItems = [
   {
     href: "/dashboard",
     label: "Dashboard",
+    mobileLabel: "Inicio",
     icon: LayoutDashboard,
+    showOnMobile: true,
   },
   {
     href: "/orders",
     label: "Pedidos",
     icon: ClipboardList,
+    showOnMobile: true,
   },
   {
     href: "/termocopiados",
     label: "Termocopiados",
+    mobileLabel: "Termo",
     icon: BookCopy,
+    showOnMobile: true,
   },
   {
     href: "/clients",
     label: "Directorio",
+    mobileLabel: "Clientes",
     icon: Users,
+    showOnMobile: true,
   },
   {
     href: "/quotes",
     label: "Cotizador",
+    mobileLabel: "Cotizar",
     icon: Calculator,
+    showOnMobile: true,
   },
   {
     href: "/reports",
     label: "Reportes",
     icon: FileBarChart,
+    showOnMobile: false,
   },
   {
     href: "/settings",
     label: "Ajustes",
     icon: SettingsIcon,
+    showOnMobile: false,
   },
 ]
 
@@ -97,11 +108,12 @@ export function Sidebar() {
 // Mobile bottom navigation - visible only on mobile
 export function MobileNav() {
   const pathname = usePathname()
+  const mobileItems = navItems.filter((item) => item.showOnMobile)
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background lg:hidden safe-area-bottom">
       <div className="flex items-center justify-around">
-        {navItems.map((item) => {
+        {mobileItems.map((item) => {
           const isActive = pathname.startsWith(item.href)
           return (
             <Link
@@ -115,7 +127,7 @@ export function MobileNav() {
               )}
             >
               <item.icon className={cn("h-6 w-6", isActive && "text-primary")} />
-              <span>{item.label}</span>
+              <span>{item.mobileLabel || item.label}</span>
             </Link>
           )
         })}

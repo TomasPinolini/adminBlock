@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Mail, Send, Loader2 } from "lucide-react"
 import {
   Dialog,
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { sendEmail } from "@/lib/utils/email"
+import { escapeHtml } from "@/lib/utils/validation"
 import { toast } from "sonner"
 
 interface EmailComposeModalProps {
@@ -36,16 +37,18 @@ export function EmailComposeModal({
   const [body, setBody] = useState(defaultBody)
   const [sending, setSending] = useState(false)
 
+  // Sync state when modal opens with new props (different order)
+  useEffect(() => {
+    if (open) {
+      setSubject(defaultSubject)
+      setBody(defaultBody)
+    }
+  }, [open, defaultSubject, defaultBody])
+
   const handleOpen = (isOpen: boolean) => {
     if (!isOpen) {
       onClose()
     }
-  }
-
-  // Reset fields when modal opens with new defaults
-  const handleAfterOpen = () => {
-    setSubject(defaultSubject)
-    setBody(defaultBody)
   }
 
   const handleSend = async () => {
@@ -58,8 +61,8 @@ export function EmailComposeModal({
     try {
       const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">¡Hola ${clientName}!</h2>
-          ${body.split("\n").map((line) => `<p style="font-size: 16px; color: #555; margin: 8px 0;">${line || "&nbsp;"}</p>`).join("")}
+          <h2 style="color: #333;">¡Hola ${escapeHtml(clientName)}!</h2>
+          ${body.split("\n").map((line) => `<p style="font-size: 16px; color: #555; margin: 8px 0;">${escapeHtml(line) || "&nbsp;"}</p>`).join("")}
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
           <p style="font-size: 12px; color: #999;">AdminBlock</p>
         </div>
@@ -79,7 +82,7 @@ export function EmailComposeModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
-      <DialogContent className="sm:max-w-lg" onOpenAutoFocus={handleAfterOpen}>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />

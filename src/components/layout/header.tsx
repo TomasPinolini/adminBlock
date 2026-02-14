@@ -3,13 +3,21 @@
 import { LogOut } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
 import { createClient } from "@/lib/supabase/client"
 
 export function Header() {
   const router = useRouter()
   const supabase = createClient()
+  const { confirm, ConfirmDialog } = useConfirmDialog()
 
   const handleSignOut = async () => {
+    const confirmed = await confirm({
+      title: "Cerrar sesión",
+      description: "¿Estás seguro de que querés cerrar sesión?",
+      confirmText: "Cerrar sesión",
+    })
+    if (!confirmed) return
     await supabase.auth.signOut()
     router.push("/login")
     router.refresh()
@@ -32,6 +40,7 @@ export function Header() {
         <LogOut className="h-4 w-4 lg:mr-2" />
         <span className="hidden lg:inline">Salir</span>
       </Button>
+      <ConfirmDialog />
     </header>
   )
 }

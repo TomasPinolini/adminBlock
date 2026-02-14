@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 
 interface QuoteLineItem {
   materialId?: string
@@ -63,7 +64,7 @@ export function useQuotes() {
   return useQuery<QuoteListItem[]>({
     queryKey: ["quotes"],
     queryFn: async () => {
-      const res = await fetch("/api/quotes")
+      const res = await fetchWithTimeout("/api/quotes")
       if (!res.ok) throw new Error("Error al obtener cotizaciones")
       return res.json()
     },
@@ -75,7 +76,7 @@ export function useQuote(id: string | null) {
   return useQuery<QuoteDetail>({
     queryKey: ["quotes", id],
     queryFn: async () => {
-      const res = await fetch(`/api/quotes/${id}`)
+      const res = await fetchWithTimeout(`/api/quotes/${id}`)
       if (!res.ok) throw new Error("Error al obtener cotización")
       return res.json()
     },

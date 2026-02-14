@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 
 export interface DashboardStats {
   todayOrders: number
@@ -13,7 +14,7 @@ export interface DashboardStats {
 }
 
 async function fetchStats(): Promise<DashboardStats> {
-  const res = await fetch("/api/stats")
+  const res = await fetchWithTimeout("/api/stats")
   if (!res.ok) throw new Error("Error al obtener estadísticas")
   return res.json()
 }
