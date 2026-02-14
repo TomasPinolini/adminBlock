@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server"
 import { sendWhatsAppBackground, whatsappTemplates } from "@/lib/whatsapp"
 import { isWhatsAppAutoEnabled, isEmailAutoEnabled } from "@/lib/settings"
 import { logApiError } from "@/lib/logger"
+import { escapeHtml } from "@/lib/utils/validation"
 
 export async function GET(
   request: NextRequest,
@@ -181,7 +182,7 @@ export async function PATCH(
           body: JSON.stringify({
             to: currentOrderWithClient.clientEmail,
             subject: `Tu ${serviceLabelEmail} está listo - AdminBlock`,
-            html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>¡Hola ${clientName}!</h2><p>Tu <strong>${serviceLabelEmail.toLowerCase()}</strong> ya está listo para retirar.</p><p>¡Te esperamos!</p><hr style="border:none;border-top:1px solid #eee;margin:20px 0"/><p style="font-size:12px;color:#999">AdminBlock</p></div>`,
+            html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>¡Hola ${escapeHtml(clientName)}!</h2><p>Tu <strong>${escapeHtml(serviceLabelEmail.toLowerCase())}</strong> ya está listo para retirar.</p><p>¡Te esperamos!</p><hr style="border:none;border-top:1px solid #eee;margin:20px 0"/><p style="font-size:12px;color:#999">AdminBlock</p></div>`,
           }),
         }).then(async (res) => {
           if (!res.ok) {

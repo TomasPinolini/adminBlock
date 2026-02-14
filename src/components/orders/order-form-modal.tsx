@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Combobox } from "@/components/ui/combobox"
 import { useUIStore } from "@/stores/ui-store"
 import { useCreateOrder } from "@/hooks/use-orders"
 import { useClients } from "@/hooks/use-clients"
@@ -30,6 +31,7 @@ import {
   type CreateOrderInput,
 } from "@/lib/validations/orders"
 import { Building2 } from "lucide-react"
+import { useMemo } from "react"
 
 export function OrderFormModal() {
   const { createOrderModalOpen, setCreateOrderModalOpen } = useUIStore()
@@ -52,6 +54,15 @@ export function OrderFormModal() {
   const selectedClientId = watch("clientId")
   const selectedServiceType = watch("serviceType")
   const selectedPersonId = watch("personId")
+
+  const clientOptions = useMemo(
+    () =>
+      clients.map((c) => ({
+        value: c.id,
+        label: c.name + (c.clientType === "company" ? " 🏢" : "") + (c.email ? ` (${c.email})` : ""),
+      })),
+    [clients]
+  )
 
   // Find the selected client to check if it's a company
   const selectedClient = clients.find(c => c.id === selectedClientId)
@@ -94,33 +105,15 @@ export function OrderFormModal() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label>Cliente *</Label>
-            <Select
+            <Combobox
+              options={clientOptions}
               value={selectedClientId}
               onValueChange={(value) => setValue("clientId", value)}
-            >
-              <SelectTrigger className="h-11 lg:h-9">
-                <SelectValue placeholder="Selecciona un cliente" />
-              </SelectTrigger>
-              <SelectContent>
-                {clients.length === 0 ? (
-                  <SelectItem value="none" disabled>
-                    No hay clientes - crea uno primero
-                  </SelectItem>
-                ) : (
-                  clients.map((client) => (
-                    <SelectItem key={client.id} value={client.id}>
-                      <span className="flex items-center gap-2">
-                        {client.clientType === "company" && (
-                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-                        )}
-                        {client.name}
-                        {client.email && ` (${client.email})`}
-                      </span>
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+              placeholder="Buscar cliente..."
+              searchPlaceholder="Escribí el nombre..."
+              emptyText={clients.length === 0 ? "No hay clientes - crea uno primero" : "Sin resultados"}
+              className="h-11 lg:h-9"
+            />
             {errors.clientId && (
               <p className="text-sm text-destructive">{errors.clientId.message}</p>
             )}

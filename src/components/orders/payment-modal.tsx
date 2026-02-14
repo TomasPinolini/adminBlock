@@ -36,6 +36,7 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [invoiceType, setInvoiceType] = useState<InvoiceType>("none")
   const [invoiceNumber, setInvoiceNumber] = useState("")
+  const [customAmount, setCustomAmount] = useState("")
   const [error, setError] = useState("")
   const [validationResult, setValidationResult] = useState<{
     amountMatch: boolean
@@ -44,10 +45,11 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
   } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const registerPayment = useRegisterPayment()
+  const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const orderPrice = Number(order?.price || 0)
   const previousPaid = Number(order?.paymentAmount || 0)
-  const remaining = orderPrice - previousPaid
+  const remaining = Math.round((orderPrice - previousPaid) * 100) / 100
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
@@ -87,13 +89,23 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
     e.preventDefault()
     if (!order) return
 
+    // Determine amount: use custom input or remaining balance
+    const amount = customAmount.trim()
+      ? Math.round(parseFloat(customAmount) * 100) / 100
+      : remaining
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setError("Ingresá un monto válido mayor a 0")
+      return
+    }
+
     setError("")
     setValidationResult(null)
 
     try {
       const result = await registerPayment.mutateAsync({
         orderId: order.id,
-        paymentAmount: remaining > 0 ? remaining : orderPrice,
+        paymentAmount: amount,
         receipt: receipt || undefined,
         invoiceType: invoiceType !== "none" ? invoiceType : undefined,
         invoiceNumber: invoiceNumber || undefined,
@@ -103,7 +115,7 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
 
       // If fully paid, close after showing success
       if (result.validation.amountMatch) {
-        setTimeout(() => {
+        autoCloseRef.current = setTimeout(() => {
           handleClose()
         }, 2000)
       }
@@ -113,10 +125,15 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
   }
 
   const handleClose = () => {
+    if (autoCloseRef.current) {
+      clearTimeout(autoCloseRef.current)
+      autoCloseRef.current = null
+    }
     setReceipt(null)
     setPreviewUrl(null)
     setInvoiceType("none")
     setInvoiceNumber("")
+    setCustomAmount("")
     setError("")
     setValidationResult(null)
     onClose()
@@ -156,6 +173,34 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
               </>
             )}
           </div>
+
+          {/* Payment Amount */}
+          {remaining > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="paymentAmount">Monto a pagar</Label>
+              <Input
+                id="paymentAmount"
+                type="number"
+                step="0.01"
+                min="0.01"
+                placeholder={`$${remaining.toLocaleString("es-AR")} (total restante)`}
+                className="h-11 text-base"
+                value={customAmount}
+                onChange={(e) => setCustomAmount(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Dejá vacío para pagar el total restante (${remaining.toLocaleString("es-AR")})
+              </p>
+            </div>
+          )}
+
+          {/* Already fully paid warning */}
+          {remaining <= 0 && (
+            <div className="rounded-lg bg-green-50 dark:bg-green-950/30 p-3 text-sm text-green-800 dark:text-green-400 flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 shrink-0" />
+              Este pedido ya está pagado en su totalidad.
+            </div>
+          )}
 
           {/* Invoice Type */}
           <div className="space-y-2">
@@ -201,13 +246,13 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal (sin IVA):</span>
                 <span className="font-medium">
-                  ${(orderPrice / (1 + IVA_RATE)).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ${(Math.round(orderPrice / (1 + IVA_RATE) * 100) / 100).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">IVA (21%):</span>
                 <span className="font-medium">
-                  ${(orderPrice - orderPrice / (1 + IVA_RATE)).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ${(Math.round((orderPrice - orderPrice / (1 + IVA_RATE)) * 100) / 100).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between border-t pt-1">
@@ -301,7 +346,7 @@ export function PaymentModal({ order, open, onClose }: PaymentModalProps) {
             </Button>
             <Button
               type="submit"
-              disabled={registerPayment.isPending}
+              disabled={registerPayment.isPending || (remaining <= 0 && !customAmount.trim())}
               className="flex-1 h-11"
             >
               {registerPayment.isPending ? "Registrando..." : "Registrar Pago"}

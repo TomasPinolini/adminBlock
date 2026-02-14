@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import { TermocopiadoCard } from "./termocopiado-card"
 import { TermocopiadoEditModal } from "./termocopiado-edit-modal"
 import { useDeleteTermocopiado } from "@/hooks/use-termocopiados"
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
 import type { TermocopiadoEntry } from "@/hooks/use-termocopiados"
 import { toast } from "sonner"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -35,6 +36,7 @@ function getDateLabel(dateStr: string): string {
 
 export function TermocopiadoList({ entries, isLoading }: TermocopiadoListProps) {
   const deleteTermocopiado = useDeleteTermocopiado()
+  const { confirm, ConfirmDialog } = useConfirmDialog()
   const [editingEntry, setEditingEntry] = useState<TermocopiadoEntry | null>(null)
 
   // Group entries by date
@@ -55,7 +57,13 @@ export function TermocopiadoList({ entries, isLoading }: TermocopiadoListProps) 
   }, [entries])
 
   const handleDelete = async (entry: TermocopiadoEntry) => {
-    if (!confirm(`¿Eliminar termocopiado de ${entry.client?.name || "cliente"}?`)) return
+    const confirmed = await confirm({
+      title: "Eliminar termocopiado",
+      description: `¿Eliminar termocopiado de ${entry.client?.name || "cliente"}?`,
+      confirmText: "Eliminar",
+      variant: "destructive",
+    })
+    if (!confirmed) return
     try {
       await deleteTermocopiado.mutateAsync(entry.id)
       toast.success("Termocopiado eliminado")
@@ -110,6 +118,7 @@ export function TermocopiadoList({ entries, isLoading }: TermocopiadoListProps) 
         open={!!editingEntry}
         onOpenChange={(open) => !open && setEditingEntry(null)}
       />
+      <ConfirmDialog />
     </>
   )
 }

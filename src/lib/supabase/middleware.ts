@@ -44,8 +44,7 @@ export async function updateSession(request: NextRequest) {
   // Protected routes - redirect to login if not authenticated
   const pathname = request.nextUrl.pathname
   const isPublicRoute =
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/api/test-whatsapp")
+    pathname.startsWith("/login")
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()

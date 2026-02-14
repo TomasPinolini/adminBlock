@@ -60,7 +60,8 @@ export function EditOrderModal({ order, open, onOpenChange }: EditOrderModalProp
         quantity: order.quantity || "",
       })
     }
-  }, [order])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?.id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

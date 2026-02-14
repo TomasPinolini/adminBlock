@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 import type { Supplier, NewSupplier } from "@/lib/db/schema"
 
 // Fetch all suppliers
@@ -6,7 +7,7 @@ export function useSuppliers() {
   return useQuery<Supplier[]>({
     queryKey: ["suppliers"],
     queryFn: async () => {
-      const res = await fetch("/api/suppliers")
+      const res = await fetchWithTimeout("/api/suppliers")
       if (!res.ok) throw new Error("Error al obtener proveedores")
       return res.json()
     },
@@ -19,7 +20,7 @@ export function useSupplier(id: string | null) {
   return useQuery<Supplier>({
     queryKey: ["suppliers", id],
     queryFn: async () => {
-      const res = await fetch(`/api/suppliers/${id}`)
+      const res = await fetchWithTimeout(`/api/suppliers/${id}`)
       if (!res.ok) throw new Error("Error al obtener proveedor")
       return res.json()
     },
@@ -125,7 +126,7 @@ export function useSupplierMaterials(supplierId?: string, materialId?: string) {
       let url = "/api/supplier-materials"
       if (supplierId) url += `?supplierId=${supplierId}`
       else if (materialId) url += `?materialId=${materialId}`
-      const res = await fetch(url)
+      const res = await fetchWithTimeout(url)
       if (!res.ok) throw new Error("Error al obtener materiales del proveedor")
       return res.json()
     },

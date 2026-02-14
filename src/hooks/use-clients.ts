@@ -47,7 +47,10 @@ async function deleteClient(id: string): Promise<void> {
     method: "DELETE",
     timeout: 10000,
   })
-  if (!res.ok) throw new Error("Error al eliminar cliente")
+  if (!res.ok) {
+    const data = await res.json().catch(() => null)
+    throw new Error(data?.error || "Error al eliminar cliente")
+  }
 }
 
 export function useClients() {

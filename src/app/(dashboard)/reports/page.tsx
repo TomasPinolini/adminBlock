@@ -47,7 +47,7 @@ const monthNames = [
 ]
 
 function formatCurrency(value: string | number | null | undefined): string {
-  if (!value) return "-"
+  if (value == null || value === "") return "-"
   const num = typeof value === "string" ? parseFloat(value) : value
   if (isNaN(num)) return "-"
   return `$${num.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`

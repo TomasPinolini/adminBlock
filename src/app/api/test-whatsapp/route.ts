@@ -1,29 +1,10 @@
-import { NextRequest, NextResponse } from "next/server"
-import { sendWhatsApp } from "@/lib/whatsapp"
+import { NextResponse } from "next/server"
 
-// Test endpoint - DELETE THIS IN PRODUCTION
-export async function POST(request: NextRequest) {
-  try {
-    const { to, message } = await request.json()
-
-    if (!to || !message) {
-      return NextResponse.json(
-        { error: "Faltan los campos 'to' o 'message'" },
-        { status: 400 }
-      )
-    }
-
-    const result = await sendWhatsApp({ to, message })
-
-    return NextResponse.json({
-      success: true,
-      messageSid: result.sid,
-    })
-  } catch (error) {
-    console.error("WhatsApp test error:", error)
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Error desconocido" },
-      { status: 500 }
-    )
-  }
+// This test endpoint has been disabled for security.
+// WhatsApp sending is handled internally by order status change notifications.
+export async function POST() {
+  return NextResponse.json(
+    { error: "Este endpoint fue deshabilitado" },
+    { status: 404 }
+  )
 }

@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm"
 import { logApiError } from "@/lib/logger"
 
 // Default notification settings
-const DEFAULT_SETTINGS = {
+const DEFAULT_SETTINGS: Record<string, string> = {
   "whatsapp.auto.ready": "true",
   "whatsapp.auto.quoted": "true",
   "whatsapp.auto.in_progress": "false",
@@ -14,6 +14,9 @@ const DEFAULT_SETTINGS = {
   "email.auto.ready": "false",
   "admin.email": "",
 }
+
+// Only these keys can be written via the API
+const ALLOWED_KEYS = new Set(Object.keys(DEFAULT_SETTINGS))
 
 export async function GET() {
   try {
@@ -43,6 +46,13 @@ export async function PATCH(request: NextRequest) {
     if (!key || value === undefined) {
       return NextResponse.json(
         { error: "Clave y valor son requeridos" },
+        { status: 400 }
+      )
+    }
+
+    if (!ALLOWED_KEYS.has(key)) {
+      return NextResponse.json(
+        { error: `Clave no válida: ${key}` },
         { status: 400 }
       )
     }

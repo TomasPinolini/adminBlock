@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { clients } from "@/lib/db/schema"
+import { clients, orders, quotes } from "@/lib/db/schema"
 import { updateClientSchema } from "@/lib/validations/clients"
-import { eq } from "drizzle-orm"
+import { z } from "zod"
+import { eq, count } from "drizzle-orm"
 import { logApiError } from "@/lib/logger"
 
 export async function GET(
@@ -57,6 +58,12 @@ export async function PATCH(
 
     return NextResponse.json(updatedClient)
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: error.errors[0].message },
+        { status: 400 }
+      )
+    }
     logApiError("/api/clients/[id]", "PATCH", error)
     return NextResponse.json(
       { error: "Error al actualizar cliente" },
@@ -71,6 +78,24 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
+
+    // Check for existing orders/quotes that reference this client (FK constraint)
+    const [[orderCount], [quoteCount]] = await Promise.all([
+      db.select({ n: count() }).from(orders).where(eq(orders.clientId, id)),
+      db.select({ n: count() }).from(quotes).where(eq(quotes.clientId, id)),
+    ])
+
+    const totalRefs = (orderCount?.n ?? 0) + (quoteCount?.n ?? 0)
+    if (totalRefs > 0) {
+      const parts: string[] = []
+      if (orderCount?.n) parts.push(`${orderCount.n} pedido${orderCount.n > 1 ? "s" : ""}`)
+      if (quoteCount?.n) parts.push(`${quoteCount.n} cotización${quoteCount.n > 1 ? "es" : ""}`)
+      return NextResponse.json(
+        { error: `No se puede eliminar: el cliente tiene ${parts.join(" y ")}` },
+        { status: 409 }
+      )
+    }
+
     const [deletedClient] = await db
       .delete(clients)
       .where(eq(clients.id, id))

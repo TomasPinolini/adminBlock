@@ -31,7 +31,7 @@ function FilterButton({ label, count, icon, active, variant = "default", onClick
     <button
       onClick={onClick}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border",
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 min-h-[44px] text-xs font-medium transition-colors border",
         variantStyles[variant],
         active && "border-transparent"
       )}

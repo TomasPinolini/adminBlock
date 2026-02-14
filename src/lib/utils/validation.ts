@@ -22,6 +22,21 @@ export function sanitize(val: string): string {
   return sanitizeText(val)
 }
 
+// ─── HTML Escaping (for emails) ──────────────────────────────────────
+
+/**
+ * Escape HTML special characters to prevent injection in email templates.
+ * Converts &, <, >, ", ' to their HTML entity equivalents.
+ */
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+}
+
 // ─── Numeric Validation ──────────────────────────────────────────────
 
 /**
@@ -40,7 +55,7 @@ export function safeParseNumber(value: unknown): number {
 export const numericString = z
   .string()
   .refine(
-    (val) => { const n = parseFloat(val); return Number.isFinite(n) && n >= 0 },
+    (val) => { const n = Number(val); return Number.isFinite(n) && n >= 0 },
     { message: "Debe ser un número válido (≥ 0)" }
   )
 
@@ -50,7 +65,7 @@ export const numericString = z
 export const numericStringNullable = z
   .string()
   .refine(
-    (val) => { const n = parseFloat(val); return Number.isFinite(n) && n >= 0 },
+    (val) => { const n = Number(val); return Number.isFinite(n) && n >= 0 },
     { message: "Debe ser un número válido (≥ 0)" }
   )
   .nullable()
@@ -88,11 +103,12 @@ export function parseInvoiceType(value: unknown): InvoiceType {
  */
 export const ORDER_STATUSES = [
   "pending_quote",
-  "pending_approval", 
+  "quoted",
+  "approved",
   "in_progress",
   "ready",
   "delivered",
-  "cancelled"
+  "cancelled",
 ] as const
 export type OrderStatus = typeof ORDER_STATUSES[number]
 

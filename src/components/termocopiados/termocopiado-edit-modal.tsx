@@ -53,8 +53,8 @@ export function TermocopiadoEditModal({ entry, open, onOpenChange }: Termocopiad
       await updateTermocopiado.mutateAsync({
         id: entry.id,
         data: {
-          libros: parseInt(libros) || undefined,
-          copias: parseInt(copias) || undefined,
+          libros: libros ? parseInt(libros) : undefined,
+          copias: copias ? parseInt(copias) : undefined,
           precio: precio || undefined,
           paymentStatus,
         },

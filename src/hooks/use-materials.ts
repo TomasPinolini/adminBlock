@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 import type { Material, NewMaterial } from "@/lib/db/schema"
 
 // Fetch all materials
@@ -6,7 +7,7 @@ export function useMaterials() {
   return useQuery<Material[]>({
     queryKey: ["materials"],
     queryFn: async () => {
-      const res = await fetch("/api/materials")
+      const res = await fetchWithTimeout("/api/materials")
       if (!res.ok) throw new Error("Error al obtener materiales")
       return res.json()
     },
@@ -19,7 +20,7 @@ export function useMaterial(id: string | null) {
   return useQuery<Material>({
     queryKey: ["materials", id],
     queryFn: async () => {
-      const res = await fetch(`/api/materials/${id}`)
+      const res = await fetchWithTimeout(`/api/materials/${id}`)
       if (!res.ok) throw new Error("Error al obtener material")
       return res.json()
     },
@@ -120,7 +121,7 @@ export function useServiceMaterials(serviceType?: string) {
       const url = serviceType
         ? `/api/service-materials?serviceType=${serviceType}`
         : "/api/service-materials"
-      const res = await fetch(url)
+      const res = await fetchWithTimeout(url)
       if (!res.ok) throw new Error("Error al obtener materiales de servicio")
       return res.json()
     },

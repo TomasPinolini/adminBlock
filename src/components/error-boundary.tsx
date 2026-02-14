@@ -43,14 +43,13 @@ export class ErrorBoundary extends Component<Props, State> {
           <p className="text-muted-foreground mb-6 max-w-md">
             Ocurrió un error inesperado. Por favor, intenta recargar la página.
           </p>
-          {this.state.error && (
+          {this.state.error && process.env.NODE_ENV === "development" && (
             <details className="mb-6 text-left max-w-2xl w-full">
               <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground mb-2">
                 Detalles técnicos
               </summary>
               <pre className="text-xs bg-muted p-4 rounded-lg overflow-auto">
                 {this.state.error.toString()}
-                {this.state.error.stack && `\n\n${this.state.error.stack}`}
               </pre>
             </details>
           )}

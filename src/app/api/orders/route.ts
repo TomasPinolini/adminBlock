@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { orders, clients } from "@/lib/db/schema"
 import { createOrderSchema } from "@/lib/validations/orders"
+import { z } from "zod"
 import { and, desc, eq, or, isNull, sql, type SQL } from "drizzle-orm"
 import { logActivity } from "@/lib/activity"
 import { createClient } from "@/lib/supabase/server"
@@ -89,16 +90,16 @@ export async function POST(request: NextRequest) {
       .insert(orders)
       .values({
         clientId: validated.clientId,
-        personId: validated.personId || null,
+        personId: validated.personId ?? null,
         serviceType: validated.serviceType,
         description: validated.description,
-        price: validated.price || null,
-        dueDate: validated.dueDate || null,
-        invoiceNumber: validated.invoiceNumber || null,
-        invoiceType: validated.invoiceType || "none",
-        quantity: validated.quantity || null,
-        subtotal: validated.subtotal || null,
-        taxAmount: validated.taxAmount || null,
+        price: validated.price ?? null,
+        dueDate: validated.dueDate ?? null,
+        invoiceNumber: validated.invoiceNumber ?? null,
+        invoiceType: validated.invoiceType ?? "none",
+        quantity: validated.quantity ?? null,
+        subtotal: validated.subtotal ?? null,
+        taxAmount: validated.taxAmount ?? null,
       })
       .returning()
 
@@ -115,6 +116,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newOrder, { status: 201 })
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: error.errors[0].message },
+        { status: 400 }
+      )
+    }
     logApiError("/api/orders", "POST", error)
     return NextResponse.json(
       { error: "Error al crear pedido" },

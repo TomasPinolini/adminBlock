@@ -81,10 +81,14 @@ function OrderCard({ order, onPayment, onEdit, onHistory, onEmail, onComprobante
   const unarchiveOrder = useUnarchiveOrder()
 
   const handleStatusChange = async (newStatus: string) => {
-    await updateOrder.mutateAsync({
-      id: order.id,
-      data: { status: newStatus as OrderStatus },
-    })
+    try {
+      await updateOrder.mutateAsync({
+        id: order.id,
+        data: { status: newStatus as OrderStatus },
+      })
+    } catch {
+      toast.error("Error al cambiar estado")
+    }
   }
 
   const handleDelete = async () => {
@@ -95,21 +99,40 @@ function OrderCard({ order, onPayment, onEdit, onHistory, onEmail, onComprobante
       variant: "destructive",
     })
     if (confirmed) {
-      await deleteOrder.mutateAsync(order.id)
-      toast.success("Pedido eliminado")
+      try {
+        await deleteOrder.mutateAsync(order.id)
+        toast.success("Pedido eliminado")
+      } catch {
+        toast.error("Error al eliminar pedido")
+      }
     }
   }
 
   const handleDuplicate = async () => {
-    await duplicateOrder.mutateAsync(order.id)
+    try {
+      await duplicateOrder.mutateAsync(order.id)
+      toast.success("Pedido duplicado")
+    } catch {
+      toast.error("Error al duplicar pedido")
+    }
   }
 
   const handleArchive = async () => {
-    await archiveOrder.mutateAsync(order.id)
+    try {
+      await archiveOrder.mutateAsync(order.id)
+      toast.success("Pedido archivado")
+    } catch {
+      toast.error("Error al archivar pedido")
+    }
   }
 
   const handleUnarchive = async () => {
-    await unarchiveOrder.mutateAsync(order.id)
+    try {
+      await unarchiveOrder.mutateAsync(order.id)
+      toast.success("Pedido desarchivado")
+    } catch {
+      toast.error("Error al desarchivar pedido")
+    }
   }
 
   const isArchived = order.isArchived

@@ -47,7 +47,7 @@ export function useConfirmDialog() {
   }
 
   const ConfirmDialog = () => (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+    <AlertDialog open={isOpen} onOpenChange={(open) => { if (!open) handleCancel() }}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{options.title || "¿Estás seguro?"}</AlertDialogTitle>

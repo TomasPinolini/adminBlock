@@ -52,15 +52,15 @@ export function TermocopiadoForm() {
       toast.error("Seleccioná un cliente")
       return
     }
-    if (!libros || parseInt(libros) < 1) {
+    if (!libros || !Number.isFinite(parseInt(libros)) || parseInt(libros) < 1) {
       toast.error("Ingresá la cantidad de libros")
       return
     }
-    if (!copias || parseInt(copias) < 1) {
+    if (!copias || !Number.isFinite(parseInt(copias)) || parseInt(copias) < 1) {
       toast.error("Ingresá la cantidad de copias")
       return
     }
-    if (!precio || parseFloat(precio) <= 0) {
+    if (!precio || !Number.isFinite(parseFloat(precio)) || parseFloat(precio) <= 0) {
       toast.error("Ingresá el precio")
       return
     }

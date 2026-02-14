@@ -2,9 +2,20 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { clients, orders, orderMaterials, quotes, quoteMaterials, materials, services, suppliers, supplierMaterials, monthlyExpenses, clientRelationships } from "@/lib/db/schema"
 import { logApiError } from "@/lib/logger"
+import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
   try {
+    // Verify the user is authenticated (defense in depth — middleware also checks)
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: "No autorizado" },
+        { status: 401 }
+      )
+    }
+
     const [
       allClients,
       allOrders,
