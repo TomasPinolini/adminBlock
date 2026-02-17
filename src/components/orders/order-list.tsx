@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import dynamic from "next/dynamic"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
 import { MoreVertical, Trash2, MessageCircle, Mail, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone, History, FileDown, FileText } from "lucide-react"
@@ -25,7 +26,6 @@ import { useUIStore } from "@/stores/ui-store"
 import { formatDate, formatRelative, isOverdue } from "@/lib/utils/dates"
 import { getWhatsAppLink, messageTemplates } from "@/lib/utils/messaging"
 import { emailTemplates } from "@/lib/utils/email"
-import { EmailComposeModal } from "@/components/email-compose-modal"
 import {
   orderStatusLabels,
   orderStatuses,
@@ -33,10 +33,12 @@ import {
 } from "@/lib/validations/orders"
 import { useServices } from "@/hooks/use-services"
 import type { OrderStatus, PaymentStatus, Service } from "@/lib/db/schema"
-import { PaymentModal } from "./payment-modal"
-import { EditOrderModal } from "./edit-order-modal"
-import { ActivityModal } from "./activity-modal"
-import { ComprobantesModal } from "./comprobantes-modal"
+
+const PaymentModal = dynamic(() => import("./payment-modal").then(m => ({ default: m.PaymentModal })), { ssr: false })
+const EditOrderModal = dynamic(() => import("./edit-order-modal").then(m => ({ default: m.EditOrderModal })), { ssr: false })
+const ActivityModal = dynamic(() => import("./activity-modal").then(m => ({ default: m.ActivityModal })), { ssr: false })
+const ComprobantesModal = dynamic(() => import("./comprobantes-modal").then(m => ({ default: m.ComprobantesModal })), { ssr: false })
+const EmailComposeModal = dynamic(() => import("@/components/email-compose-modal").then(m => ({ default: m.EmailComposeModal })), { ssr: false })
 import { cn } from "@/lib/utils"
 import { generateInvoicePDF, type InvoicePDFData } from "@/lib/utils/pdf"
 

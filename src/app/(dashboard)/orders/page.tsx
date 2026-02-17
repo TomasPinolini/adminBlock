@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic"
 
 import { useState } from "react"
+import nextDynamic from "next/dynamic"
 import { Plus, Archive, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,8 +21,9 @@ import {
 } from "@/lib/validations/orders"
 import { useServices } from "@/hooks/use-services"
 import { OrderList } from "@/components/orders/order-list"
-import { OrderFormModal } from "@/components/orders/order-form-modal"
 import { DashboardStats } from "@/components/orders/dashboard-stats"
+
+const OrderFormModal = nextDynamic(() => import("@/components/orders/order-form-modal").then(m => ({ default: m.OrderFormModal })), { ssr: false })
 import { QuickFilters } from "@/components/orders/quick-filters"
 
 export default function OrdersPage() {

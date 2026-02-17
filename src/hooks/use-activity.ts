@@ -1,6 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 
 export interface ActivityLog {
   id: string
@@ -16,7 +17,7 @@ export interface ActivityLog {
 
 async function fetchActivity(entityType: string, entityId: string): Promise<ActivityLog[]> {
   const params = new URLSearchParams({ entityType, entityId })
-  const res = await fetch(`/api/activity?${params}`)
+  const res = await fetchWithTimeout(`/api/activity?${params}`)
   if (!res.ok) throw new Error("Error al cargar historial")
   return res.json()
 }

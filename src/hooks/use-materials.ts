@@ -34,10 +34,11 @@ export function useCreateMaterial() {
 
   return useMutation({
     mutationFn: async (data: Omit<NewMaterial, "id" | "createdAt" | "updatedAt" | "isActive">) => {
-      const res = await fetch("/api/materials", {
+      const res = await fetchWithTimeout("/api/materials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        timeout: 15000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -60,10 +61,11 @@ export function useUpdateMaterial() {
       id,
       ...data
     }: Partial<Material> & { id: string }) => {
-      const res = await fetch(`/api/materials/${id}`, {
+      const res = await fetchWithTimeout(`/api/materials/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        timeout: 15000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -83,8 +85,9 @@ export function useDeleteMaterial() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/materials/${id}`, {
+      const res = await fetchWithTimeout(`/api/materials/${id}`, {
         method: "DELETE",
+        timeout: 10000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -139,10 +142,11 @@ export function useAddServiceMaterial() {
       defaultQuantity?: string
       isRequired?: boolean
     }) => {
-      const res = await fetch("/api/service-materials", {
+      const res = await fetchWithTimeout("/api/service-materials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        timeout: 15000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -162,8 +166,9 @@ export function useRemoveServiceMaterial() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/service-materials/${id}`, {
+      const res = await fetchWithTimeout(`/api/service-materials/${id}`, {
         method: "DELETE",
+        timeout: 10000,
       })
       if (!res.ok) {
         const error = await res.json()

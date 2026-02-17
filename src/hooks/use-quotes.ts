@@ -90,10 +90,11 @@ export function useCreateQuote() {
 
   return useMutation({
     mutationFn: async (data: CreateQuoteData) => {
-      const res = await fetch("/api/quotes", {
+      const res = await fetchWithTimeout("/api/quotes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        timeout: 15000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -113,8 +114,9 @@ export function useDeleteQuote() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/quotes/${id}`, {
+      const res = await fetchWithTimeout(`/api/quotes/${id}`, {
         method: "DELETE",
+        timeout: 10000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -134,8 +136,9 @@ export function useCreateOrderFromQuote() {
 
   return useMutation({
     mutationFn: async (quoteId: string) => {
-      const res = await fetch(`/api/quotes/${quoteId}/create-order`, {
+      const res = await fetchWithTimeout(`/api/quotes/${quoteId}/create-order`, {
         method: "POST",
+        timeout: 15000,
       })
       if (!res.ok) {
         const error = await res.json()

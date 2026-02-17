@@ -237,7 +237,20 @@ export function useArchiveOrder() {
 
   return useMutation({
     mutationFn: archiveOrder,
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["orders"] })
+      const previousOrders = queryClient.getQueriesData<OrderWithClient[]>({ queryKey: ["orders"] })
+      queryClient.setQueriesData<OrderWithClient[]>({ queryKey: ["orders"] }, (old) =>
+        old?.map((o) => (o.id === id ? { ...o, isArchived: true } : o))
+      )
+      return { previousOrders }
+    },
+    onError: (_err, _id, context) => {
+      context?.previousOrders.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data)
+      })
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] })
       queryClient.invalidateQueries({ queryKey: ["stats"] })
     },
@@ -249,7 +262,20 @@ export function useUnarchiveOrder() {
 
   return useMutation({
     mutationFn: unarchiveOrder,
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["orders"] })
+      const previousOrders = queryClient.getQueriesData<OrderWithClient[]>({ queryKey: ["orders"] })
+      queryClient.setQueriesData<OrderWithClient[]>({ queryKey: ["orders"] }, (old) =>
+        old?.map((o) => (o.id === id ? { ...o, isArchived: false } : o))
+      )
+      return { previousOrders }
+    },
+    onError: (_err, _id, context) => {
+      context?.previousOrders.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data)
+      })
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] })
       queryClient.invalidateQueries({ queryKey: ["stats"] })
     },

@@ -130,23 +130,24 @@
     * Mercado Pago - Links de pago desde pedidos
 
 ===============================================================================
- OPTIMIZACIONES TECNICAS (cuando escale el negocio)
+ OPTIMIZACIONES TECNICAS
 ===============================================================================
 
-    Estas mejoras son para cuando el volumen de datos crezca significativamente.
+    [COMPLETADO] TypeScript strict mode — ya habilitado en tsconfig.json
+    [COMPLETADO] Structured logging — logger.ts con clasificacion de errores
+    [COMPLETADO] Manejo de fechas timezone-aware — dayjs + locale es + utils centralizados
+    [COMPLETADO] IVA rate centralizado — IVA_RATE exportado desde utils/invoice.ts
+    [COMPLETADO] Retry logic — React Query retry: 2 con backoff exponencial
+    [COMPLETADO] fetchWithTimeout — todas las mutaciones migradas, timeout 15s escrituras / 10s deletes
+    [COMPLETADO] Code splitting — modals pesados con next/dynamic (ssr: false)
+    [COMPLETADO] Optimistic updates — archive/unarchive con rollback en error
+    [COMPLETADO] Security headers — X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy
 
-    - Paginacion cursor-based (cuando > 1000 registros por entidad)
-    - N+1 query optimization con Drizzle 'with' eager loading
-    - Rate limiting en APIs (cuando haya riesgo de abuso)
-    - Structured logging con Pino/Winston
-    - Code splitting / dynamic imports para modals pesados
-    - HTTP caching strategy (Cache-Control headers)
-    - CSRF protection (cuando app sea mas publica)
-    - Optimistic updates en React Query
-    - Retry logic para requests fallidos
-    - Habilitar TypeScript strict mode
-    - IVA rate configurable desde settings (actualmente hardcoded 21%)
-    - Estandarizar manejo de fechas (timezone-aware)
+    [DIFERIDO] Paginacion cursor-based — <1000 registros, innecesario por ahora
+    [DIFERIDO] Rate limiting — app interna detras de auth, sin riesgo de abuso
+    [DIFERIDO] CSRF protection — Supabase usa cookies SameSite, protegido por defecto
+    [DIFERIDO] HTTP caching (Cache-Control) — prematuro para app interna
+    [DIFERIDO] N+1 query optimization — impacto negligible en 2 rutas poco usadas
 
 ===============================================================================
                               FIN DEL ROADMAP

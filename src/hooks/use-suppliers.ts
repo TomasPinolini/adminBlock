@@ -34,10 +34,11 @@ export function useCreateSupplier() {
 
   return useMutation({
     mutationFn: async (data: Omit<NewSupplier, "id" | "createdAt" | "updatedAt" | "isActive">) => {
-      const res = await fetch("/api/suppliers", {
+      const res = await fetchWithTimeout("/api/suppliers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        timeout: 15000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -60,10 +61,11 @@ export function useUpdateSupplier() {
       id,
       ...data
     }: Partial<Supplier> & { id: string }) => {
-      const res = await fetch(`/api/suppliers/${id}`, {
+      const res = await fetchWithTimeout(`/api/suppliers/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        timeout: 15000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -83,8 +85,9 @@ export function useDeleteSupplier() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/suppliers/${id}`, {
+      const res = await fetchWithTimeout(`/api/suppliers/${id}`, {
         method: "DELETE",
+        timeout: 10000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -144,10 +147,11 @@ export function useAddSupplierMaterial() {
       currentPrice?: string
       notes?: string
     }) => {
-      const res = await fetch("/api/supplier-materials", {
+      const res = await fetchWithTimeout("/api/supplier-materials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        timeout: 15000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -170,10 +174,11 @@ export function useUpdateSupplierMaterial() {
       id,
       ...data
     }: { id: string; currentPrice?: string; notes?: string }) => {
-      const res = await fetch(`/api/supplier-materials/${id}`, {
+      const res = await fetchWithTimeout(`/api/supplier-materials/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        timeout: 15000,
       })
       if (!res.ok) {
         const error = await res.json()
@@ -193,8 +198,9 @@ export function useRemoveSupplierMaterial() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/supplier-materials/${id}`, {
+      const res = await fetchWithTimeout(`/api/supplier-materials/${id}`, {
         method: "DELETE",
+        timeout: 10000,
       })
       if (!res.ok) {
         const error = await res.json()

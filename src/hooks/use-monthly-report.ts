@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { fetchWithTimeout } from "@/lib/utils/fetch-with-timeout"
 
 interface MonthlyOrder {
   id: string
@@ -74,7 +75,7 @@ export function useMonthlyReport(year: number, month: number) {
   return useQuery<MonthlyReportResponse>({
     queryKey: ["monthly-report", year, month],
     queryFn: async () => {
-      const res = await fetch(`/api/reports/monthly?year=${year}&month=${month}`)
+      const res = await fetchWithTimeout(`/api/reports/monthly?year=${year}&month=${month}`)
       if (!res.ok) throw new Error("Error al obtener reporte del mes")
       return res.json()
     },
@@ -86,7 +87,7 @@ export function useMonthlyExpenses(year: number, month: number) {
   return useQuery<MonthlyExpense[]>({
     queryKey: ["monthly-expenses", year, month],
     queryFn: async () => {
-      const res = await fetch(`/api/monthly-expenses?year=${year}&month=${month}`)
+      const res = await fetchWithTimeout(`/api/monthly-expenses?year=${year}&month=${month}`)
       if (!res.ok) throw new Error("Error al obtener gastos")
       return res.json()
     },
@@ -98,10 +99,11 @@ export function useCreateExpense() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: CreateExpenseData) => {
-      const res = await fetch("/api/monthly-expenses", {
+      const res = await fetchWithTimeout("/api/monthly-expenses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        timeout: 15000,
       })
       if (!res.ok) {
         const err = await res.json()
@@ -121,10 +123,11 @@ export function useUpdateExpense() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: UpdateExpenseData & { id: string }) => {
-      const res = await fetch(`/api/monthly-expenses/${id}`, {
+      const res = await fetchWithTimeout(`/api/monthly-expenses/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        timeout: 15000,
       })
       if (!res.ok) {
         const err = await res.json()
@@ -142,8 +145,9 @@ export function useDeleteExpense() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/monthly-expenses/${id}`, {
+      const res = await fetchWithTimeout(`/api/monthly-expenses/${id}`, {
         method: "DELETE",
+        timeout: 10000,
       })
       if (!res.ok) {
         const err = await res.json()

@@ -3,14 +3,16 @@
 export const dynamic = "force-dynamic"
 
 import { useState } from "react"
+import nextDynamic from "next/dynamic"
 import { Plus, Search, Users, Truck, Package, Layers } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { RouteErrorBoundary } from "@/components/error-boundary-route"
 import { useUIStore } from "@/stores/ui-store"
 import { ClientList } from "@/components/clients/client-list"
-import { ClientFormModal } from "@/components/clients/client-form-modal"
-import { ClientOrdersModal } from "@/components/clients/client-orders-modal"
+
+const ClientFormModal = nextDynamic(() => import("@/components/clients/client-form-modal").then(m => ({ default: m.ClientFormModal })), { ssr: false })
+const ClientOrdersModal = nextDynamic(() => import("@/components/clients/client-orders-modal").then(m => ({ default: m.ClientOrdersModal })), { ssr: false })
 import { ClientStats } from "@/components/clients/client-stats"
 import { SuppliersPanel } from "@/components/suppliers/suppliers-panel"
 import { MaterialsPanel } from "@/components/materials/materials-panel"

@@ -7,6 +7,7 @@ import { sendWhatsAppBackground, whatsappTemplates } from "@/lib/whatsapp"
 import { isPaymentNotificationEnabled } from "@/lib/settings"
 import { logApiError } from "@/lib/logger"
 import { logActivity } from "@/lib/activity"
+import { IVA_RATE } from "@/lib/utils/invoice"
 import type { PaymentStatus } from "@/lib/db/schema"
 
 export async function POST(
@@ -92,7 +93,6 @@ export async function POST(
 
     // Calculate IVA breakdown based on invoice type
     const orderPrice = Number(order.price || 0)
-    const IVA_RATE = 0.21
     let subtotal: string | null = null
     let taxAmount: string | null = null
 
