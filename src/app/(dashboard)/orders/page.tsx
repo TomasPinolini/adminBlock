@@ -24,6 +24,7 @@ import { OrderList } from "@/components/orders/order-list"
 import { DashboardStats } from "@/components/orders/dashboard-stats"
 
 const OrderFormModal = nextDynamic(() => import("@/components/orders/order-form-modal").then(m => ({ default: m.OrderFormModal })), { ssr: false })
+const KanbanBoard = nextDynamic(() => import("@/components/orders/kanban").then(m => ({ default: m.KanbanBoard })), { ssr: false })
 import { QuickFilters } from "@/components/orders/quick-filters"
 
 export default function OrdersPage() {
@@ -124,8 +125,13 @@ export default function OrdersPage() {
           </Button>
         </div>
 
-        {/* Orders list */}
-        <OrderList searchQuery={searchQuery} />
+        {/* Orders list — mobile: card list, desktop: kanban board */}
+        <div className="lg:hidden">
+          <OrderList searchQuery={searchQuery} />
+        </div>
+        <div className="hidden lg:block">
+          <KanbanBoard searchQuery={searchQuery} />
+        </div>
       </div>
 
       <OrderFormModal />

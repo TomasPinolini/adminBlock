@@ -55,7 +55,74 @@
       "WebFetch(domain:adminblock.vercel.app)",
       "WebFetch(domain:admin-block-six.vercel.app)",
       "Bash(git stash pop:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(python:*)",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__execute_sql",
+      "mcp__supabase__apply_migration",
+      "Bash(npx kill-port:*)",
+      "Bash(git reset:*)",
+      "mcp__supabase__list_migrations",
+      "Bash(npx playwright install:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase"
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/db-push-guard.js",
+            "statusMessage": "Checking DB operation safety..."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/schema-sentinel.js",
+            "statusMessage": "Checking for schema changes..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/eslint-fix.js",
+            "timeout": 30,
+            "statusMessage": "Running ESLint auto-fix..."
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/tsc-check.js",
+            "timeout": 60,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/build-check.js",
+            "timeout": 120,
+            "statusMessage": "Validating build..."
+          }
+        ]
+      }
     ]
   }
 }
