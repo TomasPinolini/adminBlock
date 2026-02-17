@@ -207,7 +207,10 @@ WHATSAPP:
 FACTURACIÓN:
   - ✅ Implementado: Factura A (con IVA 21%), B/C, NC, ND, Recibos, variantes electrónicas
   - ✅ Implementado: Generación de PDFs (jsPDF + AutoTable)
-  - Pendiente: Integración AFIP (factura electrónica)
+  - ✅ Implementado: Infraestructura AFIP — auto-numeración atómica de facturas (XXXXX-XXXXXXXX),
+    consulta de CUIT vía API pública, configuración de datos fiscales en Ajustes
+    (razón social, CUIT, domicilio fiscal, condición IVA, punto de venta, inicio actividades)
+  - Pendiente: Factura electrónica con CAE (requiere certificado digital AFIP)
 
 ================================================================================
 6. PROBLEMAS QUE RESUELVE ADMINBLOCK

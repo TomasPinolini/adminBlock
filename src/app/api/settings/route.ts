@@ -13,6 +13,12 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   "email.auto.quoted": "false",
   "email.auto.ready": "false",
   "admin.email": "",
+  "afip.razon_social": "",
+  "afip.cuit": "",
+  "afip.domicilio_fiscal": "",
+  "afip.condicion_iva": "",
+  "afip.punto_venta": "00001",
+  "afip.inicio_actividades": "",
 }
 
 // Only these keys can be written via the API

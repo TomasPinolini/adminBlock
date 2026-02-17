@@ -1,10 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import dynamic from "next/dynamic"
 import { MessageCircle, Mail, Bell, BellOff, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
+
+const AFIPSettings = dynamic(() => import("@/components/settings/afip-settings").then(m => ({ default: m.AFIPSettings })), { ssr: false })
 
 interface NotificationSetting {
   key: string
@@ -265,6 +268,13 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* AFIP Settings Section */}
+      <AFIPSettings
+        settings={settings}
+        onSave={saveSetting}
+        saving={saving}
+      />
 
       {/* Info Box */}
       <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950">

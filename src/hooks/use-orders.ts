@@ -11,6 +11,8 @@ interface FetchOrdersParams {
   serviceType?: string
   clientId?: string
   includeArchived?: boolean
+  startDate?: string
+  endDate?: string
 }
 
 async function fetchOrders(params?: FetchOrdersParams): Promise<OrderWithClient[]> {
@@ -19,6 +21,8 @@ async function fetchOrders(params?: FetchOrdersParams): Promise<OrderWithClient[
   if (params?.serviceType) searchParams.set("serviceType", params.serviceType)
   if (params?.clientId) searchParams.set("clientId", params.clientId)
   if (params?.includeArchived) searchParams.set("includeArchived", "true")
+  if (params?.startDate) searchParams.set("startDate", params.startDate)
+  if (params?.endDate) searchParams.set("endDate", params.endDate)
 
   const res = await fetchWithTimeout(`/api/orders?${searchParams}`, { timeout: 15000 })
   if (!res.ok) throw new Error("Error al obtener pedidos")

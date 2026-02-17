@@ -15,6 +15,8 @@ export async function GET(request: NextRequest) {
     const serviceType = searchParams.get("serviceType")
     const clientId = searchParams.get("clientId")
     const includeArchived = searchParams.get("includeArchived") === "true"
+    const startDate = searchParams.get("startDate")
+    const endDate = searchParams.get("endDate")
 
     // Build WHERE conditions
     const conditions: SQL[] = []
@@ -29,6 +31,12 @@ export async function GET(request: NextRequest) {
     }
     if (serviceType && serviceType !== "all") {
       conditions.push(eq(orders.serviceType, serviceType))
+    }
+    if (startDate) {
+      conditions.push(sql`${orders.dueDate} >= ${startDate}`)
+    }
+    if (endDate) {
+      conditions.push(sql`${orders.dueDate} <= ${endDate}`)
     }
 
     const result = await db

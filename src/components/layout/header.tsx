@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
 import { createClient } from "@/lib/supabase/client"
+import { SearchTrigger } from "@/components/search/search-trigger"
 
 export function Header() {
   const router = useRouter()
@@ -31,15 +32,18 @@ export function Header() {
       {/* Desktop spacer */}
       <div className="hidden lg:block" />
 
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleSignOut}
-        className="h-9 px-3"
-      >
-        <LogOut className="h-4 w-4 lg:mr-2" />
-        <span className="hidden lg:inline">Salir</span>
-      </Button>
+      <div className="flex items-center gap-2">
+        <SearchTrigger />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleSignOut}
+          className="h-9 px-3"
+        >
+          <LogOut className="h-4 w-4 lg:mr-2" />
+          <span className="hidden lg:inline">Salir</span>
+        </Button>
+      </div>
       <ConfirmDialog />
     </header>
   )

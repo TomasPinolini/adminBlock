@@ -22,7 +22,11 @@
  14. Reportes mensuales y exportacion
  15. Los filtros rapidos
  16. Ajustes (configuracion)
- 17. Tips y consejos
+ 17. Calendario de entregas
+ 18. Busqueda rapida (Ctrl+K)
+ 19. Seleccion multiple (acciones en lote)
+ 20. Datos fiscales AFIP
+ 21. Tips y consejos
 
 ================================================================================
 1. COMO ENTRAR A LA APLICACION
@@ -919,7 +923,218 @@ NOTA IMPORTANTE:
   notificaciones automaticas al cambiar estados.
 
 ================================================================================
-17. TIPS Y CONSEJOS
+17. CALENDARIO DE ENTREGAS
+================================================================================
+
+El Calendario muestra todos los pedidos que tienen fecha de entrega, organizados
+visualmente por dia. Sirve para planificar el trabajo de la semana o el mes.
+
+COMO LLEGAR:
+  - En la computadora: Click en "Calendario" en el menu de la izquierda
+
+DOS VISTAS DISPONIBLES:
+-----------------------
+
+  Arriba hay botones para elegir la vista:
+
+  [ Mes ]  [ Semana ]                       [ < ]  Febrero 2026  [ > ]  [ Hoy ]
+
+VISTA MENSUAL:
+  Se ve una grilla con los dias del mes (como un calendario comun).
+  Cada dia muestra los pedidos con pastillas de colores:
+
+  +-------+-------+-------+-------+-------+-------+-------+
+  |  Lun  |  Mar  |  Mie  |  Jue  |  Vie  |  Sab  |  Dom  |
+  +-------+-------+-------+-------+-------+-------+-------+
+  |       |       |       |       |  14   |  15   |       |
+  |       |       |       |       | Juan  | Maria |       |
+  |       |       |       |       | (azul)| (verd)|       |
+  +-------+-------+-------+-------+-------+-------+-------+
+
+  * En el celular, los dias muestran puntos de colores en vez de nombres
+    (para que entre todo en la pantalla).
+
+VISTA SEMANAL:
+  Se ve una lista con los 7 dias de la semana.
+  Cada dia muestra los pedidos como tarjetas compactas con el nombre
+  del cliente, el servicio y el estado.
+
+COLORES:
+--------
+  Cada pedido tiene un color segun su estado:
+
+  * AZUL     = Cotizado / Aprobado (por hacer)
+  * AMARILLO = En proceso (trabajando)
+  * VERDE    = Listo (terminado, esperando retiro)
+  * ROJO     = Vencido (fecha pasada, sin entregar)
+
+TOCAR UN PEDIDO:
+  Al tocar una pastilla o tarjeta se abre la ventana de edicion del pedido,
+  igual que en la pantalla de Pedidos. Podes cambiar estado, registrar pago, etc.
+
+NAVEGACION:
+  * Flechas < > para ir al mes/semana anterior o siguiente
+  * Boton "Hoy" para volver al dia actual rapidamente
+
+================================================================================
+18. BUSQUEDA RAPIDA (Ctrl+K)
+================================================================================
+
+AdminBlock tiene un buscador rapido que sirve para encontrar pedidos, clientes
+y acciones sin tener que navegar por los menus.
+
+COMO ABRIRLO:
+-------------
+  * En la computadora: Presiona Ctrl+K (o Cmd+K en Mac)
+  * Tambien podes tocar el boton "Buscar..." en la barra superior (computadora)
+
+  Se abre una ventana en el centro de la pantalla:
+
+  +-------------------------------------------------------------+
+  |  Buscar pedidos, clientes o acciones...                      |
+  |  [ _____________________________________ ]                   |
+  |  -----------------------------------------------------------  |
+  |                                                              |
+  |  PEDIDOS                                                     |
+  |  > Juan Perez - Tesis (En proceso)                          |
+  |  > Maria Lopez - Calcos (Listo)                             |
+  |                                                              |
+  |  CLIENTES                                                    |
+  |  > Juan Perez                                                |
+  |  > Imprenta Norte S.A.                                      |
+  |                                                              |
+  |  ACCIONES RAPIDAS                                            |
+  |  > + Nuevo pedido                                            |
+  |  > + Nuevo cliente                                           |
+  |  > Ir al cotizador                                           |
+  +-------------------------------------------------------------+
+
+COMO USARLO:
+------------
+  1. Escribi lo que buscas (nombre del cliente, descripcion, etc.)
+  2. Los resultados aparecen agrupados: Pedidos, Clientes, Acciones
+  3. Usa las flechas del teclado para moverte, Enter para seleccionar
+     (o toca directamente con el dedo/mouse)
+
+QUE PASA AL SELECCIONAR:
+  * PEDIDO: Te lleva a la pantalla de Pedidos y abre ese pedido
+  * CLIENTE: Te lleva al Directorio y abre ese cliente
+  * ACCION RAPIDA: Ejecuta la accion (abrir formulario nuevo, etc.)
+
+CONSEJO: Es la forma mas rapida de encontrar algo. Si sabes el nombre
+del cliente o del trabajo, en 2 segundos lo tenes en pantalla.
+
+================================================================================
+19. SELECCION MULTIPLE (ACCIONES EN LOTE)
+================================================================================
+
+Cuando necesitas hacer lo mismo con varios pedidos a la vez (archivar,
+cambiar estado, o eliminar), podes seleccionarlos y aplicar la accion
+de una sola vez.
+
+COMO ACTIVAR LA SELECCION:
+--------------------------
+
+PASO 1: En la pantalla de Pedidos, toca el boton "Seleccionar"
+        (aparece arriba, junto a los filtros)
+
+PASO 2: Aparecen casillas de seleccion en cada pedido:
+
+  +-------------------------------------------------------------+
+  | [x] JUAN PEREZ - Tesis                     En proceso       |
+  | [ ] MARIA LOPEZ - Calcos                   Listo            |
+  | [x] PEDRO GARCIA - Ploteo                  Cotizado         |
+  +-------------------------------------------------------------+
+
+  * Toca la casilla de cada pedido que quieras seleccionar
+  * "Seleccionar todo" marca todos los pedidos visibles
+  * "Deseleccionar todo" limpia la seleccion
+
+PASO 3: Al seleccionar pedidos, aparece una barra fija abajo:
+
+  +-------------------------------------------------------------+
+  |  2 seleccionados    [ Archivar ]  [ Estado ]  [ Eliminar ]  |
+  +-------------------------------------------------------------+
+
+ACCIONES DISPONIBLES:
+---------------------
+
+  * ARCHIVAR: Mueve los pedidos seleccionados al archivo
+    (desaparecen de la lista principal pero no se borran)
+
+  * CAMBIAR ESTADO: Cambia el estado de todos los seleccionados
+    a uno nuevo (ej: pasar varios a "En proceso" de una vez)
+
+  * ELIMINAR: Borra los pedidos seleccionados (pide confirmacion)
+
+LIMITES:
+  * Se pueden seleccionar hasta 50 pedidos a la vez
+  * Las acciones destructivas (eliminar) siempre piden confirmacion
+
+PARA SALIR DEL MODO SELECCION:
+  Toca de nuevo el boton "Seleccionar" o presiona Escape.
+
+================================================================================
+20. DATOS FISCALES AFIP
+================================================================================
+
+En la seccion de Ajustes hay una parte dedicada a los datos fiscales de AFIP.
+Esto sirve para que las facturas se generen con la informacion correcta.
+
+COMO LLEGAR: Ajustes > seccion "Datos Fiscales AFIP"
+
+CAMPOS CONFIGURABLES:
+---------------------
+
+  +-------------------------------------------------------------+
+  |  DATOS FISCALES AFIP                                         |
+  |  -----------------------------------------------------------  |
+  |                                                              |
+  |  Razon Social                                                |
+  |  [ Block Imprenta                          ]                 |
+  |                                                              |
+  |  CUIT                                                        |
+  |  [ 20-12345678-9          ] [ Verificar ]                   |
+  |                                                              |
+  |  Domicilio Fiscal                                            |
+  |  [ Av. Corrientes 1234, Rosario           ]                 |
+  |                                                              |
+  |  Condicion IVA                                               |
+  |  [ Responsable Inscripto  v ]                                |
+  |                                                              |
+  |  Punto de Venta                                              |
+  |  [ 00001                   ]                                 |
+  |                                                              |
+  |  Inicio de Actividades                                       |
+  |  [ 01/01/2010              ]                                 |
+  |                                                              |
+  |            [ Guardar ]                                       |
+  +-------------------------------------------------------------+
+
+VERIFICAR CUIT:
+  Al tocar "Verificar", el sistema consulta la base de datos de AFIP
+  y auto-completa la razon social y condicion IVA si encuentra el CUIT.
+  Esto sirve para verificar que los datos sean correctos.
+
+NUMERACION AUTOMATICA DE FACTURAS:
+-----------------------------------
+  El sistema lleva la numeracion de facturas automaticamente.
+  Formato: XXXXX-XXXXXXXX (Punto de Venta - Numero)
+  Ejemplo: 00001-00000045
+
+  Al crear una factura, podes:
+  * Tocar "Auto-asignar" para usar el siguiente numero disponible
+  * O escribir el numero manualmente si necesitas
+
+  Tipos de comprobante con numeracion automatica:
+  * Factura A, B, C, C Electronica
+
+IMPORTANTE: Esta infraestructura es para la numeracion interna.
+La factura electronica con CAE de AFIP requiere certificado digital
+y se implementara en el futuro.
+
+================================================================================
+21. TIPS Y CONSEJOS
 ================================================================================
 
 > REVISA EL DASHBOARD TODOS LOS DIAS

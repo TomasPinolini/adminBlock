@@ -1,5 +1,6 @@
 import { Sidebar, MobileNav } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
+import { CommandPalette } from "@/components/search/command-palette"
 
 export default function DashboardLayout({
   children,
@@ -16,6 +17,7 @@ export default function DashboardLayout({
         </main>
       </div>
       <MobileNav />
+      <CommandPalette />
     </div>
   )
 }

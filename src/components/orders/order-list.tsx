@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog"
-import { MoreVertical, Trash2, MessageCircle, Mail, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone, History, FileDown, FileText } from "lucide-react"
+import { MoreVertical, Trash2, MessageCircle, Mail, Send, Copy, Receipt, CheckCircle, Clock, Archive, ArchiveRestore, Edit, Phone, History, FileDown, FileText, CheckSquare, Square, ListChecks } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -39,6 +39,7 @@ const EditOrderModal = dynamic(() => import("./edit-order-modal").then(m => ({ d
 const ActivityModal = dynamic(() => import("./activity-modal").then(m => ({ default: m.ActivityModal })), { ssr: false })
 const ComprobantesModal = dynamic(() => import("./comprobantes-modal").then(m => ({ default: m.ComprobantesModal })), { ssr: false })
 const EmailComposeModal = dynamic(() => import("@/components/email-compose-modal").then(m => ({ default: m.EmailComposeModal })), { ssr: false })
+import { BulkActionBar } from "./bulk-action-bar"
 import { cn } from "@/lib/utils"
 import { generateInvoicePDF, type InvoicePDFData } from "@/lib/utils/pdf"
 
@@ -71,9 +72,12 @@ interface OrderCardProps {
   onHistory: (order: OrderWithClient) => void
   onEmail: (order: OrderWithClient) => void
   onComprobantes: (order: OrderWithClient) => void
+  selectionMode?: boolean
+  isSelected?: boolean
+  onToggleSelect?: (id: string) => void
 }
 
-function OrderCard({ order, onPayment, onEdit, onHistory, onEmail, onComprobantes }: OrderCardProps) {
+function OrderCard({ order, onPayment, onEdit, onHistory, onEmail, onComprobantes, selectionMode, isSelected, onToggleSelect }: OrderCardProps) {
   const { confirm, ConfirmDialog } = useConfirmDialog()
   const { data: services = [] } = useServices()
   const updateOrder = useUpdateOrder()
@@ -186,8 +190,20 @@ function OrderCard({ order, onPayment, onEdit, onHistory, onEmail, onComprobante
 
 
   return (
-    <div className="rounded-lg border bg-background p-3 sm:p-4">
+    <div className={cn("rounded-lg border bg-background p-3 sm:p-4", isSelected && "ring-2 ring-primary")}>
       <div className="flex items-start justify-between gap-2 sm:gap-3">
+        {selectionMode && (
+          <button
+            onClick={() => onToggleSelect?.(order.id)}
+            className="mt-1 shrink-0"
+          >
+            {isSelected ? (
+              <CheckSquare className="h-5 w-5 text-primary" />
+            ) : (
+              <Square className="h-5 w-5 text-muted-foreground" />
+            )}
+          </button>
+        )}
         <div className="min-w-0 flex-1">
           {/* Client name */}
           <h3 className="font-medium text-sm sm:text-base">
@@ -453,11 +469,32 @@ interface OrderListProps {
 
 export function OrderList({ searchQuery = "" }: OrderListProps) {
   const { statusFilter, serviceFilter, quickFilter, showArchived } = useUIStore()
+  const focusOrderId = useUIStore((s) => s.focusOrderId)
+  const setFocusOrderId = useUIStore((s) => s.setFocusOrderId)
   const [paymentOrder, setPaymentOrder] = useState<OrderWithClient | null>(null)
   const [editingOrder, setEditingOrder] = useState<OrderWithClient | null>(null)
   const [historyOrder, setHistoryOrder] = useState<OrderWithClient | null>(null)
   const [emailOrder, setEmailOrder] = useState<OrderWithClient | null>(null)
   const [comprobantesOrder, setComprobantesOrder] = useState<OrderWithClient | null>(null)
+  const [selectionMode, setSelectionMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }
+
+  const clearSelection = () => {
+    setSelectionMode(false)
+    setSelectedIds(new Set())
+  }
 
   const getEmailDefaults = (order: OrderWithClient) => {
     const name = order.client?.name?.split(" ")[0] || "cliente"
@@ -480,6 +517,17 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
     serviceType: serviceFilter !== "all" ? serviceFilter : undefined,
     includeArchived: showArchived,
   })
+
+  // Auto-open order from search/command palette
+  useEffect(() => {
+    if (focusOrderId && orders.length > 0) {
+      const order = orders.find((o) => o.id === focusOrderId)
+      if (order) {
+        setEditingOrder(order)
+        setFocusOrderId(null)
+      }
+    }
+  }, [focusOrderId, orders, setFocusOrderId])
 
   // Apply quick filters and search client-side
   const filteredOrders = orders.filter((order) => {
@@ -554,6 +602,37 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
 
   return (
     <>
+      <div className="flex items-center justify-between mb-3">
+        <Button
+          variant={selectionMode ? "default" : "outline"}
+          size="sm"
+          onClick={() => {
+            if (selectionMode) {
+              clearSelection()
+            } else {
+              setSelectionMode(true)
+            }
+          }}
+        >
+          <ListChecks className="h-4 w-4 mr-1.5" />
+          {selectionMode ? "Cancelar" : "Seleccionar"}
+        </Button>
+        {selectionMode && filteredOrders.length > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              if (selectedIds.size === filteredOrders.length) {
+                setSelectedIds(new Set())
+              } else {
+                setSelectedIds(new Set(filteredOrders.map(o => o.id)))
+              }
+            }}
+          >
+            {selectedIds.size === filteredOrders.length ? "Deseleccionar todo" : "Seleccionar todo"}
+          </Button>
+        )}
+      </div>
       <div className="space-y-3">
         {filteredOrders.map((order) => (
           <OrderCard
@@ -564,6 +643,9 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
             onHistory={setHistoryOrder}
             onEmail={setEmailOrder}
             onComprobantes={setComprobantesOrder}
+            selectionMode={selectionMode}
+            isSelected={selectedIds.has(order.id)}
+            onToggleSelect={toggleSelect}
           />
         ))}
       </div>
@@ -604,6 +686,15 @@ export function OrderList({ searchQuery = "" }: OrderListProps) {
         open={!!comprobantesOrder}
         onOpenChange={(open) => !open && setComprobantesOrder(null)}
       />
+
+      {selectionMode && selectedIds.size > 0 && (
+        <BulkActionBar
+          selectedCount={selectedIds.size}
+          selectedIds={selectedIds}
+          onClear={clearSelection}
+          onDone={clearSelection}
+        />
+      )}
     </>
   )
 }

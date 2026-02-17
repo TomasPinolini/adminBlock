@@ -10,6 +10,7 @@ import {
   FileBarChart,
   Settings as SettingsIcon,
   BookCopy,
+  CalendarDays,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -47,6 +48,12 @@ const navItems = [
     mobileLabel: "Cotizar",
     icon: Calculator,
     showOnMobile: true,
+  },
+  {
+    href: "/calendar",
+    label: "Calendario",
+    icon: CalendarDays,
+    showOnMobile: false,
   },
   {
     href: "/reports",

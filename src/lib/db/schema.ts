@@ -184,6 +184,15 @@ export const appSettings = pgTable("app_settings", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
+// Invoice counters for auto-numbering
+export const invoiceCounters = pgTable("invoice_counters", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  invoiceType: text("invoice_type").notNull(),
+  puntoVenta: text("punto_venta").notNull().default("00001"),
+  nextNumber: integer("next_number").notNull().default(1),
+  updatedAt: timestamp("updated_at").defaultNow(),
+})
+
 // Suppliers (proveedores)
 export const suppliers = pgTable("suppliers", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -482,6 +491,9 @@ export type NewQuoteMaterial = typeof quoteMaterials.$inferInsert
 
 export type MonthlyExpense = typeof monthlyExpenses.$inferSelect
 export type NewMonthlyExpense = typeof monthlyExpenses.$inferInsert
+
+export type InvoiceCounter = typeof invoiceCounters.$inferSelect
+export type NewInvoiceCounter = typeof invoiceCounters.$inferInsert
 
 export type ServiceType = string // Dynamic - loaded from services table
 export type OrderStatus = (typeof orderStatusEnum.enumValues)[number]

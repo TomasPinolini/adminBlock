@@ -29,6 +29,14 @@ interface UIState {
   setEditingClient: (client: Client | null) => void
   viewingClientOrders: Client | null
   setViewingClientOrders: (client: Client | null) => void
+
+  // Command palette
+  commandPaletteOpen: boolean
+  setCommandPaletteOpen: (open: boolean) => void
+
+  // Focus order (for search navigation)
+  focusOrderId: string | null
+  setFocusOrderId: (id: string | null) => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -57,4 +65,12 @@ export const useUIStore = create<UIState>((set) => ({
   setEditingClient: (client) => set({ editingClient: client, createClientModalOpen: client !== null }),
   viewingClientOrders: null,
   setViewingClientOrders: (client) => set({ viewingClientOrders: client }),
+
+  // Command palette
+  commandPaletteOpen: false,
+  setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
+
+  // Focus order
+  focusOrderId: null,
+  setFocusOrderId: (id) => set({ focusOrderId: id }),
 }))

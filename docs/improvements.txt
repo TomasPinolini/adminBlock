@@ -29,10 +29,13 @@
        - Reporte mensual PDF (ventas + gastos + balance)
        - Business name/address configurables via env vars
 
-    4. Calendario de Entregas
+    4. Calendario de Entregas  [COMPLETADO]
        - Vista calendario de pedidos por fecha de entrega (dueDate)
-       - Vista semanal y mensual
-       - Drag & drop para reprogramar entregas
+       - Vista mensual (CSS grid) y semanal (lista)
+       - Navegacion por mes/semana, boton "Hoy"
+       - Color coding por estado (azul/amarillo/verde/rojo)
+       - Click en pedido abre modal de edicion
+       - Mobile: dots compactos en lugar de pills
 
     5. Dashboard Mejorado  [COMPLETADO]
        - Graficos de ventas vs gastos por mes (Recharts)
@@ -41,17 +44,22 @@
        - Comparacion mes actual vs mes anterior
        - KPI cards con porcentaje de cambio
 
-    6. Operaciones en Lote (Bulk Actions)
-       - Seleccionar multiples pedidos -> archivar, cambiar estado
-       - Seleccionar multiples clientes -> exportar, etiquetar
-       - Checkbox en listas + barra de acciones flotante
+    6. Operaciones en Lote (Bulk Actions)  [COMPLETADO]
+       - Seleccionar multiples pedidos -> archivar, cambiar estado, eliminar
+       - Boton "Seleccionar" activa modo seleccion con checkboxes
+       - "Seleccionar todo" / "Deseleccionar todo"
+       - Barra de acciones flotante fija al pie con confirmacion
+       - API bulk con query atomica WHERE id IN (...), max 50 IDs
+       - Validacion Zod para acciones masivas
 
-    7. Busqueda Global
-       - Barra de busqueda universal (Ctrl+K / Cmd+K)
-       - Buscar en clientes, pedidos, cotizaciones, proveedores
-       - Resultados agrupados por tipo con navegacion rapida
-       - Libreria cmdk ya instalada, infraestructura presente
-       NOTA: Buscador por cliente en cotizaciones ya implementado
+    7. Busqueda Global  [COMPLETADO]
+       - Command palette con Ctrl+K / Cmd+K (cmdk + shadcn Command)
+       - Busqueda client-side desde cache de React Query (sin API extra)
+       - Resultados agrupados: Pedidos, Clientes, Acciones rapidas
+       - Seleccionar pedido navega a /orders y abre EditOrderModal
+       - Seleccionar cliente navega a /clients y abre edicion
+       - Acciones rapidas: Nuevo pedido, Nuevo cliente, Ir a cotizador
+       - SearchTrigger visible en header desktop
 
     8. Gastos Recurrentes
        - Marcar gastos como recurrentes (mensual: alquiler, EPE, etc.)
@@ -110,11 +118,16 @@
         - Exportar libro de IVA ventas/compras
         - Backup completo de datos en JSON
 
-    18. Integracion con AFIP
-        - Factura electronica automatica
-        - Consulta de CUIT
-        - Generacion de CAE
-        - Requiere certificado digital
+    18. Integracion con AFIP (Infraestructura)  [COMPLETADO]
+        - Tabla invoice_counters con auto-numeracion atomica
+        - API next-number: POST consume, GET peek sin consumir
+        - Consulta de CUIT via proxy a tangofactura.com (gratis, sin auth)
+        - Seccion AFIP en Ajustes: razon social, CUIT, domicilio, condicion IVA, punto de venta, inicio actividades
+        - Verificar CUIT auto-completa datos de AFIP
+        - Formato factura XXXXX-XXXXXXXX (PtoVta-Numero)
+        - InvoiceNumberField con boton "Auto-asignar"
+        - PDF actualizado para nuevo formato de numeracion
+        PENDIENTE: Factura electronica (CAE) requiere certificado digital
 
 ===============================================================================
  COMPLETADO (resumen)
@@ -122,8 +135,12 @@
 
     * Auditoria / Log de Actividad (#2)
     * Generacion de PDFs (#3) - jsPDF + AutoTable
+    * Calendario de Entregas (#4) - Vista mes/semana, pills por estado, click-to-edit
     * Dashboard Mejorado (#5) - Recharts, KPIs, rankings
+    * Operaciones en Lote (#6) - Seleccion multiple, archivar/estado/eliminar en masa
+    * Busqueda Global (#7) - Command palette Ctrl+K, busqueda client-side
     * Exportacion Avanzada (#17) - Excel, Libro IVA, Backup JSON
+    * Infraestructura AFIP (#18) - Auto-numeracion, CUIT lookup, datos fiscales
     * Termocopiados - Pagina dedicada de carga rapida
     * Email notifications - Resend via Edge Function
     * Automatizaciones (cron) - Auto-archive, daily digest, overdue reminders

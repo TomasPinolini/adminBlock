@@ -65,7 +65,7 @@ export function generateInvoicePDF(data: InvoicePDFData) {
   doc.text(BUSINESS_ADDRESS, margin, y)
 
   const invoiceNum = data.invoiceNumber
-    ? `N° 0000-${data.invoiceNumber.padStart(4, "0")}`
+    ? `N° ${data.invoiceNumber.includes("-") ? data.invoiceNumber : `00001-${data.invoiceNumber.padStart(8, "0")}`}`
     : "Sin número"
   doc.text(invoiceNum, pageWidth - margin, y, { align: "right" })
   y += 6

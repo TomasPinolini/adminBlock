@@ -111,8 +111,32 @@ export function validateCUIT(cuit: string): boolean {
  */
 export function formatCUIT(cuit: string): string {
   const cleaned = cuit.replace(/[-\s]/g, "")
-  
+
   if (cleaned.length !== 11) return cuit
-  
+
   return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 10)}-${cleaned.slice(10)}`
+}
+
+/**
+ * Format invoice number in AFIP format: XXXXX-XXXXXXXX
+ * @param ptoVenta - Punto de venta (padded to 5 digits)
+ * @param number - Invoice number (padded to 8 digits)
+ */
+export function formatInvoiceNumber(ptoVenta: string | number, number: string | number): string {
+  const pv = String(ptoVenta).padStart(5, "0")
+  const num = String(number).padStart(8, "0")
+  return `${pv}-${num}`
+}
+
+/**
+ * Parse an AFIP-formatted invoice number
+ * @returns { puntoVenta, number } or null if invalid
+ */
+export function parseInvoiceNumber(formatted: string): { puntoVenta: string; number: string } | null {
+  const match = formatted.match(/^(\d{1,5})-(\d{1,8})$/)
+  if (!match) return null
+  return {
+    puntoVenta: match[1].padStart(5, "0"),
+    number: match[2].padStart(8, "0"),
+  }
 }
