@@ -196,16 +196,18 @@ PAGOS:
   - Empresas a veces pagan varios pedidos juntos (cuenta corriente informal)
 
 AUDITORÍA:
-  - SÍ se necesita: registrar quién hizo cada acción y cuándo
+  - ✅ Implementado: activity_logs registra quién hizo cada acción y cuándo
+  - UI: ActivityModal con timeline por pedido
 
 WHATSAPP:
-  - Botones manuales: funcionan bien
-  - Mensajes automáticos: requieren Twilio premium (pendiente activar)
-  - Recordatorios a clientes: útil para el futuro
+  - ✅ Botones manuales: funcionan bien
+  - ✅ Mensajes automáticos via Twilio (configurable en Ajustes)
+  - ✅ Recordatorios a clientes vencidos (via email, cron diario)
 
 FACTURACIÓN:
-  - ✅ Implementado: Factura A (con IVA 21%), Factura B/C (monotributo), campos en pedidos
-  - Pendiente: Generación de PDFs, integración AFIP
+  - ✅ Implementado: Factura A (con IVA 21%), B/C, NC, ND, Recibos, variantes electrónicas
+  - ✅ Implementado: Generación de PDFs (jsPDF + AutoTable)
+  - Pendiente: Integración AFIP (factura electrónica)
 
 ================================================================================
 6. PROBLEMAS QUE RESUELVE ADMINBLOCK

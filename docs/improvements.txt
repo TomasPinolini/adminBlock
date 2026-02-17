@@ -1,4 +1,4 @@
-﻿===============================================================================
+===============================================================================
                      ADMINBLOCK - ROADMAP DE MEJORAS
                      Ultima actualizacion: Feb 2026
 ===============================================================================
@@ -24,22 +24,22 @@
  MEDIA PRIORIDAD
 ===============================================================================
 
-    3. Generacion de PDFs
-       - Generar PDF de facturas (Factura A, C) desde pedidos
-       - Generar PDF del reporte mensual (ventas + gastos + balance)
-       - Libreria sugerida: @react-pdf/renderer o jsPDF
+    3. Generacion de PDFs  [COMPLETADO]
+       - Factura A, B, C, NC, ND, Recibos con jsPDF + AutoTable
+       - Reporte mensual PDF (ventas + gastos + balance)
+       - Business name/address configurables via env vars
 
     4. Calendario de Entregas
        - Vista calendario de pedidos por fecha de entrega (dueDate)
        - Vista semanal y mensual
        - Drag & drop para reprogramar entregas
 
-    5. Dashboard Mejorado
-       - Graficos de ventas vs gastos por mes (tendencia)
+    5. Dashboard Mejorado  [COMPLETADO]
+       - Graficos de ventas vs gastos por mes (Recharts)
        - Top clientes por facturacion
        - Servicios mas vendidos
        - Comparacion mes actual vs mes anterior
-       - Libreria sugerida: recharts
+       - KPI cards con porcentaje de cambio
 
     6. Operaciones en Lote (Bulk Actions)
        - Seleccionar multiples pedidos -> archivar, cambiar estado
@@ -50,7 +50,7 @@
        - Barra de busqueda universal (Ctrl+K / Cmd+K)
        - Buscar en clientes, pedidos, cotizaciones, proveedores
        - Resultados agrupados por tipo con navegacion rapida
-       - Libreria sugerida: cmdk
+       - Libreria cmdk ya instalada, infraestructura presente
        NOTA: Buscador por cliente en cotizaciones ya implementado
 
     8. Gastos Recurrentes
@@ -73,11 +73,11 @@
         - Notificaciones push para cambios de estado de pedidos
         - Offline basico: ver datos cacheados sin conexion
 
-    11. WhatsApp Avanzado
+    11. WhatsApp Avanzado  [PARCIALMENTE COMPLETADO]
+        - [COMPLETADO] Enviar recordatorios automaticos a clientes vencidos (via email)
+        - [COMPLETADO] Resumen diario automatico al admin (via email)
         - Recibir comprobantes de pago por WhatsApp
         - Asociar PDFs/imagenes a pedidos por telefono
-        - Enviar recordatorios automaticos a clientes que no retiran
-        - Resumen diario automatico al admin
 
     12. Portal de Cliente (publico)
         - Link publico para que el cliente vea estado de su pedido
@@ -108,13 +108,26 @@
     17. Exportacion Avanzada  [COMPLETADO]
         - Exportar reporte mensual como Excel (formato IVA AFIP)
         - Exportar libro de IVA ventas/compras
-        - Backup completo de datos en JSON/CSV
+        - Backup completo de datos en JSON
 
     18. Integracion con AFIP
         - Factura electronica automatica
         - Consulta de CUIT
         - Generacion de CAE
         - Requiere certificado digital
+
+===============================================================================
+ COMPLETADO (resumen)
+===============================================================================
+
+    * Auditoria / Log de Actividad (#2)
+    * Generacion de PDFs (#3) - jsPDF + AutoTable
+    * Dashboard Mejorado (#5) - Recharts, KPIs, rankings
+    * Exportacion Avanzada (#17) - Excel, Libro IVA, Backup JSON
+    * Termocopiados - Pagina dedicada de carga rapida
+    * Email notifications - Resend via Edge Function
+    * Automatizaciones (cron) - Auto-archive, daily digest, overdue reminders
+    * Mercado Pago - Links de pago desde pedidos
 
 ===============================================================================
  OPTIMIZACIONES TECNICAS (cuando escale el negocio)
