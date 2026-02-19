@@ -179,13 +179,13 @@ export function MaterialsPanel() {
 
       {/* Create/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md short:max-w-xl">
           <DialogHeader>
             <DialogTitle>
               {editingMaterial ? "Editar Material" : "Nuevo Material"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 short:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="material-name">Nombre *</Label>
               <Input
@@ -212,7 +212,7 @@ export function MaterialsPanel() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 short:col-span-2">
               <Label htmlFor="material-notes">Notas (opcional)</Label>
               <Input
                 id="material-notes"
@@ -224,7 +224,7 @@ export function MaterialsPanel() {
               />
             </div>
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-3 pt-2 short:col-span-2">
               <Button
                 type="button"
                 variant="outline"

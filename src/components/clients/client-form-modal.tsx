@@ -121,14 +121,14 @@ export function ClientFormModal() {
 
   return (
     <Dialog open={createClientModalOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md short:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Editar Cliente" : "Nuevo Cliente"}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 short:grid-cols-2 gap-4">
           {/* Client Type Selector */}
-          <div className="space-y-2">
+          <div className="space-y-2 short:col-span-2">
             <Label>Tipo de cliente</Label>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -160,7 +160,7 @@ export function ClientFormModal() {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 short:col-span-2">
             <Label htmlFor="name">
               {clientType === "company" ? "Nombre de la empresa *" : "Nombre *"}
             </Label>
@@ -222,7 +222,7 @@ export function ClientFormModal() {
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 short:col-span-2">
             <Label htmlFor="notes">Notas</Label>
             <Textarea
               id="notes"
@@ -236,7 +236,7 @@ export function ClientFormModal() {
 
           {/* Company selector for individuals (only when creating) */}
           {clientType === "individual" && !isEditing && companies.length > 0 && (
-            <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
+            <div className="space-y-3 rounded-lg border bg-muted/30 p-3 short:col-span-2">
               <div className="space-y-2">
                 <Label>Vincular a empresa (opcional)</Label>
                 <Select
@@ -273,14 +273,14 @@ export function ClientFormModal() {
           )}
 
           {clientType === "company" && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground short:col-span-2">
               Después de crear la empresa, podrás agregar contactos (personas) desde la lista de clientes.
             </p>
           )}
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className="text-sm text-destructive short:col-span-2">{error}</p>}
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-2 short:col-span-2">
             <Button
               type="button"
               variant="outline"

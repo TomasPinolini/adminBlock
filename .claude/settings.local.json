@@ -63,7 +63,9 @@
       "Bash(npx kill-port:*)",
       "Bash(git reset:*)",
       "mcp__supabase__list_migrations",
-      "Bash(npx playwright install:*)"
+      "Bash(npx playwright install:*)",
+      "Bash(done)",
+      "Bash(xargs:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

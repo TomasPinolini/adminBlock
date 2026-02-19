@@ -193,7 +193,7 @@ export function ServicesPanel() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isCreateOpen || !!editingService} onOpenChange={handleCloseDialog}>
-        <DialogContent>
+        <DialogContent className="short:max-w-xl">
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle>
@@ -206,7 +206,7 @@ export function ServicesPanel() {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-4">
+            <div className="grid grid-cols-1 short:grid-cols-2 gap-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="service-name">
                   Nombre interno <span className="text-destructive">*</span>
@@ -240,7 +240,7 @@ export function ServicesPanel() {
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 short:col-span-2">
                 <Label htmlFor="service-description">Descripción (opcional)</Label>
                 <Textarea
                   id="service-description"

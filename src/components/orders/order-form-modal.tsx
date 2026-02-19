@@ -97,12 +97,12 @@ export function OrderFormModal() {
 
   return (
     <Dialog open={createOrderModalOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md short:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nuevo Pedido</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 short:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Cliente *</Label>
             <Combobox
@@ -118,38 +118,6 @@ export function OrderFormModal() {
               <p className="text-sm text-destructive">{errors.clientId.message}</p>
             )}
           </div>
-
-          {/* Person selector for company clients */}
-          {isCompany && (
-            <div className="space-y-2">
-              <Label>Persona (opcional)</Label>
-              <Select
-                value={selectedPersonId || ""}
-                onValueChange={(value) => setValue("personId", value === "none" ? null : value)}
-              >
-                <SelectTrigger className="h-11 lg:h-9">
-                  <SelectValue placeholder="¿Quién hace el pedido?" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin especificar</SelectItem>
-                  {employees.map((employee) => (
-                    <SelectItem key={employee.personId} value={employee.personId}>
-                      {employee.person?.name}
-                      {employee.role && ` (${employee.role})`}
-                    </SelectItem>
-                  ))}
-                  {employees.length === 0 && (
-                    <SelectItem value="no-employees" disabled>
-                      No hay personas - vincúlalas desde Clientes
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Persona de la empresa que hizo el pedido
-              </p>
-            </div>
-          )}
 
           <div className="space-y-2">
             <Label>Tipo de servicio *</Label>
@@ -181,7 +149,39 @@ export function OrderFormModal() {
             )}
           </div>
 
-          <div className="space-y-2">
+          {/* Person selector for company clients */}
+          {isCompany && (
+            <div className="space-y-2 short:col-span-2">
+              <Label>Persona (opcional)</Label>
+              <Select
+                value={selectedPersonId || ""}
+                onValueChange={(value) => setValue("personId", value === "none" ? null : value)}
+              >
+                <SelectTrigger className="h-11 lg:h-9">
+                  <SelectValue placeholder="¿Quién hace el pedido?" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sin especificar</SelectItem>
+                  {employees.map((employee) => (
+                    <SelectItem key={employee.personId} value={employee.personId}>
+                      {employee.person?.name}
+                      {employee.role && ` (${employee.role})`}
+                    </SelectItem>
+                  ))}
+                  {employees.length === 0 && (
+                    <SelectItem value="no-employees" disabled>
+                      No hay personas - vincúlalas desde Clientes
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Persona de la empresa que hizo el pedido
+              </p>
+            </div>
+          )}
+
+          <div className="space-y-2 short:col-span-2">
             <Label htmlFor="description">Descripcion *</Label>
             <Textarea
               id="description"
@@ -196,7 +196,7 @@ export function OrderFormModal() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 short:col-span-2">
             <div className="space-y-2">
               <Label htmlFor="price">Precio</Label>
               <Input
@@ -220,9 +220,9 @@ export function OrderFormModal() {
             </div>
           </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className="text-sm text-destructive short:col-span-2">{error}</p>}
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-2 short:col-span-2">
             <Button
               type="button"
               variant="outline"
